@@ -405,6 +405,8 @@ class StrategyEngine:
         confidence_threshold: float,
         crowded: bool,
         extreme_volatility: bool,
+        llm_direction: str = "none",
+        llm_action: str = "HOLD",
     ) -> tuple[str, str | None, float, str, str]:
         action = "HOLD"
         side = None
@@ -483,6 +485,19 @@ class StrategyEngine:
                 final_reason = "强势下跌但短周期过冷，暂不在最低点追空。"
         else:
             final_reason = "未知市场状态，维持观望。"
+
+        # 高频比赛模式兜底：只要加权分已通过门槛，就不再被状态分支二次拦截
+        if action == "HOLD" and weighted_score >= confidence_threshold:
+            fallback_ratio = clamp(position_ratio * 0.60, settings.min_position_ratio_initial, position_ratio)
+            llm_direction = str(llm_direction or "none").lower()
+            llm_action = str(llm_action or "HOLD").upper()
+            if llm_direction == "buy" or llm_action == "OPEN_LONG":
+                return "OPEN_LONG", "buy", fallback_ratio, "高频比赛兜底做多", f"高频兜底：加权分{weighted_score:.4f}已通过门槛{confidence_threshold:.4f}，按LLM建议做多。"
+            if llm_direction == "sell" or llm_action == "OPEN_SHORT":
+                return "OPEN_SHORT", "sell", fallback_ratio, "高频比赛兜底做空", f"高频兜底：加权分{weighted_score:.4f}已通过门槛{confidence_threshold:.4f}，按LLM建议做空。"
+            if state_name in {"强势上涨", "弱势上涨"} or (state_name == "区间震荡" and obi >= 0):
+                return "OPEN_LONG", "buy", fallback_ratio, "高频比赛兜底做多", f"高频兜底：加权分{weighted_score:.4f}已通过门槛{confidence_threshold:.4f}，按技术偏向补充执行做多。"
+            return "OPEN_SHORT", "sell", fallback_ratio, "高频比赛兜底做空", f"高频兜底：加权分{weighted_score:.4f}已通过门槛{confidence_threshold:.4f}，按技术偏向补充执行做空。"
 
         return action, side, position_ratio, entry_bias, final_reason
 
@@ -691,6 +706,9 @@ class StrategyEngine:
             llm_analysis=llm_analysis,
         )
         weighted_score = safe_float(llm_adjustment.get("adjusted_weighted_score"), weighted_score)
+        llm_trade_advice = llm_analysis.get("trade_advice") or {}
+        llm_direction = str(llm_trade_advice.get("direction") or "none").lower()
+        llm_action = str(llm_trade_advice.get("action") or "HOLD").upper()
 
         action, side, position_ratio, entry_bias, final_reason = self._entry_signal(
             state_name=state_name,
@@ -702,6 +720,8 @@ class StrategyEngine:
             confidence_threshold=confidence_threshold,
             crowded=crowded,
             extreme_volatility=extreme_volatility,
+            llm_direction=llm_direction,
+            llm_action=llm_action,
         )
 
         close_action, close_reason = self._close_signal(
@@ -737,7 +757,8 @@ class StrategyEngine:
             position_ratio = 0.0
             final_reason = f"检测到反向信号，先平掉当前 {position_snapshot['abs_pos']:.2f} 张反向持仓，下一轮开新方向。"
 
-        if close_action is None and action in {"OPEN_LONG", "OPEN_SHORT"} and bool(llm_adjustment.get("should_skip_entry")):
+        strong_entry_signal = weighted_score > confidence_threshold * 1.2
+        if close_action is None and action in {"OPEN_LONG", "OPEN_SHORT"} and bool(llm_adjustment.get("should_skip_entry")) and not strong_entry_signal:
             llm_action = str((llm_analysis.get("trade_advice") or {}).get("action") or "HOLD")
             llm_confidence = safe_float((llm_analysis.get("trade_advice") or {}).get("confidence"))
             action = "HOLD"
