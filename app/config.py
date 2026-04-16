@@ -68,8 +68,8 @@ class Settings:
     fee_buffer_capital_ratio: float = 0.03
     duplicate_entry_cooldown_seconds: int = 180
 
-    single_loss_pct: float = 0.01
-    single_loss_pct_strong_trend: float = 0.008
+    single_loss_pct: float = 0.02
+    single_loss_pct_strong_trend: float = 0.015
     daily_loss_fuse_pct: float = 0.08
     total_drawdown_fuse_pct: float = 0.20
     consecutive_loss_half: int = 4
@@ -86,8 +86,8 @@ class Settings:
     knife_attack_margin_usdt: float = 60.0
     knife_attack_leverage: int = 30
     knife_attack_td_mode: str = "isolated"
-    knife_attack_stop_loss_pct: float = 0.008
-    knife_attack_take_profit_pct: float = 0.015
+    knife_attack_stop_loss_pct: float = 0.015
+    knife_attack_take_profit_pct: float = 0.03
     knife_attack_min_score: float = 0.75
     knife_attack_min_weighted_score: float = 0.35
 
@@ -102,9 +102,9 @@ class Settings:
     overall_position_scale_max: float = 1.40
     leverage_scale_min: float = 0.70
     leverage_scale_max: float = 1.50
-    adaptive_stop_loss_min: float = 0.006
-    adaptive_stop_loss_max: float = 0.012
-    adaptive_stop_loss_default: float = 0.008
+    adaptive_stop_loss_min: float = 0.015
+    adaptive_stop_loss_max: float = 0.025
+    adaptive_stop_loss_default: float = 0.018
 
     # Hotfix: 权重调整
     trend_following_weight: float = 0.30

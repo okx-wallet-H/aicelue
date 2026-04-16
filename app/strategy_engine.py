@@ -506,27 +506,27 @@ class StrategyEngine:
 
         # 高频移动止盈：快进快出，赚2-5U就锁定
         if pos_side == "buy":
-            if upl_ratio >= 0.02:
-                # 浮盈2%+：出现任何转弱就立刻止盈
+            if upl_ratio >= 0.025:
+                # 浮盈2.5%+：出现任何转弱就立刻止盈
                 if m15["rsi14"] >= 62 or m15["ema20"] < m15["ema60"] or h1["ema20"] < h1["ema60"]:
-                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达2%+，检测到转弱信号，快速锁定利润。"
-            elif upl_ratio >= 0.012:
-                # 浮盈1.2%+：RSI偏热或短线EMA死叉就止盈
+                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达2.5%+，检测到转弱信号，快速锁定利润。"
+            elif upl_ratio >= 0.018:
+                # 浮盈1.8%+：RSI偏热或短线EMA死叉就止盈
                 if m15["rsi14"] >= 65 or m15["ema20"] < m15["ema60"]:
-                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达1.2%+，短线转弱，快速止盈。"
-            elif upl_ratio >= 0.008:
-                # 浮盈0.8%+：明确反转信号就止盈
+                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达1.8%+，短线转弱，快速止盈。"
+            elif upl_ratio >= 0.012:
+                # 浮盈1.2%+：明确反转信号就止盈
                 if m15["rsi14"] >= 68 and m15["ema20"] < m15["ema60"]:
                     return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%，RSI过热且死叉，保护性止盈。"
 
         if pos_side == "sell":
-            if upl_ratio >= 0.02:
+            if upl_ratio >= 0.025:
                 if m15["rsi14"] <= 38 or m15["ema20"] > m15["ema60"] or h1["ema20"] > h1["ema60"]:
-                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达2%+，检测到转强信号，快速锁定利润。"
-            elif upl_ratio >= 0.012:
+                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达2.5%+，检测到转强信号，快速锁定利润。"
+            elif upl_ratio >= 0.018:
                 if m15["rsi14"] <= 35 or m15["ema20"] > m15["ema60"]:
-                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达1.2%+，短线转强，快速止盈。"
-            elif upl_ratio >= 0.008:
+                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达1.8%+，短线转强，快速止盈。"
+            elif upl_ratio >= 0.012:
                 if m15["rsi14"] <= 32 and m15["ema20"] > m15["ema60"]:
                     return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%，RSI过冷且金叉，保护性止盈。"
         low_confidence = weighted_score < max(confidence_threshold * 0.92, confidence_threshold - 0.06)
@@ -552,11 +552,11 @@ class StrategyEngine:
                 return "CLOSE_LONG", "市场状态已转入下跌区间，多单按策略退出。"
             if long_reversal and low_confidence:
                 return "CLOSE_LONG", "1H/15M 多头结构失效，且当前置信度不足，多单主动平仓。"
-            if upl_ratio >= 0.015 and m15["rsi14"] >= 65:
+            if upl_ratio >= 0.025 and m15["rsi14"] >= 68:
                 return "CLOSE_LONG", f"多单浮盈{upl_ratio * 100:.1f}%且15M RSI过热({m15['rsi14']:.0f})，执行移动止盈。"
-            if upl_ratio >= 0.01 and m15["ema20"] < m15["ema60"]:
+            if upl_ratio >= 0.015 and m15["ema20"] < m15["ema60"]:
                 return "CLOSE_LONG", f"多单浮盈{upl_ratio * 100:.1f}%且15M EMA死叉，执行保护性止盈。"
-            if upl_ratio <= -0.012:
+            if upl_ratio <= -0.018:
                 return "CLOSE_LONG", f"多单浮亏{abs(upl_ratio) * 100:.1f}%超过软止损线，主动平仓止损。"
             return None, "持有多单，当前结构未触发退出条件。"
 
@@ -573,11 +573,11 @@ class StrategyEngine:
                 return "CLOSE_SHORT", "市场状态已转入上涨区间，空单按策略退出。"
             if short_reversal and low_confidence:
                 return "CLOSE_SHORT", "1H/15M 空头结构失效，且当前置信度不足，空单主动平仓。"
-            if upl_ratio >= 0.015 and m15["rsi14"] <= 35:
+            if upl_ratio >= 0.025 and m15["rsi14"] <= 35:
                 return "CLOSE_SHORT", f"空单浮盈{upl_ratio * 100:.1f}%且15M RSI过冷({m15['rsi14']:.0f})，执行移动止盈。"
-            if upl_ratio >= 0.01 and m15["ema20"] > m15["ema60"]:
+            if upl_ratio >= 0.015 and m15["ema20"] > m15["ema60"]:
                 return "CLOSE_SHORT", f"空单浮盈{upl_ratio * 100:.1f}%且15M EMA金叉，执行保护性止盈。"
-            if upl_ratio <= -0.012:
+            if upl_ratio <= -0.018:
                 return "CLOSE_SHORT", f"空单浮亏{abs(upl_ratio) * 100:.1f}%超过软止损线，主动平仓止损。"
             return None, "持有空单，当前结构未触发退出条件。"
 

@@ -611,7 +611,7 @@ class AgentTradeKitApp:
                         market_state=market_state["overall_state"],
                         atr_change_rate=float(market_state["atr_change_rate"]),
                     )
-                    take_profit_pct = round(max(stop_loss_pct * 1.5, stop_loss_pct + 0.003), 4)
+                    take_profit_pct = round(max(stop_loss_pct * 1.5, stop_loss_pct + 0.005), 4)
                     if bool(decision.get("tight_take_profit_to_1r")):
                         take_profit_pct = round(stop_loss_pct, 4)
                     requested_margin = round(equity * safe_float(decision["position_ratio"]), 6)
