@@ -58,14 +58,14 @@ class Settings:
     max_single_symbol_margin_ratio: float = 0.60
     max_total_margin_ratio: float = 0.90
     min_available_balance_ratio: float = 0.03
-    order_margin_safety_buffer_usdt: float = 5.0
+    order_margin_safety_buffer_usdt: float = 2.0
     min_order_margin_usdt: float = 100.0
     default_position_ratio: float = 0.35
 
-    # BTC 风向标资金分配：BTC 12%，SOL 83%，预留 5% 作为手续费与缓冲
-    btc_weathervane_capital_ratio: float = 0.12
-    sol_main_attack_capital_ratio: float = 0.88
-    fee_buffer_capital_ratio: float = 0.03
+    # BTC 风向标资金分配：BTC 30%，SOL 70%，预留 2% 作为手续费与缓冲
+    btc_weathervane_capital_ratio: float = 0.30
+    sol_main_attack_capital_ratio: float = 0.70
+    fee_buffer_capital_ratio: float = 0.02
     duplicate_entry_cooldown_seconds: int = 180
 
     single_loss_pct: float = 0.02

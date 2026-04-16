@@ -615,38 +615,70 @@ class AgentTradeKitApp:
                     if bool(decision.get("tight_take_profit_to_1r")):
                         take_profit_pct = round(stop_loss_pct, 4)
                     requested_margin = round(equity * safe_float(decision["position_ratio"]), 6)
-                    allowed_margin = self._allowed_additional_margin(budget_snapshot, symbol, requested_margin)
-                    # 高频模式：单笔开仓保证金不低于总权益的15%或100U
-                    min_margin = max(settings.min_order_margin_usdt, equity * 0.15)
-                    if allowed_margin < min_margin and allowed_margin > 0:
-                        allowed_margin = min_margin
-                    effective_position_ratio = 0.0 if equity <= 0 else allowed_margin / equity
+                    symbol_margin_before = safe_float(budget_snapshot["symbol_margin"].get(symbol))
+                    symbol_margin_limit = max(budget_snapshot["equity"] * self._symbol_capital_ratio(symbol) - symbol_margin_before, 0.0)
+                    total_margin_limit = max(budget_snapshot["equity"] * self._total_capital_limit_ratio() - budget_snapshot["total_margin"], 0.0)
+                    reserve_floor = budget_snapshot["equity"] * self._reserve_capital_ratio()
+                    raw_allowed_margin = self._allowed_additional_margin(budget_snapshot, symbol, requested_margin)
+                    adapted_margin = raw_allowed_margin
+                    margin_adapted = False
+                    adapt_reason = ""
+                    original_requested_margin = requested_margin
+
+                    # 自动适配：如果请求保证金超过各类资金限制，则缩减后继续开仓，而不是直接跳过
+                    if requested_margin > symbol_margin_limit and symbol_margin_limit > 0:
+                        adapted_margin = min(adapted_margin, symbol_margin_limit * 0.90)
+                        margin_adapted = True
+                        adapt_reason = "标的资金上限"
+                    if requested_margin > total_margin_limit and total_margin_limit > 0:
+                        adapted_margin = min(adapted_margin, total_margin_limit * 0.90)
+                        margin_adapted = True
+                        adapt_reason = adapt_reason or "总保证金上限"
+                    if requested_margin > raw_allowed_margin and raw_allowed_margin > 0:
+                        adapted_margin = min(adapted_margin, raw_allowed_margin * 0.90)
+                        margin_adapted = True
+                        adapt_reason = adapt_reason or "可用余额与缓冲限制"
+
+                    if adapted_margin <= 0 and raw_allowed_margin > 0:
+                        adapted_margin = raw_allowed_margin
+
+                    effective_margin = round(max(adapted_margin, 0.0), 6)
+                    effective_position_ratio = 0.0 if equity <= 0 else effective_margin / equity
                     record["budget_guard"] = {
-                        "requested_margin": requested_margin,
-                        "allowed_margin": round(allowed_margin, 6),
+                        "requested_margin": original_requested_margin,
+                        "allowed_margin": round(raw_allowed_margin, 6),
+                        "effective_margin": round(effective_margin, 6),
+                        "margin_adapted": margin_adapted,
                         "equity": budget_snapshot["equity"],
                         "avail_balance_before": budget_snapshot["avail_balance"],
                         "total_margin_before": budget_snapshot["total_margin"],
-                        "symbol_margin_before": safe_float(budget_snapshot["symbol_margin"].get(symbol)),
+                        "symbol_margin_before": symbol_margin_before,
                         "per_symbol_limit": round(budget_snapshot["equity"] * self._symbol_capital_ratio(symbol), 6),
                         "total_limit": round(budget_snapshot["equity"] * self._total_capital_limit_ratio(), 6),
-                        "reserve_floor": round(budget_snapshot["equity"] * self._reserve_capital_ratio(), 6),
+                        "reserve_floor": round(reserve_floor, 6),
                         "safety_buffer": settings.order_margin_safety_buffer_usdt,
                     }
-                    minimum_required_margin = max(equity * settings.min_position_ratio_initial, 5.0)
-                    if allowed_margin < minimum_required_margin:
+                    if effective_margin <= 0:
                         record["trade_status"] = "skipped_budget_guard"
                         engine_logger.warning(
                             "%s 因资金分配限制跳过开仓: 请求保证金=%.2f, 允许保证金=%.2f, 标的资金上限=%.2f, 总保证金上限=%.2f, 手续费缓冲保留=%.2f, 安全缓冲=%.2f",
                             symbol,
-                            requested_margin,
-                            allowed_margin,
+                            original_requested_margin,
+                            raw_allowed_margin,
                             budget_snapshot["equity"] * self._symbol_capital_ratio(symbol),
                             budget_snapshot["equity"] * self._total_capital_limit_ratio(),
-                            budget_snapshot["equity"] * self._reserve_capital_ratio(),
+                            reserve_floor,
                             settings.order_margin_safety_buffer_usdt,
                         )
                     else:
+                        if margin_adapted:
+                            engine_logger.info(
+                                "%s 请求保证金 %.2f 超过资金分配限制，已自动缩减到 %.2f（原因：%s）后继续开仓。",
+                                symbol,
+                                original_requested_margin,
+                                effective_margin,
+                                adapt_reason or "综合限制",
+                            )
                         size = self.execution_engine.estimate_order_size(
                             symbol=symbol,
                             equity_usdt=equity,
@@ -668,7 +700,7 @@ class AgentTradeKitApp:
                             )
                             record["order_result"] = order_result
                             if self._order_entry_succeeded(order_result):
-                                self._consume_margin_budget(budget_snapshot, symbol, allowed_margin)
+                                self._consume_margin_budget(budget_snapshot, symbol, effective_margin)
                                 record["trade_status"] = "open_sent"
                             else:
                                 record["trade_status"] = "open_failed"
