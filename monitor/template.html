@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{PAGE_TITLE}}</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b1220;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --border: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --blue: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(1200px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 20px 0 40px;
+    }
+
+    .hero {
+      margin-bottom: 18px;
+      padding: 20px;
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      border-radius: 18px;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 28%), rgba(15, 23, 42, 0.95);
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.35);
+    }
+
+    h1, h2, h3 {
+      margin: 0;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      grid-column: span 12;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      background: rgba(15, 23, 42, 0.88);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 24px rgba(2, 6, 23, 0.3);
+      overflow: hidden;
+    }
+
+    .card h2 {
+      margin-bottom: 14px;
+      font-size: 18px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(30, 41, 59, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .stat .value {
+      margin-top: 8px;
+      font-size: 24px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .summary-item {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(30, 41, 59, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .summary-item .label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-item .value {
+      margin-top: 6px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+      background: rgba(15, 23, 42, 0.6);
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #172033;
+      color: #cbd5e1;
+      z-index: 1;
+    }
+
+    tr:hover td {
+      background: rgba(30, 41, 59, 0.7);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .positive {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    .negative {
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .warning {
+      color: var(--yellow);
+      font-weight: 700;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(30, 41, 59, 0.82);
+    }
+
+    .badge.long {
+      color: #86efac;
+      border-color: rgba(34, 197, 94, 0.35);
+    }
+
+    .badge.short {
+      color: #fca5a5;
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .badge.flat {
+      color: #fde68a;
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .log-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .log-item {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+    }
+
+    .footer {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    @media (min-width: 768px) {
+      .span-6 {
+        grid-column: span 6;
+      }
+    }
+
+    @media (max-width: 767px) {
+      .container {
+        width: min(100%, calc(100% - 16px));
+        padding-top: 12px;
+      }
+
+      .hero, .card {
+        padding: 16px;
+        border-radius: 16px;
+      }
+
+      .stats,
+      .summary {
+        grid-template-columns: 1fr;
+      }
+
+      .stat .value {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>{{PAGE_TITLE}}</h1>
+      <div class="subtitle">参赛账户：温暖小号</div>
+      <div class="subtitle">最后更新时间：{{LAST_UPDATED}}</div>
+    </section>
+
+    <div class="grid">
+      <section class="card span-6">
+        <h2>账户概览</h2>
+        <div class="stats">
+          <div class="stat">
+            <div class="label">总权益</div>
+            <div class="value">{{TOTAL_EQUITY}}</div>
+          </div>
+          <div class="stat">
+            <div class="label">可用余额</div>
+            <div class="value">{{AVAILABLE_BALANCE}}</div>
+          </div>
+          <div class="stat">
+            <div class="label">冻结资金</div>
+            <div class="value">{{FROZEN_BALANCE}}</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card span-6">
+        <h2>多空资金汇总</h2>
+        <div class="summary">
+          <div class="summary-item">
+            <div class="label">做多总保证金</div>
+            <div class="value positive">{{LONG_MARGIN}}</div>
+          </div>
+          <div class="summary-item">
+            <div class="label">做空总保证金</div>
+            <div class="value negative">{{SHORT_MARGIN}}</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card span-6">
+        <h2>全市场情绪</h2>
+        <div class="summary">
+          <div class="summary-item">
+            <div class="label">BTC 未平仓量</div>
+            <div class="value">{{BTC_OI}}</div>
+          </div>
+          <div class="summary-item">
+            <div class="label">SOL 未平仓量</div>
+            <div class="value">{{SOL_OI}}</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card span-6">
+        <h2>策略连接信号</h2>
+        <div class="log-list">
+          {{LOG_ITEMS}}
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>当前持仓</h2>
+        <div class="table-wrap">
+          {{POSITIONS_TABLE}}
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>最近交易记录</h2>
+        <div class="table-wrap">
+          {{TRADES_TABLE}}
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">本页面由定时任务生成静态 HTML，适合 Nginx 直接托管。</div>
+  </div>
+</body>
+</html>
