@@ -145,6 +145,13 @@ class OKXClient:
         data = self.run(args) or []
         return data if isinstance(data, list) else []
 
+    def get_max_avail_size(self, inst_id: str, td_mode: str = "isolated", lever: int | None = None) -> list[dict[str, Any]]:
+        args = ["account", "max-avail-size", "--instId", inst_id, "--tdMode", td_mode]
+        if lever is not None:
+            args.extend(["--lever", str(lever)])
+        data = self.run(args) or []
+        return data if isinstance(data, list) else []
+
     def place_order(
         self,
         inst_id: str,

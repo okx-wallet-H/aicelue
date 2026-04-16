@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from app.logger import engine_logger
 from app.okx_cli import OKXClient
 from app.utils import safe_float
 
@@ -87,6 +88,38 @@ class ExecutionEngine:
             "td_mode": td_mode,
         }
 
+    def _okx_max_avail_size_cap(self, symbol: str, size: float, td_mode: str = "isolated", leverage: int | None = None) -> tuple[float, list[dict[str, Any]]]:
+        requested_size = self._normalize_contracts(size)
+        if requested_size <= 0:
+            return 0.0, []
+        try:
+            rows = self.client.get_max_avail_size(inst_id=symbol, td_mode=td_mode, lever=leverage)
+        except Exception as exc:
+            engine_logger.warning("%s 查询 OKX 最大可开张数失败，回退到代码侧张数控制: %s", symbol, exc)
+            return requested_size, []
+
+        max_size = 0.0
+        for row in rows if isinstance(rows, list) else []:
+            if not isinstance(row, dict):
+                continue
+            for value in (
+                row.get("maxBuy"),
+                row.get("maxSell"),
+                row.get("availBuy"),
+                row.get("availSell"),
+                row.get("maxAvailSz"),
+                row.get("maxSz"),
+                row.get("availSz"),
+            ):
+                max_size = max(max_size, safe_float(value))
+
+        if max_size <= 0:
+            return requested_size, rows if isinstance(rows, list) else []
+        okx_safe_size = self._normalize_contracts(max_size * 0.90)
+        if okx_safe_size <= 0:
+            return 0.0, rows if isinstance(rows, list) else []
+        return min(requested_size, okx_safe_size), rows if isinstance(rows, list) else []
+
     def place_entry_with_tpsl(
         self,
         symbol: str,
@@ -103,10 +136,26 @@ class ExecutionEngine:
         if leverage is not None:
             leverage_result = self.client.set_leverage(symbol, lever=leverage, mgn_mode=td_mode)
 
+        final_size, max_avail_rows = self._okx_max_avail_size_cap(symbol=symbol, size=size, td_mode=td_mode, leverage=leverage)
+        if final_size <= 0:
+            return {
+                "leverage": leverage_result,
+                "entry": [],
+                "algo": [],
+                "max_avail_size": max_avail_rows,
+                "requested_size": size,
+                "final_size": 0.0,
+                "stop_loss_pct": stop_loss_pct,
+                "take_profit_pct": take_profit_pct,
+                "td_mode": td_mode,
+            }
+        if final_size < self._normalize_contracts(size):
+            engine_logger.info("%s 下单前双保险生效：请求sz=%.2f，按 OKX 最大可开张数九折后缩减至 %.2f。", symbol, size, final_size)
+
         order_result = self.client.place_order(
             symbol,
             side=side,
-            size=size,
+            size=final_size,
             ord_type="market",
             td_mode=td_mode,
             tag=tag,
@@ -121,6 +170,9 @@ class ExecutionEngine:
                 "leverage": leverage_result,
                 "entry": order_result,
                 "algo": [],
+                "max_avail_size": max_avail_rows,
+                "requested_size": size,
+                "final_size": final_size,
                 "stop_loss_pct": stop_loss_pct,
                 "take_profit_pct": take_profit_pct,
                 "td_mode": td_mode,
@@ -139,7 +191,7 @@ class ExecutionEngine:
             td_mode=td_mode,
             algo_ord_type="oco",
             side=exit_side,
-            sz=size,
+            sz=final_size,
             tp_trigger_px=tp_trigger,
             sl_trigger_px=sl_trigger,
             tag=tag,
@@ -149,6 +201,9 @@ class ExecutionEngine:
             "leverage": leverage_result,
             "entry": order_result,
             "algo": algo_result,
+            "max_avail_size": max_avail_rows,
+            "requested_size": size,
+            "final_size": final_size,
             "stop_loss_pct": stop_loss_pct,
             "take_profit_pct": take_profit_pct,
             "td_mode": td_mode,
