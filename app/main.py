@@ -686,5 +686,5 @@ class AgentTradeKitApp:
 
 if __name__ == "__main__":
     app = AgentTradeKitApp()
-    result = app.run_once(execute_orders=False)
+    result = app.run_once(execute_orders=True)
     engine_logger.info("单次运行完成，决策数=%s", len(result))
