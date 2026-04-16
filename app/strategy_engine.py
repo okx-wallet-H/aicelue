@@ -427,7 +427,7 @@ class StrategyEngine:
                 final_reason = "强势上涨，多周期多头共振，允许正常仓位追随趋势。"
             elif h1["ema20"] > h1["ema60"] and m15["rsi14"] <= 74:
                 action, side = "OPEN_LONG", "buy"
-                position_ratio = clamp(position_ratio * 0.80, settings.min_position_ratio_initial, position_ratio)
+                position_ratio = clamp(position_ratio * 1.0, settings.min_position_ratio_initial, position_ratio)
                 entry_bias = "强势上涨先试探后加仓"
                 final_reason = "强势上涨但15M未完全共振，先以小仓位试探上车。"
             else:
@@ -435,7 +435,7 @@ class StrategyEngine:
         elif state_name == "弱势上涨":
             if h1["ema20"] > h1["ema60"] and m15["rsi14"] <= 72:
                 action, side = "OPEN_LONG", "buy"
-                position_ratio = clamp(position_ratio * 0.60, settings.min_position_ratio_initial, position_ratio)
+                position_ratio = clamp(position_ratio * 0.80, settings.min_position_ratio_initial, position_ratio)
                 entry_bias = "弱势上涨小仓位跟随做多"
                 final_reason = "弱势上涨阶段，采用小仓位跟随做多积累数据。"
             else:
@@ -443,28 +443,28 @@ class StrategyEngine:
         elif state_name == "区间震荡":
             if m15["rsi14"] <= 38 and obi > -0.12:
                 action, side = "OPEN_LONG", "buy"
-                position_ratio = clamp(position_ratio * 0.70, settings.min_position_ratio_initial, position_ratio)
+                position_ratio = clamp(position_ratio * 0.90, settings.min_position_ratio_initial, position_ratio)
                 entry_bias = "震荡下沿均值回归做多"
                 final_reason = "区间震荡接近超卖，执行小仓位低吸。"
             elif m15["rsi14"] >= 62 and obi < 0.12:
                 action, side = "OPEN_SHORT", "sell"
-                position_ratio = clamp(position_ratio * 0.70, settings.min_position_ratio_initial, position_ratio)
+                position_ratio = clamp(position_ratio * 0.90, settings.min_position_ratio_initial, position_ratio)
                 entry_bias = "震荡上沿均值回归做空"
                 final_reason = "区间震荡接近超买，执行小仓位高抛。"
             elif obi >= 0:
                 action, side = "OPEN_LONG", "buy"
-                position_ratio = clamp(position_ratio * 0.50, settings.min_position_ratio_initial, position_ratio)
+                position_ratio = clamp(position_ratio * 0.70, settings.min_position_ratio_initial, position_ratio)
                 entry_bias = "震荡中性偏多试探"
                 final_reason = "震荡中部也保持资金流动，以更小试探仓参与。"
             else:
                 action, side = "OPEN_SHORT", "sell"
-                position_ratio = clamp(position_ratio * 0.50, settings.min_position_ratio_initial, position_ratio)
+                position_ratio = clamp(position_ratio * 0.70, settings.min_position_ratio_initial, position_ratio)
                 entry_bias = "震荡中性偏空试探"
                 final_reason = "震荡中部也保持资金流动，以更小试探仓参与。"
         elif state_name == "弱势下跌":
             if h1["ema20"] < h1["ema60"] and m15["rsi14"] >= 28:
                 action, side = "OPEN_SHORT", "sell"
-                position_ratio = clamp(position_ratio * 0.60, settings.min_position_ratio_initial, position_ratio)
+                position_ratio = clamp(position_ratio * 0.80, settings.min_position_ratio_initial, position_ratio)
                 entry_bias = "弱势下跌小仓位跟随做空"
                 final_reason = "弱势下跌阶段，采用小仓位跟随做空积累数据。"
             else:
@@ -476,7 +476,7 @@ class StrategyEngine:
                 final_reason = "强势下跌，多周期空头共振，允许正常仓位追随趋势。"
             elif h1["ema20"] < h1["ema60"] and m15["rsi14"] >= 26:
                 action, side = "OPEN_SHORT", "sell"
-                position_ratio = clamp(position_ratio * 0.80, settings.min_position_ratio_initial, position_ratio)
+                position_ratio = clamp(position_ratio * 1.0, settings.min_position_ratio_initial, position_ratio)
                 entry_bias = "强势下跌先试探后加仓"
                 final_reason = "强势下跌但15M未完全共振，先以小仓位试探做空。"
             else:
@@ -722,9 +722,9 @@ class StrategyEngine:
             position_ratio = 0.0
             final_reason = close_reason
         elif position_snapshot["side"] == side and action in {"OPEN_LONG", "OPEN_SHORT"}:
-            position_ratio = clamp(position_ratio * 0.5, settings.min_position_ratio_initial, position_ratio)
+            position_ratio = clamp(position_ratio * 0.7, settings.min_position_ratio_initial, position_ratio)
             entry_bias = "同向加仓"
-            final_reason = f"当前已持有同向仓位 {position_snapshot['abs_pos']:.2f} 张，以50%仓位追加同向加仓积累收益。"
+            final_reason = f"当前已持有同向仓位 {position_snapshot['abs_pos']:.2f} 张，以70%仓位追加同向加仓积累收益。"
         elif position_snapshot["side"] and action in {"OPEN_LONG", "OPEN_SHORT"}:
             # 反向信号：先平旧仓再开新仓，action改为平仓，下一轮自动开新仓
             if position_snapshot["side"] == "buy":

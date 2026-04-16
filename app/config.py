@@ -52,13 +52,15 @@ class Settings:
     kelly_window: int = 20
     kelly_fraction_default: float = 0.50
     kelly_fraction_aggressive: float = 0.80
-    min_position_ratio: float = 0.0
+    min_position_ratio: float = 0.20
     max_position_ratio: float = 0.70
-    min_position_ratio_initial: float = 0.02
+    min_position_ratio_initial: float = 0.25
     max_single_symbol_margin_ratio: float = 0.60
     max_total_margin_ratio: float = 0.90
     min_available_balance_ratio: float = 0.03
     order_margin_safety_buffer_usdt: float = 5.0
+    min_order_margin_usdt: float = 100.0
+    default_position_ratio: float = 0.35
 
     # BTC 风向标资金分配：BTC 12%，SOL 83%，预留 5% 作为手续费与缓冲
     btc_weathervane_capital_ratio: float = 0.12

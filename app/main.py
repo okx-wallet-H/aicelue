@@ -616,6 +616,10 @@ class AgentTradeKitApp:
                         take_profit_pct = round(stop_loss_pct, 4)
                     requested_margin = round(equity * safe_float(decision["position_ratio"]), 6)
                     allowed_margin = self._allowed_additional_margin(budget_snapshot, symbol, requested_margin)
+                    # 高频模式：单笔开仓保证金不低于总权益的15%或100U
+                    min_margin = max(settings.min_order_margin_usdt, equity * 0.15)
+                    if allowed_margin < min_margin and allowed_margin > 0:
+                        allowed_margin = min_margin
                     effective_position_ratio = 0.0 if equity <= 0 else allowed_margin / equity
                     record["budget_guard"] = {
                         "requested_margin": requested_margin,
