@@ -70,8 +70,9 @@ class Settings:
 
     single_loss_pct: float = 0.02
     single_loss_pct_strong_trend: float = 0.015
-    daily_loss_fuse_pct: float = 0.08
-    total_drawdown_fuse_pct: float = 0.20
+    max_single_loss_usdt: float = 10.0
+    daily_loss_fuse_pct: float = 0.15
+    total_drawdown_fuse_pct: float = 0.25
     consecutive_loss_half: int = 4
     consecutive_loss_stop: int = 6
     max_concurrent_positions: int = 2

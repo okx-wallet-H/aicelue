@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from app.config import settings
 from app.logger import engine_logger
 from app.okx_cli import OKXClient
 from app.utils import safe_float
@@ -88,6 +89,24 @@ class ExecutionEngine:
             "td_mode": td_mode,
         }
 
+    def _single_loss_size_cap(self, symbol: str, size: float, entry_price: float, stop_loss_pct: float) -> float:
+        requested_size = self._normalize_contracts(size)
+        if requested_size <= 0:
+            return 0.0
+        if entry_price <= 0 or stop_loss_pct <= 0:
+            return requested_size
+        contract_notional_usdt = self._contract_notional_usdt(symbol, entry_price)
+        if contract_notional_usdt <= 0:
+            return requested_size
+        max_loss_usdt = safe_float(settings.max_single_loss_usdt)
+        if max_loss_usdt <= 0:
+            return requested_size
+        max_notional_usdt = max_loss_usdt / stop_loss_pct
+        max_contracts = self._normalize_contracts(max_notional_usdt / contract_notional_usdt)
+        if max_contracts <= 0:
+            return 0.0
+        return min(requested_size, max_contracts)
+
     def _okx_max_avail_size_cap(self, symbol: str, size: float, td_mode: str = "isolated", leverage: int | None = None) -> tuple[float, list[dict[str, Any]]]:
         requested_size = self._normalize_contracts(size)
         if requested_size <= 0:
@@ -136,7 +155,10 @@ class ExecutionEngine:
         if leverage is not None:
             leverage_result = self.client.set_leverage(symbol, lever=leverage, mgn_mode=td_mode)
 
-        final_size, max_avail_rows = self._okx_max_avail_size_cap(symbol=symbol, size=size, td_mode=td_mode, leverage=leverage)
+        loss_capped_size = self._single_loss_size_cap(symbol=symbol, size=size, entry_price=entry_price, stop_loss_pct=stop_loss_pct)
+        if loss_capped_size < self._normalize_contracts(size):
+            engine_logger.info("%s 单笔亏损保护生效：请求sz=%.2f，按最大亏损%.2fU与止损%.4f反算后缩减至 %.2f。", symbol, size, settings.max_single_loss_usdt, stop_loss_pct, loss_capped_size)
+        final_size, max_avail_rows = self._okx_max_avail_size_cap(symbol=symbol, size=loss_capped_size, td_mode=td_mode, leverage=leverage)
         if final_size <= 0:
             return {
                 "leverage": leverage_result,
@@ -144,6 +166,7 @@ class ExecutionEngine:
                 "algo": [],
                 "max_avail_size": max_avail_rows,
                 "requested_size": size,
+                "loss_capped_size": loss_capped_size,
                 "final_size": 0.0,
                 "stop_loss_pct": stop_loss_pct,
                 "take_profit_pct": take_profit_pct,
@@ -172,6 +195,7 @@ class ExecutionEngine:
                 "algo": [],
                 "max_avail_size": max_avail_rows,
                 "requested_size": size,
+                "loss_capped_size": loss_capped_size,
                 "final_size": final_size,
                 "stop_loss_pct": stop_loss_pct,
                 "take_profit_pct": take_profit_pct,
