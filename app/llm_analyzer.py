@@ -298,6 +298,11 @@ class LLMAnalyzer:
             "trade_advice.action 只能是 OPEN_LONG、OPEN_SHORT、HOLD 之一；"
             "trade_advice.direction 只能是 buy、sell、none 之一；"
             "trade_advice.confidence 必须是 0 到 1 之间的小数。"
+            "【比赛背景】当前正在参加OKX合约交易赛，比赛2026年4月23日16:00截止，本金1500U，剩余不到6天。"
+            "核心策略是高频小仓位交易、积少成多，每笔赚2-5U即可。"
+            "你应该倾向于给出OPEN_LONG或OPEN_SHORT的建议，积极寻找交易机会。"
+            "只有在市场极度危险（如暴跌暴涨超5%、流动性枯竭）时才建议HOLD。"
+            "不要过于保守，比赛需要不停交易来积累收益。"
         )
         user_prompt = (
             "请分析目标标的并仅返回 JSON，结构如下："

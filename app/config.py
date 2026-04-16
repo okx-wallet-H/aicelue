@@ -50,52 +50,52 @@ class Settings:
     atr_extreme_change: float = 0.18
 
     kelly_window: int = 20
-    kelly_fraction_default: float = 0.25
-    kelly_fraction_aggressive: float = 0.50
+    kelly_fraction_default: float = 0.50
+    kelly_fraction_aggressive: float = 0.80
     min_position_ratio: float = 0.0
-    max_position_ratio: float = 0.40
+    max_position_ratio: float = 0.70
     min_position_ratio_initial: float = 0.02
-    max_single_symbol_margin_ratio: float = 0.40
-    max_total_margin_ratio: float = 0.70
-    min_available_balance_ratio: float = 0.05
-    order_margin_safety_buffer_usdt: float = 12.0
+    max_single_symbol_margin_ratio: float = 0.60
+    max_total_margin_ratio: float = 0.90
+    min_available_balance_ratio: float = 0.03
+    order_margin_safety_buffer_usdt: float = 5.0
 
     # BTC 风向标资金分配：BTC 12%，SOL 83%，预留 5% 作为手续费与缓冲
     btc_weathervane_capital_ratio: float = 0.12
-    sol_main_attack_capital_ratio: float = 0.83
-    fee_buffer_capital_ratio: float = 0.05
-    duplicate_entry_cooldown_seconds: int = 900
+    sol_main_attack_capital_ratio: float = 0.88
+    fee_buffer_capital_ratio: float = 0.03
+    duplicate_entry_cooldown_seconds: int = 180
 
     single_loss_pct: float = 0.02
     single_loss_pct_strong_trend: float = 0.015
     daily_loss_fuse_pct: float = 0.08
     total_drawdown_fuse_pct: float = 0.20
-    consecutive_loss_half: int = 2
-    consecutive_loss_stop: int = 3
+    consecutive_loss_half: int = 4
+    consecutive_loss_stop: int = 6
     max_concurrent_positions: int = 2
 
-    btc_leverage_normal: int = 4
-    btc_leverage_strong: int = 6
-    sol_leverage_normal: int = 10
-    sol_leverage_strong: int = 10
+    btc_leverage_normal: int = 8
+    btc_leverage_strong: int = 12
+    sol_leverage_normal: int = 15
+    sol_leverage_strong: int = 20
     symbol_priority: tuple[str, ...] = ("BTC-USDT-SWAP", "SOL-USDT-SWAP")
 
     knife_attack_enabled: bool = True
-    knife_attack_margin_usdt: float = 40.0
-    knife_attack_leverage: int = 20
+    knife_attack_margin_usdt: float = 60.0
+    knife_attack_leverage: int = 30
     knife_attack_td_mode: str = "isolated"
     knife_attack_stop_loss_pct: float = 0.015
     knife_attack_take_profit_pct: float = 0.03
-    knife_attack_min_score: float = 0.88
-    knife_attack_min_weighted_score: float = 0.55
+    knife_attack_min_score: float = 0.75
+    knife_attack_min_weighted_score: float = 0.35
 
     strategy_learning_rate: float = 0.10
     min_strategy_weight: float = 0.10
     ewma_alpha: float = 0.35
 
-    confidence_threshold_default: float = 0.30
-    confidence_threshold_min: float = 0.20
-    confidence_threshold_max: float = 0.75
+    confidence_threshold_default: float = 0.15
+    confidence_threshold_min: float = 0.08
+    confidence_threshold_max: float = 0.50
     overall_position_scale_min: float = 0.60
     overall_position_scale_max: float = 1.40
     leverage_scale_min: float = 0.70
@@ -122,9 +122,9 @@ class Settings:
     llm_recent_trade_window: int = field(default_factory=lambda: int(os.getenv("LLM_RECENT_TRADE_WINDOW", "20")))
     llm_confidence_weight: float = field(default_factory=lambda: float(os.getenv("LLM_CONFIDENCE_WEIGHT", "0.10")))
     llm_alignment_boost: float = field(default_factory=lambda: float(os.getenv("LLM_ALIGNMENT_BOOST", "0.08")))
-    llm_conflict_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_CONFLICT_PENALTY", "0.12")))
-    llm_hold_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_HOLD_PENALTY", "0.08")))
-    llm_skip_conflict_threshold: float = field(default_factory=lambda: float(os.getenv("LLM_SKIP_CONFLICT_THRESHOLD", "0.85")))
+    llm_conflict_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_CONFLICT_PENALTY", "0.05")))
+    llm_hold_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_HOLD_PENALTY", "0.03")))
+    llm_skip_conflict_threshold: float = field(default_factory=lambda: float(os.getenv("LLM_SKIP_CONFLICT_THRESHOLD", "0.95")))
     llm_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_TEMPERATURE", "0.15")))
     llm_review_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_REVIEW_TEMPERATURE", "0.10")))
     llm_review_bias_scale: float = field(default_factory=lambda: float(os.getenv("LLM_REVIEW_BIAS_SCALE", "0.50")))

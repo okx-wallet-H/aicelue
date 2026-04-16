@@ -29,18 +29,18 @@ class RiskManager:
     def compute_kelly_fraction(self, symbol: str) -> float:
         trades = self._recent_symbol_trades(symbol)
         if len(trades) < 5:
-            return 0.08
+            return 0.15
 
         wins = [r for r in trades if safe_float(r.get("realized_pnl")) > 0]
         losses = [r for r in trades if safe_float(r.get("realized_pnl")) < 0]
         if not wins or not losses:
-            return 0.10
+            return 0.18
 
         w = len(wins) / max(1, len(wins) + len(losses))
         avg_win = sum(safe_float(r.get("realized_pnl")) for r in wins) / len(wins)
         avg_loss = abs(sum(safe_float(r.get("realized_pnl")) for r in losses) / len(losses))
         if avg_loss <= 0:
-            return 0.10
+            return 0.18
 
         r_ratio = avg_win / avg_loss
         raw = w - (1 - w) / r_ratio
