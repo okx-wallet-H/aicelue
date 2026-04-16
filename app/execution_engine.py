@@ -16,28 +16,44 @@ class ExecutionEngine:
         if symbol == "BTC-USDT-SWAP":
             return 0.01
         if symbol == "SOL-USDT-SWAP":
-            return 0.1
+            return 1.0
         return 1.0
 
     def _normalize_contracts(self, contracts: float) -> float:
         if contracts <= 0:
             return 0.0
-        normalized = math.floor(contracts * 100) / 100
-        return round(max(normalized, 0.0), 2)
+        normalized = math.floor(contracts)
+        return float(max(normalized, 0))
+
+    def _contract_notional_usdt(self, symbol: str, price: float) -> float:
+        if price <= 0:
+            return 0.0
+        return price * self._contract_size(symbol)
+
+    def _contracts_from_margin(self, symbol: str, margin_usdt: float, price: float, leverage: int, safety_haircut: float = 0.90) -> float:
+        if margin_usdt <= 0 or leverage <= 0:
+            return 0.0
+        contract_notional_usdt = self._contract_notional_usdt(symbol, price)
+        if contract_notional_usdt <= 0:
+            return 0.0
+        notional_usdt = margin_usdt * leverage
+        raw_contracts = notional_usdt / contract_notional_usdt
+        safe_contracts = raw_contracts * safety_haircut
+        return self._normalize_contracts(safe_contracts)
 
     def estimate_order_size(self, symbol: str, equity_usdt: float, price: float, leverage: int, position_ratio: float) -> float:
-        notional = equity_usdt * position_ratio * leverage
-        if price <= 0:
-            return 0.0
-        contracts = notional / (price * self._contract_size(symbol))
-        return self._normalize_contracts(contracts)
+        margin_usdt = equity_usdt * position_ratio
+        return self._contracts_from_margin(symbol=symbol, margin_usdt=margin_usdt, price=price, leverage=leverage)
 
     def estimate_fixed_margin_order_size(self, symbol: str, margin_usdt: float, price: float, leverage: int) -> float:
-        notional = margin_usdt * leverage
-        if price <= 0:
+        return self._contracts_from_margin(symbol=symbol, margin_usdt=margin_usdt, price=price, leverage=leverage)
+
+    def cap_order_size_by_margin(self, symbol: str, requested_size: float, margin_usdt: float, price: float, leverage: int) -> float:
+        max_size = self.estimate_fixed_margin_order_size(symbol=symbol, margin_usdt=margin_usdt, price=price, leverage=leverage)
+        requested_size = self._normalize_contracts(requested_size)
+        if max_size <= 0:
             return 0.0
-        contracts = notional / (price * self._contract_size(symbol))
-        return self._normalize_contracts(contracts)
+        return min(requested_size, max_size)
 
     def get_net_position(self, symbol: str) -> float:
         positions = self.client.get_positions(symbol)

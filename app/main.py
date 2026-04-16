@@ -679,14 +679,32 @@ class AgentTradeKitApp:
                                 effective_margin,
                                 adapt_reason or "综合限制",
                             )
-                        size = self.execution_engine.estimate_order_size(
+                        size = self.execution_engine.estimate_fixed_margin_order_size(
                             symbol=symbol,
-                            equity_usdt=equity,
+                            margin_usdt=effective_margin,
                             price=entry_price,
-                            leverage=decision["leverage"],
-                            position_ratio=effective_position_ratio,
+                            leverage=int(decision["leverage"]),
                         )
+                        capped_size = self.execution_engine.cap_order_size_by_margin(
+                            symbol=symbol,
+                            requested_size=size,
+                            margin_usdt=effective_margin,
+                            price=entry_price,
+                            leverage=int(decision["leverage"]),
+                        )
+                        if capped_size < size:
+                            engine_logger.info(
+                                "%s 下单数量安全校验生效：原始sz=%.2f，按保证金 %.2fU 与杠杆 %s 重算后的最大安全sz=%.2f，已自动缩减。",
+                                symbol,
+                                size,
+                                effective_margin,
+                                decision["leverage"],
+                                capped_size,
+                            )
+                            size = capped_size
                         record["position_ratio"] = round(effective_position_ratio, 6)
+                        record["margin_usdt"] = round(effective_margin, 6)
+                        record["order_size"] = size
                         if size > 0:
                             order_result = self.execution_engine.place_entry_with_tpsl(
                                 symbol=symbol,
