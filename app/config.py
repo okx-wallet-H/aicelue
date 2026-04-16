@@ -115,7 +115,7 @@ class Settings:
 
     # LLM 分析配置
     llm_enabled: bool = field(default_factory=lambda: os.getenv("LLM_ENABLED", "true").lower() == "true")
-    llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gemini-2.5-flash"))
+    llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "deepseek-chat"))
     llm_timeout_seconds: int = field(default_factory=lambda: int(os.getenv("LLM_TIMEOUT_SECONDS", "12")))
     llm_max_candles_per_tf: int = field(default_factory=lambda: int(os.getenv("LLM_MAX_CANDLES_PER_TF", "24")))
     llm_recent_record_window: int = field(default_factory=lambda: int(os.getenv("LLM_RECENT_RECORD_WINDOW", "12")))
