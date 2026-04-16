@@ -20,7 +20,7 @@ class LLMAnalyzer:
 
     def __init__(self) -> None:
         self.enabled = bool(getattr(settings, "llm_enabled", True))
-        self.model = str(getattr(settings, "llm_model", "deepseek-chat"))
+        self.model = str(getattr(settings, "llm_model", "qwen-plus-latest"))
         self.timeout_seconds = int(getattr(settings, "llm_timeout_seconds", 12))
         self.max_candles = int(getattr(settings, "llm_max_candles_per_tf", 24))
         self.recent_record_window = int(getattr(settings, "llm_recent_record_window", 12))
@@ -131,7 +131,7 @@ class LLMAnalyzer:
             "degraded": True,
             "target_symbol": target_symbol,
             "timestamp": now_ts_ms(),
-            "model": str(getattr(settings, "llm_model", "deepseek-chat")),
+            "model": str(getattr(settings, "llm_model", "qwen-plus-latest")),
             "latency_ms": 0,
             "error": error,
             "market_analysis": {
@@ -163,7 +163,7 @@ class LLMAnalyzer:
             "enabled": False,
             "degraded": True,
             "timestamp": now_ts_ms(),
-            "model": str(getattr(settings, "llm_model", "deepseek-chat")),
+            "model": str(getattr(settings, "llm_model", "qwen-plus-latest")),
             "latency_ms": 0,
             "error": error,
             "review_summary": "大模型复盘不可用，沿用规则自适应结果。",
