@@ -1,0 +1,1972 @@
+[
+  {
+    "timestamp": 1776120792035,
+    "trade_count": 0,
+    "reasoning": [
+      "最近窗口内暂无已完成交易，自适应参数保持不变。"
+    ],
+    "metrics": {
+      "trade_count": 0,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": 0.0,
+      "total_pnl": 0.0,
+      "stop_out_rate": 0.0,
+      "by_symbol": {},
+      "by_state": {},
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "weights_after": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "params_before": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776120485325
+    },
+    "params_after": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776120485325
+    },
+    "iteration_id": "iteration_1776120792035_1"
+  },
+  {
+    "timestamp": 1776135228811,
+    "trade_count": 0,
+    "reasoning": [
+      "最近窗口内暂无已完成交易，自适应参数保持不变。"
+    ],
+    "metrics": {
+      "trade_count": 0,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": 0.0,
+      "total_pnl": 0.0,
+      "stop_out_rate": 0.0,
+      "by_symbol": {},
+      "by_state": {},
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "weights_after": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "params_before": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776134921285
+    },
+    "params_after": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776134921285
+    },
+    "iteration_id": "iteration_1776135228811_2"
+  },
+  {
+    "timestamp": 1776149648475,
+    "trade_count": 0,
+    "reasoning": [
+      "最近窗口内暂无已完成交易，自适应参数保持不变。"
+    ],
+    "metrics": {
+      "trade_count": 0,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": 0.0,
+      "total_pnl": 0.0,
+      "stop_out_rate": 0.0,
+      "by_symbol": {},
+      "by_state": {},
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "weights_after": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "params_before": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776149340730
+    },
+    "params_after": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776149340730
+    },
+    "iteration_id": "iteration_1776149648475_3"
+  },
+  {
+    "timestamp": 1776164101922,
+    "trade_count": 0,
+    "reasoning": [
+      "最近窗口内暂无已完成交易，自适应参数保持不变。"
+    ],
+    "metrics": {
+      "trade_count": 0,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": 0.0,
+      "total_pnl": 0.0,
+      "stop_out_rate": 0.0,
+      "by_symbol": {},
+      "by_state": {},
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "weights_after": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "params_before": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776163794215
+    },
+    "params_after": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776163794215
+    },
+    "iteration_id": "iteration_1776164101922_4"
+  },
+  {
+    "timestamp": 1776178580455,
+    "trade_count": 0,
+    "reasoning": [
+      "最近窗口内暂无已完成交易，自适应参数保持不变。"
+    ],
+    "metrics": {
+      "trade_count": 0,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": 0.0,
+      "total_pnl": 0.0,
+      "stop_out_rate": 0.0,
+      "by_symbol": {},
+      "by_state": {},
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "weights_after": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "params_before": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776178271470
+    },
+    "params_after": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776178271470
+    },
+    "iteration_id": "iteration_1776178580455_5"
+  },
+  {
+    "timestamp": 1776192989082,
+    "trade_count": 1,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 1,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -23.149079,
+      "total_pnl": -23.149079,
+      "stop_out_rate": 1.0,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 1,
+          "wins": 0,
+          "total_pnl": -23.149079,
+          "avg_pnl": -23.149079,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 1,
+          "wins": 0,
+          "total_pnl": -23.149079,
+          "avg_pnl": -23.149079,
+          "stop_outs": 1,
+          "stop_out_rate": 1.0
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -23.149079,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.35,
+      "mean_reversion": 0.2,
+      "breakout": 0.25,
+      "momentum_confirmation": 0.2
+    },
+    "weights_after": {
+      "trend_following": 0.1538,
+      "mean_reversion": 0.3077,
+      "breakout": 0.3846,
+      "momentum_confirmation": 0.1538
+    },
+    "params_before": {
+      "confidence_threshold": 0.42,
+      "overall_position_scale": 1.0,
+      "overall_leverage_scale": 1.0,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 1.0
+      },
+      "state_position_scale": {
+        "强势上涨": 1.1,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.03,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.015,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": 0.0,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": 0.0
+      },
+      "last_updated_ts": 1776192682969
+    },
+    "params_after": {
+      "confidence_threshold": 0.44,
+      "overall_position_scale": 0.95,
+      "overall_leverage_scale": 0.95,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.9125
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.895
+      },
+      "state_position_scale": {
+        "强势上涨": 0.96,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.002,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.016,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -8.102178,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -8.102178
+      },
+      "last_updated_ts": 1776192682969
+    },
+    "iteration_id": "iteration_1776192989082_6"
+  },
+  {
+    "timestamp": 1776207559275,
+    "trade_count": 1,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 1,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -23.149079,
+      "total_pnl": -23.149079,
+      "stop_out_rate": 1.0,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 1,
+          "wins": 0,
+          "total_pnl": -23.149079,
+          "avg_pnl": -23.149079,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 1,
+          "wins": 0,
+          "total_pnl": -23.149079,
+          "avg_pnl": -23.149079,
+          "stop_outs": 1,
+          "stop_out_rate": 1.0
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -23.149079,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1538,
+      "mean_reversion": 0.3077,
+      "breakout": 0.3846,
+      "momentum_confirmation": 0.1538
+    },
+    "weights_after": {
+      "trend_following": 0.1121,
+      "mean_reversion": 0.3448,
+      "breakout": 0.431,
+      "momentum_confirmation": 0.1121
+    },
+    "params_before": {
+      "confidence_threshold": 0.44,
+      "overall_position_scale": 0.95,
+      "overall_leverage_scale": 0.95,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.9125
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.895
+      },
+      "state_position_scale": {
+        "强势上涨": 0.96,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": -0.002,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.016,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -8.102178,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -8.102178
+      },
+      "last_updated_ts": 1776207249914
+    },
+    "params_after": {
+      "confidence_threshold": 0.46,
+      "overall_position_scale": 0.9,
+      "overall_leverage_scale": 0.9,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.8556
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.8267
+      },
+      "state_position_scale": {
+        "强势上涨": 0.869,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0162,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -13.368593,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -13.368593
+      },
+      "last_updated_ts": 1776207249914
+    },
+    "iteration_id": "iteration_1776207559275_7"
+  },
+  {
+    "timestamp": 1776222117330,
+    "trade_count": 2,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 2,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -12.5116575,
+      "total_pnl": -25.023315,
+      "stop_out_rate": 0.5,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "stop_outs": 1,
+          "stop_out_rate": 0.5
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -12.5116575,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1121,
+      "mean_reversion": 0.3448,
+      "breakout": 0.431,
+      "momentum_confirmation": 0.1121
+    },
+    "weights_after": {
+      "trend_following": 0.1025,
+      "mean_reversion": 0.3534,
+      "breakout": 0.4417,
+      "momentum_confirmation": 0.1025
+    },
+    "params_before": {
+      "confidence_threshold": 0.46,
+      "overall_position_scale": 0.9,
+      "overall_leverage_scale": 0.9,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.8556
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.8267
+      },
+      "state_position_scale": {
+        "强势上涨": 0.869,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0162,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -13.368593,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -13.368593
+      },
+      "last_updated_ts": 1776221810423
+    },
+    "params_after": {
+      "confidence_threshold": 0.48,
+      "overall_position_scale": 0.85,
+      "overall_leverage_scale": 0.85,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.8186
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7824
+      },
+      "state_position_scale": {
+        "强势上涨": 0.8098,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.028,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -13.068666,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -16.791763
+      },
+      "last_updated_ts": 1776221810423
+    },
+    "iteration_id": "iteration_1776222117330_8"
+  },
+  {
+    "timestamp": 1776236553270,
+    "trade_count": 2,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 2,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -12.5116575,
+      "total_pnl": -25.023315,
+      "stop_out_rate": 0.5,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "stop_outs": 1,
+          "stop_out_rate": 0.5
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -12.5116575,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1025,
+      "mean_reversion": 0.3534,
+      "breakout": 0.4417,
+      "momentum_confirmation": 0.1025
+    },
+    "weights_after": {
+      "trend_following": 0.1005,
+      "mean_reversion": 0.3551,
+      "breakout": 0.4439,
+      "momentum_confirmation": 0.1005
+    },
+    "params_before": {
+      "confidence_threshold": 0.48,
+      "overall_position_scale": 0.85,
+      "overall_leverage_scale": 0.85,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.8186
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7824
+      },
+      "state_position_scale": {
+        "强势上涨": 0.8098,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.028,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -13.068666,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -16.791763
+      },
+      "last_updated_ts": 1776236246418
+    },
+    "params_after": {
+      "confidence_threshold": 0.5,
+      "overall_position_scale": 0.8,
+      "overall_leverage_scale": 0.8,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7946
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7536
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7714,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0357,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.873713,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -19.016824
+      },
+      "last_updated_ts": 1776236246418
+    },
+    "iteration_id": "iteration_1776236553270_9"
+  },
+  {
+    "timestamp": 1776250977341,
+    "trade_count": 2,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 2,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -12.5116575,
+      "total_pnl": -25.023315,
+      "stop_out_rate": 0.5,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "stop_outs": 1,
+          "stop_out_rate": 0.5
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -12.5116575,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1005,
+      "mean_reversion": 0.3551,
+      "breakout": 0.4439,
+      "momentum_confirmation": 0.1005
+    },
+    "weights_after": {
+      "trend_following": 0.1001,
+      "mean_reversion": 0.3555,
+      "breakout": 0.4443,
+      "momentum_confirmation": 0.1001
+    },
+    "params_before": {
+      "confidence_threshold": 0.5,
+      "overall_position_scale": 0.8,
+      "overall_leverage_scale": 0.8,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7946
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7536
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7714,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0357,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.873713,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -19.016824
+      },
+      "last_updated_ts": 1776250670489
+    },
+    "params_after": {
+      "confidence_threshold": 0.52,
+      "overall_position_scale": 0.75,
+      "overall_leverage_scale": 0.75,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.779
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7348
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7464,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0407,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.746994,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -20.463113
+      },
+      "last_updated_ts": 1776250670489
+    },
+    "iteration_id": "iteration_1776250977341_10"
+  },
+  {
+    "timestamp": 1776265401073,
+    "trade_count": 2,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 2,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -12.5116575,
+      "total_pnl": -25.023315,
+      "stop_out_rate": 0.5,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "stop_outs": 1,
+          "stop_out_rate": 0.5
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -12.5116575,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1001,
+      "mean_reversion": 0.3555,
+      "breakout": 0.4443,
+      "momentum_confirmation": 0.1001
+    },
+    "weights_after": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "params_before": {
+      "confidence_threshold": 0.52,
+      "overall_position_scale": 0.75,
+      "overall_leverage_scale": 0.75,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.779
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7348
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7464,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0407,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.746994,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -20.463113
+      },
+      "last_updated_ts": 1776265094246
+    },
+    "params_after": {
+      "confidence_threshold": 0.54,
+      "overall_position_scale": 0.7,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7689
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7226
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7302,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.044,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.664626,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -21.403201
+      },
+      "last_updated_ts": 1776265094246
+    },
+    "iteration_id": "iteration_1776265401073_11"
+  },
+  {
+    "timestamp": 1776279826748,
+    "trade_count": 2,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 2,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -12.5116575,
+      "total_pnl": -25.023315,
+      "stop_out_rate": 0.5,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "stop_outs": 1,
+          "stop_out_rate": 0.5
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -12.5116575,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "weights_after": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "params_before": {
+      "confidence_threshold": 0.54,
+      "overall_position_scale": 0.7,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7689
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7226
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7302,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.044,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.664626,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -21.403201
+      },
+      "last_updated_ts": 1776279519190
+    },
+    "params_after": {
+      "confidence_threshold": 0.56,
+      "overall_position_scale": 0.65,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7623
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7147
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7196,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0461,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.611087,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -22.014258
+      },
+      "last_updated_ts": 1776279519190
+    },
+    "iteration_id": "iteration_1776279826748_12"
+  },
+  {
+    "timestamp": 1776294265148,
+    "trade_count": 2,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 2,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -12.5116575,
+      "total_pnl": -25.023315,
+      "stop_out_rate": 0.5,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "stop_outs": 1,
+          "stop_out_rate": 0.5
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -12.5116575,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "weights_after": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "params_before": {
+      "confidence_threshold": 0.56,
+      "overall_position_scale": 0.65,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7623
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7147
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7196,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0461,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.611087,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -22.014258
+      },
+      "last_updated_ts": 1776293957542
+    },
+    "params_after": {
+      "confidence_threshold": 0.58,
+      "overall_position_scale": 0.6,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.758
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7096
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7127,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0475,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.576287,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -22.411445
+      },
+      "last_updated_ts": 1776293957542
+    },
+    "iteration_id": "iteration_1776294265148_13"
+  },
+  {
+    "timestamp": 1776308704128,
+    "trade_count": 2,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 2,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -12.5116575,
+      "total_pnl": -25.023315,
+      "stop_out_rate": 0.5,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "stop_outs": 1,
+          "stop_out_rate": 0.5
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -12.5116575,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "weights_after": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "params_before": {
+      "confidence_threshold": 0.58,
+      "overall_position_scale": 0.6,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.758
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7096
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7127,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0475,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.576287,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -22.411445
+      },
+      "last_updated_ts": 1776308396999
+    },
+    "params_after": {
+      "confidence_threshold": 0.6,
+      "overall_position_scale": 0.6,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7552
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7062
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7083,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0484,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.553667,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -22.669617
+      },
+      "last_updated_ts": 1776308396999
+    },
+    "iteration_id": "iteration_1776308704128_14"
+  },
+  {
+    "timestamp": 1776323143967,
+    "trade_count": 2,
+    "reasoning": [
+      "已根据最近完成交易对各子策略边际贡献做 EWMA 平滑，并重分配趋势、均值回归、突破与动量确认权重。",
+      "最近交易质量走弱，整体置信度门槛上调，并适度压低仓位和杠杆系数。",
+      "已按币种胜率与不同市场状态的单位交易收益，分别更新币种尺度和状态门槛偏置。",
+      "已根据不同市场状态的止损触发率，自适应微调各状态止损宽度。"
+    ],
+    "metrics": {
+      "trade_count": 2,
+      "win_rate": 0.0,
+      "payoff_ratio": 0.0,
+      "avg_pnl": -12.5116575,
+      "total_pnl": -25.023315,
+      "stop_out_rate": 0.5,
+      "by_symbol": {
+        "SOL-USDT-SWAP": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "accuracy": 0.0
+        }
+      },
+      "by_state": {
+        "强势上涨": {
+          "count": 2,
+          "wins": 0,
+          "total_pnl": -25.023315,
+          "avg_pnl": -12.5116575,
+          "stop_outs": 1,
+          "stop_out_rate": 0.5
+        }
+      },
+      "strategy_edge": {
+        "trend_following": -12.5116575,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -23.149079
+      }
+    },
+    "weights_before": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "weights_after": {
+      "trend_following": 0.1,
+      "mean_reversion": 0.3556,
+      "breakout": 0.4444,
+      "momentum_confirmation": 0.1
+    },
+    "params_before": {
+      "confidence_threshold": 0.6,
+      "overall_position_scale": 0.6,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7552
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7062
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7083,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.0484,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.553667,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -22.669617
+      },
+      "last_updated_ts": 1776322836378
+    },
+    "params_after": {
+      "confidence_threshold": 0.62,
+      "overall_position_scale": 0.6,
+      "overall_leverage_scale": 0.7,
+      "symbol_position_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.7534
+      },
+      "symbol_leverage_scale": {
+        "BTC-USDT-SWAP": 1.0,
+        "SOL-USDT-SWAP": 0.704
+      },
+      "state_position_scale": {
+        "强势上涨": 0.7054,
+        "弱势上涨": 0.9,
+        "区间震荡": 0.75,
+        "弱势下跌": 0.85,
+        "强势下跌": 1.05
+      },
+      "state_confidence_bonus": {
+        "强势上涨": 0.049,
+        "弱势上涨": 0.0,
+        "区间震荡": 0.05,
+        "弱势下跌": 0.0,
+        "强势下跌": -0.02
+      },
+      "state_stop_loss_pct": {
+        "强势上涨": 0.017,
+        "弱势上涨": 0.017,
+        "区间震荡": 0.014,
+        "弱势下跌": 0.017,
+        "强势下跌": 0.015
+      },
+      "strategy_edge": {
+        "trend_following": -12.538964,
+        "mean_reversion": 0.0,
+        "breakout": 0.0,
+        "momentum_confirmation": -22.837429
+      },
+      "last_updated_ts": 1776322836378
+    },
+    "iteration_id": "iteration_1776323143967_15"
+  }
+]

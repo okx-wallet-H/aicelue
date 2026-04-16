@@ -1,0 +1,6 @@
+{
+  "trend_following": 0.1,
+  "mean_reversion": 0.3556,
+  "breakout": 0.4444,
+  "momentum_confirmation": 0.1
+}

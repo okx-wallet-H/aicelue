@@ -1,0 +1,178 @@
+from __future__ import annotations
+
+import math
+from typing import Any
+
+from app.okx_cli import OKXClient
+from app.utils import safe_float
+
+
+class ExecutionEngine:
+    def __init__(self, client: OKXClient) -> None:
+        self.client = client
+
+    @staticmethod
+    def _contract_size(symbol: str) -> float:
+        if symbol == "BTC-USDT-SWAP":
+            return 0.01
+        if symbol == "SOL-USDT-SWAP":
+            return 0.1
+        return 1.0
+
+    def _normalize_contracts(self, contracts: float) -> float:
+        if contracts <= 0:
+            return 0.0
+        normalized = math.floor(contracts * 100) / 100
+        return round(max(normalized, 0.0), 2)
+
+    def estimate_order_size(self, symbol: str, equity_usdt: float, price: float, leverage: int, position_ratio: float) -> float:
+        notional = equity_usdt * position_ratio * leverage
+        if price <= 0:
+            return 0.0
+        contracts = notional / (price * self._contract_size(symbol))
+        return self._normalize_contracts(contracts)
+
+    def estimate_fixed_margin_order_size(self, symbol: str, margin_usdt: float, price: float, leverage: int) -> float:
+        notional = margin_usdt * leverage
+        if price <= 0:
+            return 0.0
+        contracts = notional / (price * self._contract_size(symbol))
+        return self._normalize_contracts(contracts)
+
+    def get_net_position(self, symbol: str) -> float:
+        positions = self.client.get_positions(symbol)
+        if not positions:
+            return 0.0
+        return safe_float(positions[0].get("pos"))
+
+    def close_with_reverse_market(self, symbol: str, tag: str = "agentTradeKit", td_mode: str = "isolated") -> list[dict[str, Any]]:
+        net_pos = self.get_net_position(symbol)
+        if net_pos == 0:
+            return []
+        side = "sell" if net_pos > 0 else "buy"
+        return self.client.place_order(symbol, side=side, size=abs(net_pos), ord_type="market", td_mode=td_mode, tag=tag, reduce_only=True)
+
+    def close_position(
+        self,
+        symbol: str,
+        td_mode: str = "isolated",
+        tag: str = "agentTradeKit",
+        reason: str | None = None,
+    ) -> dict[str, Any]:
+        net_pos = self.get_net_position(symbol)
+        if abs(net_pos) <= 1e-8:
+            return {"entry": [], "algo": [], "closed_size": 0.0, "reason": reason or "flat_position"}
+        result = self.close_with_reverse_market(symbol=symbol, tag=tag, td_mode=td_mode)
+        return {
+            "entry": result,
+            "algo": [],
+            "closed_size": abs(net_pos),
+            "reason": reason or "signal_exit",
+            "td_mode": td_mode,
+        }
+
+    def place_entry_with_tpsl(
+        self,
+        symbol: str,
+        side: str,
+        size: float,
+        entry_price: float,
+        stop_loss_pct: float,
+        take_profit_pct: float,
+        tag: str = "agentTradeKit",
+        td_mode: str = "isolated",
+        leverage: int | None = None,
+    ) -> dict[str, Any]:
+        leverage_result: list[dict[str, Any]] = []
+        if leverage is not None:
+            leverage_result = self.client.set_leverage(symbol, lever=leverage, mgn_mode=td_mode)
+
+        order_result = self.client.place_order(
+            symbol,
+            side=side,
+            size=size,
+            ord_type="market",
+            td_mode=td_mode,
+            tag=tag,
+            reduce_only=False,
+        )
+        if not order_result:
+            return {"leverage": leverage_result, "entry": [], "algo": []}
+
+        entry_success = any(str(row.get("sCode", "")) == "0" for row in order_result if isinstance(row, dict))
+        if not entry_success:
+            return {
+                "leverage": leverage_result,
+                "entry": order_result,
+                "algo": [],
+                "stop_loss_pct": stop_loss_pct,
+                "take_profit_pct": take_profit_pct,
+                "td_mode": td_mode,
+            }
+
+        if side == "buy":
+            sl_trigger = round(entry_price * (1 - stop_loss_pct), 4)
+            tp_trigger = round(entry_price * (1 + take_profit_pct), 4)
+        else:
+            sl_trigger = round(entry_price * (1 + stop_loss_pct), 4)
+            tp_trigger = round(entry_price * (1 - take_profit_pct), 4)
+
+        exit_side = "sell" if side == "buy" else "buy"
+        algo_result = self.client.place_algo_order(
+            inst_id=symbol,
+            td_mode=td_mode,
+            algo_ord_type="oco",
+            side=exit_side,
+            sz=size,
+            tp_trigger_px=tp_trigger,
+            sl_trigger_px=sl_trigger,
+            tag=tag,
+            reduce_only=True,
+        )
+        return {
+            "leverage": leverage_result,
+            "entry": order_result,
+            "algo": algo_result,
+            "stop_loss_pct": stop_loss_pct,
+            "take_profit_pct": take_profit_pct,
+            "td_mode": td_mode,
+        }
+
+    def place_knife_attack(
+        self,
+        symbol: str,
+        side: str,
+        entry_price: float,
+        margin_usdt: float,
+        leverage: int,
+        stop_loss_pct: float,
+        take_profit_pct: float,
+        tag: str = "agentTradeKit",
+    ) -> dict[str, Any]:
+        size = self.estimate_fixed_margin_order_size(symbol, margin_usdt=margin_usdt, price=entry_price, leverage=leverage)
+        if size <= 0:
+            return {
+                "leverage": [],
+                "entry": [],
+                "algo": [],
+                "size": 0.0,
+                "margin_usdt": margin_usdt,
+                "leverage_requested": leverage,
+                "td_mode": "isolated",
+            }
+        result = self.place_entry_with_tpsl(
+            symbol=symbol,
+            side=side,
+            size=size,
+            entry_price=entry_price,
+            stop_loss_pct=stop_loss_pct,
+            take_profit_pct=take_profit_pct,
+            tag=tag,
+            td_mode="isolated",
+            leverage=leverage,
+        )
+        result["size"] = size
+        result["margin_usdt"] = margin_usdt
+        result["leverage_requested"] = leverage
+        result["td_mode"] = "isolated"
+        return result

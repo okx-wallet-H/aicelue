@@ -1,0 +1,4006 @@
+{
+  "BTC-USDT-SWAP": [
+    {
+      "timestamp": 1776186251238,
+      "open_interest": 3576970.8700000336
+    },
+    {
+      "timestamp": 1776186557339,
+      "open_interest": 3571681.120000033
+    },
+    {
+      "timestamp": 1776186863488,
+      "open_interest": 3571126.9800000326
+    },
+    {
+      "timestamp": 1776187169888,
+      "open_interest": 3568296.920000033
+    },
+    {
+      "timestamp": 1776187475885,
+      "open_interest": 3564761.750000033
+    },
+    {
+      "timestamp": 1776187781986,
+      "open_interest": 3563885.6600000323
+    },
+    {
+      "timestamp": 1776188088091,
+      "open_interest": 3554340.290000033
+    },
+    {
+      "timestamp": 1776188394186,
+      "open_interest": 3547776.6200000327
+    },
+    {
+      "timestamp": 1776188700339,
+      "open_interest": 3551098.960000033
+    },
+    {
+      "timestamp": 1776189006689,
+      "open_interest": 3550745.0900000334
+    },
+    {
+      "timestamp": 1776189312836,
+      "open_interest": 3561578.2100000326
+    },
+    {
+      "timestamp": 1776189618936,
+      "open_interest": 3559908.8900000327
+    },
+    {
+      "timestamp": 1776189925089,
+      "open_interest": 3559821.020000033
+    },
+    {
+      "timestamp": 1776190231134,
+      "open_interest": 3561360.240000033
+    },
+    {
+      "timestamp": 1776190537285,
+      "open_interest": 3558080.8400000324
+    },
+    {
+      "timestamp": 1776190843384,
+      "open_interest": 3556024.070000033
+    },
+    {
+      "timestamp": 1776191149434,
+      "open_interest": 3558384.550000033
+    },
+    {
+      "timestamp": 1776191455535,
+      "open_interest": 3565897.1400000323
+    },
+    {
+      "timestamp": 1776191761737,
+      "open_interest": 3569158.3500000327
+    },
+    {
+      "timestamp": 1776192067835,
+      "open_interest": 3568817.230000032
+    },
+    {
+      "timestamp": 1776192373986,
+      "open_interest": 3572831.530000032
+    },
+    {
+      "timestamp": 1776192680035,
+      "open_interest": 3558879.8400000315
+    },
+    {
+      "timestamp": 1776192986135,
+      "open_interest": 3556763.4000000325
+    },
+    {
+      "timestamp": 1776193292234,
+      "open_interest": 3555792.980000032
+    },
+    {
+      "timestamp": 1776193598336,
+      "open_interest": 3549183.9900000324
+    },
+    {
+      "timestamp": 1776193904438,
+      "open_interest": 3547795.1400000323
+    },
+    {
+      "timestamp": 1776194210536,
+      "open_interest": 3546652.360000032
+    },
+    {
+      "timestamp": 1776194516586,
+      "open_interest": 3546380.7700000317
+    },
+    {
+      "timestamp": 1776194822787,
+      "open_interest": 3546686.1300000288
+    },
+    {
+      "timestamp": 1776195128889,
+      "open_interest": 3545085.1200000294
+    },
+    {
+      "timestamp": 1776195435138,
+      "open_interest": 3545758.010000029
+    },
+    {
+      "timestamp": 1776195741238,
+      "open_interest": 3550658.6700000293
+    },
+    {
+      "timestamp": 1776196047338,
+      "open_interest": 3553118.820000029
+    },
+    {
+      "timestamp": 1776196353488,
+      "open_interest": 3554648.940000029
+    },
+    {
+      "timestamp": 1776196659689,
+      "open_interest": 3561568.5700000296
+    },
+    {
+      "timestamp": 1776196965788,
+      "open_interest": 3565537.29000003
+    },
+    {
+      "timestamp": 1776197271889,
+      "open_interest": 3565999.9300000295
+    },
+    {
+      "timestamp": 1776197577988,
+      "open_interest": 3564622.010000029
+    },
+    {
+      "timestamp": 1776197884190,
+      "open_interest": 3562900.9600000284
+    },
+    {
+      "timestamp": 1776198190291,
+      "open_interest": 3562985.7800000277
+    },
+    {
+      "timestamp": 1776198496437,
+      "open_interest": 3563934.9500000277
+    },
+    {
+      "timestamp": 1776198802562,
+      "open_interest": 3565278.9500000277
+    },
+    {
+      "timestamp": 1776199108636,
+      "open_interest": 3564339.4500000286
+    },
+    {
+      "timestamp": 1776199414688,
+      "open_interest": 3565577.9800000284
+    },
+    {
+      "timestamp": 1776199720838,
+      "open_interest": 3563401.240000028
+    },
+    {
+      "timestamp": 1776200026940,
+      "open_interest": 3562648.680000028
+    },
+    {
+      "timestamp": 1776200333136,
+      "open_interest": 3563215.440000029
+    },
+    {
+      "timestamp": 1776200639238,
+      "open_interest": 3565432.1600000286
+    },
+    {
+      "timestamp": 1776200945427,
+      "open_interest": 3563134.880000028
+    },
+    {
+      "timestamp": 1776201251530,
+      "open_interest": 3562767.2900000284
+    },
+    {
+      "timestamp": 1776201557780,
+      "open_interest": 3563355.9100000286
+    },
+    {
+      "timestamp": 1776201863829,
+      "open_interest": 3563750.740000029
+    },
+    {
+      "timestamp": 1776202169880,
+      "open_interest": 3563011.0700000282
+    },
+    {
+      "timestamp": 1776202475880,
+      "open_interest": 3563059.6300000288
+    },
+    {
+      "timestamp": 1776202781980,
+      "open_interest": 3561365.9200000283
+    },
+    {
+      "timestamp": 1776203088081,
+      "open_interest": 3562177.4800000284
+    },
+    {
+      "timestamp": 1776203394179,
+      "open_interest": 3562964.330000028
+    },
+    {
+      "timestamp": 1776203700234,
+      "open_interest": 3560060.980000027
+    },
+    {
+      "timestamp": 1776204006493,
+      "open_interest": 3559601.900000027
+    },
+    {
+      "timestamp": 1776204312679,
+      "open_interest": 3552971.8200000273
+    },
+    {
+      "timestamp": 1776204342480,
+      "open_interest": 3553393.810000027
+    },
+    {
+      "timestamp": 1776204648780,
+      "open_interest": 3550788.4300000276
+    },
+    {
+      "timestamp": 1776204954881,
+      "open_interest": 3549712.3500000276
+    },
+    {
+      "timestamp": 1776205260982,
+      "open_interest": 3549166.490000029
+    },
+    {
+      "timestamp": 1776205567130,
+      "open_interest": 3548297.2800000296
+    },
+    {
+      "timestamp": 1776205696830,
+      "open_interest": 3547532.2800000296
+    },
+    {
+      "timestamp": 1776206006582,
+      "open_interest": 3564354.930000029
+    },
+    {
+      "timestamp": 1776206316181,
+      "open_interest": 3562691.4800000275
+    },
+    {
+      "timestamp": 1776206625533,
+      "open_interest": 3560907.180000028
+    },
+    {
+      "timestamp": 1776206934930,
+      "open_interest": 3558055.0100000296
+    },
+    {
+      "timestamp": 1776207244431,
+      "open_interest": 3556699.720000029
+    },
+    {
+      "timestamp": 1776207553833,
+      "open_interest": 3555971.9800000293
+    },
+    {
+      "timestamp": 1776207863180,
+      "open_interest": 3553897.2000000286
+    },
+    {
+      "timestamp": 1776208169585,
+      "open_interest": 3552014.500000026
+    },
+    {
+      "timestamp": 1776208479685,
+      "open_interest": 3551966.8800000264
+    },
+    {
+      "timestamp": 1776208787635,
+      "open_interest": 3552342.0600000275
+    },
+    {
+      "timestamp": 1776208975436,
+      "open_interest": 3551135.7600000273
+    },
+    {
+      "timestamp": 1776209282585,
+      "open_interest": 3550808.7700000275
+    },
+    {
+      "timestamp": 1776209589334,
+      "open_interest": 3551537.9400000283
+    },
+    {
+      "timestamp": 1776209896132,
+      "open_interest": 3550710.400000028
+    },
+    {
+      "timestamp": 1776210202985,
+      "open_interest": 3546353.6600000276
+    },
+    {
+      "timestamp": 1776210440685,
+      "open_interest": 3545082.850000027
+    },
+    {
+      "timestamp": 1776210748237,
+      "open_interest": 3546666.7000000277
+    },
+    {
+      "timestamp": 1776211055786,
+      "open_interest": 3547756.670000027
+    },
+    {
+      "timestamp": 1776211362584,
+      "open_interest": 3544414.350000026
+    },
+    {
+      "timestamp": 1776211669434,
+      "open_interest": 3525090.270000029
+    },
+    {
+      "timestamp": 1776211976983,
+      "open_interest": 3524030.2300000293
+    },
+    {
+      "timestamp": 1776212283884,
+      "open_interest": 3523793.250000028
+    },
+    {
+      "timestamp": 1776212591433,
+      "open_interest": 3520114.3500000294
+    },
+    {
+      "timestamp": 1776212898934,
+      "open_interest": 3519963.4200000293
+    },
+    {
+      "timestamp": 1776213206480,
+      "open_interest": 3519152.9100000286
+    },
+    {
+      "timestamp": 1776213513285,
+      "open_interest": 3518872.1400000285
+    },
+    {
+      "timestamp": 1776213820234,
+      "open_interest": 3517610.410000029
+    },
+    {
+      "timestamp": 1776214127783,
+      "open_interest": 3514662.840000028
+    },
+    {
+      "timestamp": 1776214434583,
+      "open_interest": 3514483.120000028
+    },
+    {
+      "timestamp": 1776214741533,
+      "open_interest": 3515091.710000029
+    },
+    {
+      "timestamp": 1776215048514,
+      "open_interest": 3513190.300000029
+    },
+    {
+      "timestamp": 1776215356137,
+      "open_interest": 3511618.8600000297
+    },
+    {
+      "timestamp": 1776215663587,
+      "open_interest": 3513077.9300000295
+    },
+    {
+      "timestamp": 1776215971141,
+      "open_interest": 3514269.050000029
+    },
+    {
+      "timestamp": 1776216278040,
+      "open_interest": 3515262.71000003
+    },
+    {
+      "timestamp": 1776216585538,
+      "open_interest": 3516270.4000000297
+    },
+    {
+      "timestamp": 1776216892338,
+      "open_interest": 3516748.5200000294
+    },
+    {
+      "timestamp": 1776217199187,
+      "open_interest": 3539339.1900000283
+    },
+    {
+      "timestamp": 1776217506888,
+      "open_interest": 3541853.7100000293
+    },
+    {
+      "timestamp": 1776217813785,
+      "open_interest": 3541811.7700000294
+    },
+    {
+      "timestamp": 1776218120633,
+      "open_interest": 3540259.6500000292
+    },
+    {
+      "timestamp": 1776218427484,
+      "open_interest": 3540364.7300000293
+    },
+    {
+      "timestamp": 1776218734340,
+      "open_interest": 3541274.2400000296
+    },
+    {
+      "timestamp": 1776219041181,
+      "open_interest": 3541718.53000003
+    },
+    {
+      "timestamp": 1776219348836,
+      "open_interest": 3541751.44000003
+    },
+    {
+      "timestamp": 1776219656533,
+      "open_interest": 3539629.36000003
+    },
+    {
+      "timestamp": 1776219963536,
+      "open_interest": 3538186.470000028
+    },
+    {
+      "timestamp": 1776220271183,
+      "open_interest": 3533019.9000000283
+    },
+    {
+      "timestamp": 1776220578031,
+      "open_interest": 3528364.930000028
+    },
+    {
+      "timestamp": 1776220885529,
+      "open_interest": 3529529.0300000277
+    },
+    {
+      "timestamp": 1776221192333,
+      "open_interest": 3528379.9400000274
+    },
+    {
+      "timestamp": 1776221499181,
+      "open_interest": 3530262.180000027
+    },
+    {
+      "timestamp": 1776221806033,
+      "open_interest": 3530224.720000027
+    },
+    {
+      "timestamp": 1776222113630,
+      "open_interest": 3527135.0400000266
+    },
+    {
+      "timestamp": 1776222420491,
+      "open_interest": 3527137.1100000264
+    },
+    {
+      "timestamp": 1776222728139,
+      "open_interest": 3525172.020000027
+    },
+    {
+      "timestamp": 1776223035739,
+      "open_interest": 3526624.8200000273
+    },
+    {
+      "timestamp": 1776223343289,
+      "open_interest": 3524176.150000027
+    },
+    {
+      "timestamp": 1776223650838,
+      "open_interest": 3524371.060000027
+    },
+    {
+      "timestamp": 1776223958391,
+      "open_interest": 3524988.9700000267
+    },
+    {
+      "timestamp": 1776224265239,
+      "open_interest": 3524729.9100000276
+    },
+    {
+      "timestamp": 1776224572094,
+      "open_interest": 3523360.0400000275
+    },
+    {
+      "timestamp": 1776224878939,
+      "open_interest": 3524108.9900000268
+    },
+    {
+      "timestamp": 1776225186599,
+      "open_interest": 3523335.550000027
+    },
+    {
+      "timestamp": 1776225494188,
+      "open_interest": 3520446.7600000277
+    },
+    {
+      "timestamp": 1776225801788,
+      "open_interest": 3516850.170000027
+    },
+    {
+      "timestamp": 1776226109339,
+      "open_interest": 3520350.0900000273
+    },
+    {
+      "timestamp": 1776226416887,
+      "open_interest": 3520866.650000028
+    },
+    {
+      "timestamp": 1776226723688,
+      "open_interest": 3520548.500000027
+    },
+    {
+      "timestamp": 1776227031139,
+      "open_interest": 3521759.610000027
+    },
+    {
+      "timestamp": 1776227337884,
+      "open_interest": 3521236.510000027
+    },
+    {
+      "timestamp": 1776227644687,
+      "open_interest": 3521512.830000027
+    },
+    {
+      "timestamp": 1776227951538,
+      "open_interest": 3520728.2000000263
+    },
+    {
+      "timestamp": 1776228259034,
+      "open_interest": 3521246.650000027
+    },
+    {
+      "timestamp": 1776228565836,
+      "open_interest": 3517642.980000028
+    },
+    {
+      "timestamp": 1776228873386,
+      "open_interest": 3516873.100000028
+    },
+    {
+      "timestamp": 1776229180186,
+      "open_interest": 3516329.360000028
+    },
+    {
+      "timestamp": 1776229487736,
+      "open_interest": 3522110.250000027
+    },
+    {
+      "timestamp": 1776229795235,
+      "open_interest": 3521884.5100000277
+    },
+    {
+      "timestamp": 1776230102984,
+      "open_interest": 3525307.0600000275
+    },
+    {
+      "timestamp": 1776230410480,
+      "open_interest": 3528383.8100000285
+    },
+    {
+      "timestamp": 1776230717332,
+      "open_interest": 3529480.1900000297
+    },
+    {
+      "timestamp": 1776231024129,
+      "open_interest": 3531086.5300000287
+    },
+    {
+      "timestamp": 1776231331629,
+      "open_interest": 3532632.710000029
+    },
+    {
+      "timestamp": 1776231639179,
+      "open_interest": 3525809.2900000294
+    },
+    {
+      "timestamp": 1776231946034,
+      "open_interest": 3527993.4500000286
+    },
+    {
+      "timestamp": 1776232252881,
+      "open_interest": 3530119.120000028
+    },
+    {
+      "timestamp": 1776232559682,
+      "open_interest": 3530171.260000028
+    },
+    {
+      "timestamp": 1776232867330,
+      "open_interest": 3530669.790000029
+    },
+    {
+      "timestamp": 1776233174185,
+      "open_interest": 3530977.8300000294
+    },
+    {
+      "timestamp": 1776233480937,
+      "open_interest": 3532951.3800000288
+    },
+    {
+      "timestamp": 1776233787837,
+      "open_interest": 3532722.690000029
+    },
+    {
+      "timestamp": 1776234094734,
+      "open_interest": 3529871.8500000294
+    },
+    {
+      "timestamp": 1776234401585,
+      "open_interest": 3530679.5400000294
+    },
+    {
+      "timestamp": 1776234708436,
+      "open_interest": 3528539.7500000293
+    },
+    {
+      "timestamp": 1776235015285,
+      "open_interest": 3527578.520000029
+    },
+    {
+      "timestamp": 1776235322138,
+      "open_interest": 3527001.410000027
+    },
+    {
+      "timestamp": 1776235628987,
+      "open_interest": 3526406.180000028
+    },
+    {
+      "timestamp": 1776235935838,
+      "open_interest": 3527623.1000000285
+    },
+    {
+      "timestamp": 1776236242736,
+      "open_interest": 3522843.980000028
+    },
+    {
+      "timestamp": 1776236549628,
+      "open_interest": 3518639.0800000275
+    },
+    {
+      "timestamp": 1776236856481,
+      "open_interest": 3521168.4400000274
+    },
+    {
+      "timestamp": 1776237163531,
+      "open_interest": 3520996.300000028
+    },
+    {
+      "timestamp": 1776237470334,
+      "open_interest": 3493609.45000003
+    },
+    {
+      "timestamp": 1776237777184,
+      "open_interest": 3495663.9200000293
+    },
+    {
+      "timestamp": 1776238084134,
+      "open_interest": 3497123.970000031
+    },
+    {
+      "timestamp": 1776238391035,
+      "open_interest": 3500348.8300000303
+    },
+    {
+      "timestamp": 1776238697883,
+      "open_interest": 3499711.550000031
+    },
+    {
+      "timestamp": 1776239004732,
+      "open_interest": 3498124.080000031
+    },
+    {
+      "timestamp": 1776239311635,
+      "open_interest": 3490483.1000000313
+    },
+    {
+      "timestamp": 1776239618533,
+      "open_interest": 3494822.4600000307
+    },
+    {
+      "timestamp": 1776239925386,
+      "open_interest": 3487670.8000000305
+    },
+    {
+      "timestamp": 1776240232183,
+      "open_interest": 3483903.1700000307
+    },
+    {
+      "timestamp": 1776240539245,
+      "open_interest": 3479895.560000031
+    },
+    {
+      "timestamp": 1776240846438,
+      "open_interest": 3479043.20000003
+    },
+    {
+      "timestamp": 1776241153339,
+      "open_interest": 3478023.1800000286
+    },
+    {
+      "timestamp": 1776241460190,
+      "open_interest": 3478531.9100000286
+    },
+    {
+      "timestamp": 1776241767037,
+      "open_interest": 3480746.200000027
+    },
+    {
+      "timestamp": 1776242073888,
+      "open_interest": 3473705.060000029
+    },
+    {
+      "timestamp": 1776242380738,
+      "open_interest": 3471310.2000000277
+    },
+    {
+      "timestamp": 1776242687585,
+      "open_interest": 3471764.730000028
+    },
+    {
+      "timestamp": 1776242994377,
+      "open_interest": 3470742.370000028
+    },
+    {
+      "timestamp": 1776243301181,
+      "open_interest": 3467752.3900000276
+    },
+    {
+      "timestamp": 1776243608229,
+      "open_interest": 3469850.5700000273
+    },
+    {
+      "timestamp": 1776243915132,
+      "open_interest": 3473327.9800000265
+    },
+    {
+      "timestamp": 1776244222035,
+      "open_interest": 3476535.4800000265
+    },
+    {
+      "timestamp": 1776244528829,
+      "open_interest": 3475451.2000000267
+    },
+    {
+      "timestamp": 1776244835629,
+      "open_interest": 3476227.960000027
+    },
+    {
+      "timestamp": 1776245142531,
+      "open_interest": 3476237.4800000265
+    },
+    {
+      "timestamp": 1776245449384,
+      "open_interest": 3476788.3100000266
+    },
+    {
+      "timestamp": 1776245756734,
+      "open_interest": 3475052.870000026
+    },
+    {
+      "timestamp": 1776246063679,
+      "open_interest": 3484690.560000027
+    },
+    {
+      "timestamp": 1776246370533,
+      "open_interest": 3484756.5200000275
+    },
+    {
+      "timestamp": 1776246677382,
+      "open_interest": 3484112.580000028
+    },
+    {
+      "timestamp": 1776246984231,
+      "open_interest": 3484188.2500000275
+    },
+    {
+      "timestamp": 1776247291133,
+      "open_interest": 3484798.880000028
+    },
+    {
+      "timestamp": 1776247598038,
+      "open_interest": 3478175.2900000284
+    },
+    {
+      "timestamp": 1776247904988,
+      "open_interest": 3479123.130000028
+    },
+    {
+      "timestamp": 1776248211889,
+      "open_interest": 3481385.2500000275
+    },
+    {
+      "timestamp": 1776248518737,
+      "open_interest": 3480583.470000028
+    },
+    {
+      "timestamp": 1776248825638,
+      "open_interest": 3482627.6700000283
+    },
+    {
+      "timestamp": 1776249132488,
+      "open_interest": 3486037.430000028
+    },
+    {
+      "timestamp": 1776249439290,
+      "open_interest": 3474262.910000028
+    },
+    {
+      "timestamp": 1776249746138,
+      "open_interest": 3472075.910000028
+    },
+    {
+      "timestamp": 1776250053041,
+      "open_interest": 3468140.370000028
+    },
+    {
+      "timestamp": 1776250359891,
+      "open_interest": 3465544.6400000285
+    },
+    {
+      "timestamp": 1776250666790,
+      "open_interest": 3468211.060000029
+    },
+    {
+      "timestamp": 1776250973635,
+      "open_interest": 3465945.840000028
+    },
+    {
+      "timestamp": 1776251280536,
+      "open_interest": 3466671.8700000285
+    },
+    {
+      "timestamp": 1776251587538,
+      "open_interest": 3466845.210000029
+    },
+    {
+      "timestamp": 1776251894384,
+      "open_interest": 3469169.500000029
+    },
+    {
+      "timestamp": 1776252201287,
+      "open_interest": 3468446.1400000285
+    },
+    {
+      "timestamp": 1776252508135,
+      "open_interest": 3468219.410000029
+    },
+    {
+      "timestamp": 1776252814987,
+      "open_interest": 3468810.490000029
+    },
+    {
+      "timestamp": 1776253121835,
+      "open_interest": 3467703.5400000294
+    },
+    {
+      "timestamp": 1776253428684,
+      "open_interest": 3467488.330000029
+    },
+    {
+      "timestamp": 1776253735583,
+      "open_interest": 3464365.2400000296
+    },
+    {
+      "timestamp": 1776254042536,
+      "open_interest": 3464815.5300000287
+    },
+    {
+      "timestamp": 1776254349433,
+      "open_interest": 3465536.0800000294
+    },
+    {
+      "timestamp": 1776254656286,
+      "open_interest": 3465801.1700000283
+    },
+    {
+      "timestamp": 1776254963180,
+      "open_interest": 3463909.9500000286
+    },
+    {
+      "timestamp": 1776255270134,
+      "open_interest": 3465528.170000029
+    },
+    {
+      "timestamp": 1776255577035,
+      "open_interest": 3467071.9100000286
+    },
+    {
+      "timestamp": 1776255883933,
+      "open_interest": 3467134.4000000283
+    },
+    {
+      "timestamp": 1776256190784,
+      "open_interest": 3466022.4600000274
+    },
+    {
+      "timestamp": 1776256497633,
+      "open_interest": 3470784.490000028
+    },
+    {
+      "timestamp": 1776256804683,
+      "open_interest": 3467192.5100000273
+    },
+    {
+      "timestamp": 1776257111583,
+      "open_interest": 3468387.4200000293
+    },
+    {
+      "timestamp": 1776257418432,
+      "open_interest": 3467571.420000029
+    },
+    {
+      "timestamp": 1776257725382,
+      "open_interest": 3467381.500000029
+    },
+    {
+      "timestamp": 1776258032184,
+      "open_interest": 3465820.9400000297
+    },
+    {
+      "timestamp": 1776258339086,
+      "open_interest": 3464102.1500000283
+    },
+    {
+      "timestamp": 1776258645934,
+      "open_interest": 3466485.8300000285
+    },
+    {
+      "timestamp": 1776258952888,
+      "open_interest": 3467841.5400000284
+    },
+    {
+      "timestamp": 1776259259737,
+      "open_interest": 3472702.680000028
+    },
+    {
+      "timestamp": 1776259566696,
+      "open_interest": 3473488.030000028
+    },
+    {
+      "timestamp": 1776259873547,
+      "open_interest": 3473907.990000028
+    },
+    {
+      "timestamp": 1776260180436,
+      "open_interest": 3476562.470000028
+    },
+    {
+      "timestamp": 1776260487285,
+      "open_interest": 3484346.230000029
+    },
+    {
+      "timestamp": 1776260794186,
+      "open_interest": 3482458.640000027
+    },
+    {
+      "timestamp": 1776261100985,
+      "open_interest": 3486052.0800000266
+    },
+    {
+      "timestamp": 1776261407835,
+      "open_interest": 3491188.2700000266
+    },
+    {
+      "timestamp": 1776261714737,
+      "open_interest": 3486219.9800000275
+    },
+    {
+      "timestamp": 1776262021689,
+      "open_interest": 3485041.4200000265
+    },
+    {
+      "timestamp": 1776262328587,
+      "open_interest": 3487528.610000028
+    },
+    {
+      "timestamp": 1776262635485,
+      "open_interest": 3475935.3100000275
+    },
+    {
+      "timestamp": 1776262942338,
+      "open_interest": 3481546.020000027
+    },
+    {
+      "timestamp": 1776263249184,
+      "open_interest": 3475224.7000000286
+    },
+    {
+      "timestamp": 1776263556038,
+      "open_interest": 3478989.2700000294
+    },
+    {
+      "timestamp": 1776263862885,
+      "open_interest": 3484563.840000029
+    },
+    {
+      "timestamp": 1776264169736,
+      "open_interest": 3485522.730000028
+    },
+    {
+      "timestamp": 1776264476635,
+      "open_interest": 3493515.180000027
+    },
+    {
+      "timestamp": 1776264783636,
+      "open_interest": 3495810.750000027
+    },
+    {
+      "timestamp": 1776265090539,
+      "open_interest": 3492902.100000027
+    },
+    {
+      "timestamp": 1776265397380,
+      "open_interest": 3492909.430000027
+    },
+    {
+      "timestamp": 1776265704231,
+      "open_interest": 3496501.660000028
+    },
+    {
+      "timestamp": 1776266011131,
+      "open_interest": 3501646.130000028
+    },
+    {
+      "timestamp": 1776266318231,
+      "open_interest": 3494322.2700000275
+    },
+    {
+      "timestamp": 1776266625079,
+      "open_interest": 3495523.670000028
+    },
+    {
+      "timestamp": 1776266931930,
+      "open_interest": 3496236.4600000284
+    },
+    {
+      "timestamp": 1776267238834,
+      "open_interest": 3498056.800000028
+    },
+    {
+      "timestamp": 1776267545832,
+      "open_interest": 3503674.680000027
+    },
+    {
+      "timestamp": 1776267852738,
+      "open_interest": 3500796.770000027
+    },
+    {
+      "timestamp": 1776268159630,
+      "open_interest": 3497821.7700000256
+    },
+    {
+      "timestamp": 1776268466532,
+      "open_interest": 3496870.3100000266
+    },
+    {
+      "timestamp": 1776268773381,
+      "open_interest": 3495439.780000027
+    },
+    {
+      "timestamp": 1776269080231,
+      "open_interest": 3500766.070000026
+    },
+    {
+      "timestamp": 1776269387087,
+      "open_interest": 3500648.300000026
+    },
+    {
+      "timestamp": 1776269693990,
+      "open_interest": 3499653.8700000257
+    },
+    {
+      "timestamp": 1776270000989,
+      "open_interest": 3497580.960000026
+    },
+    {
+      "timestamp": 1776270308088,
+      "open_interest": 3495006.050000026
+    },
+    {
+      "timestamp": 1776270615288,
+      "open_interest": 3495138.6700000265
+    },
+    {
+      "timestamp": 1776270922187,
+      "open_interest": 3501727.7200000267
+    },
+    {
+      "timestamp": 1776271229088,
+      "open_interest": 3504006.6000000257
+    },
+    {
+      "timestamp": 1776271535986,
+      "open_interest": 3509701.730000026
+    },
+    {
+      "timestamp": 1776271842836,
+      "open_interest": 3508808.4300000262
+    },
+    {
+      "timestamp": 1776272149685,
+      "open_interest": 3511006.520000026
+    },
+    {
+      "timestamp": 1776272456485,
+      "open_interest": 3510950.2500000265
+    },
+    {
+      "timestamp": 1776272763436,
+      "open_interest": 3510253.5500000273
+    },
+    {
+      "timestamp": 1776273070338,
+      "open_interest": 3510423.2400000277
+    },
+    {
+      "timestamp": 1776273377235,
+      "open_interest": 3510736.550000028
+    },
+    {
+      "timestamp": 1776273684188,
+      "open_interest": 3510539.8000000278
+    },
+    {
+      "timestamp": 1776273991139,
+      "open_interest": 3509585.150000027
+    },
+    {
+      "timestamp": 1776274298192,
+      "open_interest": 3508138.0300000263
+    },
+    {
+      "timestamp": 1776274605292,
+      "open_interest": 3508338.6700000265
+    },
+    {
+      "timestamp": 1776274912289,
+      "open_interest": 3514892.9100000267
+    },
+    {
+      "timestamp": 1776275219190,
+      "open_interest": 3518136.1000000252
+    },
+    {
+      "timestamp": 1776275526136,
+      "open_interest": 3514808.9100000258
+    },
+    {
+      "timestamp": 1776275833037,
+      "open_interest": 3516157.010000026
+    },
+    {
+      "timestamp": 1776276139936,
+      "open_interest": 3515925.950000026
+    },
+    {
+      "timestamp": 1776276446790,
+      "open_interest": 3512879.4800000265
+    },
+    {
+      "timestamp": 1776276753641,
+      "open_interest": 3509345.570000027
+    },
+    {
+      "timestamp": 1776277060490,
+      "open_interest": 3504179.2500000256
+    },
+    {
+      "timestamp": 1776277367387,
+      "open_interest": 3504666.190000025
+    },
+    {
+      "timestamp": 1776277674240,
+      "open_interest": 3504733.7900000256
+    },
+    {
+      "timestamp": 1776277981143,
+      "open_interest": 3503757.590000026
+    },
+    {
+      "timestamp": 1776278288039,
+      "open_interest": 3505426.900000026
+    },
+    {
+      "timestamp": 1776278594889,
+      "open_interest": 3506068.380000026
+    },
+    {
+      "timestamp": 1776278901740,
+      "open_interest": 3506378.8100000257
+    },
+    {
+      "timestamp": 1776279208604,
+      "open_interest": 3504939.3300000257
+    },
+    {
+      "timestamp": 1776279515490,
+      "open_interest": 3504811.1500000255
+    },
+    {
+      "timestamp": 1776279822341,
+      "open_interest": 3512110.3900000257
+    },
+    {
+      "timestamp": 1776280129935,
+      "open_interest": 3497108.850000028
+    },
+    {
+      "timestamp": 1776280437536,
+      "open_interest": 3496415.600000029
+    },
+    {
+      "timestamp": 1776280744435,
+      "open_interest": 3495492.39000003
+    },
+    {
+      "timestamp": 1776281051338,
+      "open_interest": 3499909.2800000296
+    },
+    {
+      "timestamp": 1776281358238,
+      "open_interest": 3500754.98000003
+    },
+    {
+      "timestamp": 1776281665836,
+      "open_interest": 3489201.640000027
+    },
+    {
+      "timestamp": 1776281972889,
+      "open_interest": 3464346.3600000287
+    },
+    {
+      "timestamp": 1776282280539,
+      "open_interest": 3464127.330000028
+    },
+    {
+      "timestamp": 1776282588139,
+      "open_interest": 3465082.8400000287
+    },
+    {
+      "timestamp": 1776282895040,
+      "open_interest": 3466134.7600000277
+    },
+    {
+      "timestamp": 1776283202142,
+      "open_interest": 3467175.8900000267
+    },
+    {
+      "timestamp": 1776283509789,
+      "open_interest": 3461406.600000029
+    },
+    {
+      "timestamp": 1776283817382,
+      "open_interest": 3459118.9500000263
+    },
+    {
+      "timestamp": 1776284124234,
+      "open_interest": 3453942.3500000266
+    },
+    {
+      "timestamp": 1776284431784,
+      "open_interest": 3452147.4400000265
+    },
+    {
+      "timestamp": 1776284739431,
+      "open_interest": 3452584.4200000265
+    },
+    {
+      "timestamp": 1776285046233,
+      "open_interest": 3448950.5300000277
+    },
+    {
+      "timestamp": 1776285353833,
+      "open_interest": 3447898.5100000277
+    },
+    {
+      "timestamp": 1776285660732,
+      "open_interest": 3449484.930000027
+    },
+    {
+      "timestamp": 1776285968434,
+      "open_interest": 3448267.0700000273
+    },
+    {
+      "timestamp": 1776286275333,
+      "open_interest": 3448998.2200000277
+    },
+    {
+      "timestamp": 1776286582232,
+      "open_interest": 3446763.290000027
+    },
+    {
+      "timestamp": 1776286889033,
+      "open_interest": 3447466.6300000274
+    },
+    {
+      "timestamp": 1776287195890,
+      "open_interest": 3447390.4300000262
+    },
+    {
+      "timestamp": 1776287503437,
+      "open_interest": 3445121.9700000267
+    },
+    {
+      "timestamp": 1776287811041,
+      "open_interest": 3438690.3900000267
+    },
+    {
+      "timestamp": 1776288117891,
+      "open_interest": 3437576.450000027
+    },
+    {
+      "timestamp": 1776288424889,
+      "open_interest": 3436419.150000027
+    },
+    {
+      "timestamp": 1776288731789,
+      "open_interest": 3434220.800000027
+    },
+    {
+      "timestamp": 1776289038636,
+      "open_interest": 3431265.640000027
+    },
+    {
+      "timestamp": 1776289345538,
+      "open_interest": 3429924.840000027
+    },
+    {
+      "timestamp": 1776289652436,
+      "open_interest": 3433125.1700000274
+    },
+    {
+      "timestamp": 1776289959286,
+      "open_interest": 3432145.560000027
+    },
+    {
+      "timestamp": 1776290266837,
+      "open_interest": 3430970.670000027
+    },
+    {
+      "timestamp": 1776290574387,
+      "open_interest": 3432215.9300000267
+    },
+    {
+      "timestamp": 1776290882037,
+      "open_interest": 3435402.1400000267
+    },
+    {
+      "timestamp": 1776291188936,
+      "open_interest": 3443065.2300000275
+    },
+    {
+      "timestamp": 1776291496535,
+      "open_interest": 3450005.180000028
+    },
+    {
+      "timestamp": 1776291803386,
+      "open_interest": 3459270.7700000284
+    },
+    {
+      "timestamp": 1776292111038,
+      "open_interest": 3459467.8700000285
+    },
+    {
+      "timestamp": 1776292417884,
+      "open_interest": 3461675.070000028
+    },
+    {
+      "timestamp": 1776292724735,
+      "open_interest": 3467894.0900000283
+    },
+    {
+      "timestamp": 1776293031586,
+      "open_interest": 3455036.940000027
+    },
+    {
+      "timestamp": 1776293338540,
+      "open_interest": 3454919.400000027
+    },
+    {
+      "timestamp": 1776293645487,
+      "open_interest": 3456249.5300000273
+    },
+    {
+      "timestamp": 1776293953135,
+      "open_interest": 3455904.930000028
+    },
+    {
+      "timestamp": 1776294260738,
+      "open_interest": 3463003.360000027
+    },
+    {
+      "timestamp": 1776294568336,
+      "open_interest": 3462169.700000026
+    },
+    {
+      "timestamp": 1776294875884,
+      "open_interest": 3464058.9300000262
+    },
+    {
+      "timestamp": 1776295182736,
+      "open_interest": 3467864.000000027
+    },
+    {
+      "timestamp": 1776295489935,
+      "open_interest": 3468395.4200000265
+    },
+    {
+      "timestamp": 1776295796834,
+      "open_interest": 3468766.7000000267
+    },
+    {
+      "timestamp": 1776296103939,
+      "open_interest": 3468141.650000026
+    },
+    {
+      "timestamp": 1776296410839,
+      "open_interest": 3474804.320000026
+    },
+    {
+      "timestamp": 1776296718437,
+      "open_interest": 3472937.0000000256
+    },
+    {
+      "timestamp": 1776297026036,
+      "open_interest": 3478761.220000026
+    },
+    {
+      "timestamp": 1776297333637,
+      "open_interest": 3478494.8300000266
+    },
+    {
+      "timestamp": 1776297640536,
+      "open_interest": 3478267.4600000265
+    },
+    {
+      "timestamp": 1776297947436,
+      "open_interest": 3478022.6300000264
+    },
+    {
+      "timestamp": 1776298254336,
+      "open_interest": 3476806.3400000264
+    },
+    {
+      "timestamp": 1776298562005,
+      "open_interest": 3478384.7800000263
+    },
+    {
+      "timestamp": 1776298868887,
+      "open_interest": 3477125.4700000267
+    },
+    {
+      "timestamp": 1776299175788,
+      "open_interest": 3474974.380000026
+    },
+    {
+      "timestamp": 1776299483436,
+      "open_interest": 3475138.920000026
+    },
+    {
+      "timestamp": 1776299790287,
+      "open_interest": 3473372.210000026
+    },
+    {
+      "timestamp": 1776300097187,
+      "open_interest": 3473621.1900000246
+    },
+    {
+      "timestamp": 1776300404786,
+      "open_interest": 3475367.5600000257
+    },
+    {
+      "timestamp": 1776300712387,
+      "open_interest": 3474393.830000026
+    },
+    {
+      "timestamp": 1776301019288,
+      "open_interest": 3473516.2800000263
+    },
+    {
+      "timestamp": 1776301326944,
+      "open_interest": 3470645.220000027
+    },
+    {
+      "timestamp": 1776301633887,
+      "open_interest": 3470988.190000026
+    },
+    {
+      "timestamp": 1776301941581,
+      "open_interest": 3472475.510000027
+    },
+    {
+      "timestamp": 1776302249429,
+      "open_interest": 3472644.2200000267
+    },
+    {
+      "timestamp": 1776302556334,
+      "open_interest": 3474292.6600000267
+    },
+    {
+      "timestamp": 1776302863180,
+      "open_interest": 3474558.570000026
+    },
+    {
+      "timestamp": 1776303170129,
+      "open_interest": 3474757.7600000263
+    },
+    {
+      "timestamp": 1776303477030,
+      "open_interest": 3473961.470000026
+    },
+    {
+      "timestamp": 1776303784031,
+      "open_interest": 3472984.360000026
+    },
+    {
+      "timestamp": 1776304091580,
+      "open_interest": 3474348.390000026
+    },
+    {
+      "timestamp": 1776304399233,
+      "open_interest": 3474897.440000027
+    },
+    {
+      "timestamp": 1776304706232,
+      "open_interest": 3474990.090000027
+    },
+    {
+      "timestamp": 1776305013829,
+      "open_interest": 3472417.8500000276
+    },
+    {
+      "timestamp": 1776305320789,
+      "open_interest": 3473922.860000028
+    },
+    {
+      "timestamp": 1776305627692,
+      "open_interest": 3469125.3900000285
+    },
+    {
+      "timestamp": 1776305935338,
+      "open_interest": 3469183.2100000284
+    },
+    {
+      "timestamp": 1776306243042,
+      "open_interest": 3471564.490000028
+    },
+    {
+      "timestamp": 1776306550691,
+      "open_interest": 3473972.020000028
+    },
+    {
+      "timestamp": 1776306857647,
+      "open_interest": 3473941.6300000288
+    },
+    {
+      "timestamp": 1776307164643,
+      "open_interest": 3474252.670000029
+    },
+    {
+      "timestamp": 1776307471691,
+      "open_interest": 3477911.580000027
+    },
+    {
+      "timestamp": 1776307778640,
+      "open_interest": 3483508.9200000274
+    },
+    {
+      "timestamp": 1776308085594,
+      "open_interest": 3491069.610000027
+    },
+    {
+      "timestamp": 1776308393293,
+      "open_interest": 3490735.2300000265
+    },
+    {
+      "timestamp": 1776308700194,
+      "open_interest": 3490610.280000027
+    },
+    {
+      "timestamp": 1776309007538,
+      "open_interest": 3498097.9800000265
+    },
+    {
+      "timestamp": 1776309314533,
+      "open_interest": 3500464.5200000266
+    },
+    {
+      "timestamp": 1776309621434,
+      "open_interest": 3501613.9600000256
+    },
+    {
+      "timestamp": 1776309928337,
+      "open_interest": 3501901.100000026
+    },
+    {
+      "timestamp": 1776310235284,
+      "open_interest": 3500913.1900000265
+    },
+    {
+      "timestamp": 1776310306935,
+      "open_interest": 3501115.9000000264
+    },
+    {
+      "timestamp": 1776310333469,
+      "open_interest": 3501334.3100000266
+    },
+    {
+      "timestamp": 1776310386885,
+      "open_interest": 3500714.3700000267
+    },
+    {
+      "timestamp": 1776310393820,
+      "open_interest": 3500779.3700000267
+    },
+    {
+      "timestamp": 1776310519987,
+      "open_interest": 3500306.350000027
+    },
+    {
+      "timestamp": 1776310828793,
+      "open_interest": 3500504.110000027
+    },
+    {
+      "timestamp": 1776311136386,
+      "open_interest": 3500109.210000027
+    },
+    {
+      "timestamp": 1776311443987,
+      "open_interest": 3500665.650000027
+    },
+    {
+      "timestamp": 1776311751583,
+      "open_interest": 3500576.0500000273
+    },
+    {
+      "timestamp": 1776312059184,
+      "open_interest": 3502233.110000028
+    },
+    {
+      "timestamp": 1776312366887,
+      "open_interest": 3500467.430000027
+    },
+    {
+      "timestamp": 1776312674488,
+      "open_interest": 3502761.4500000267
+    },
+    {
+      "timestamp": 1776312982092,
+      "open_interest": 3507495.870000026
+    },
+    {
+      "timestamp": 1776313289740,
+      "open_interest": 3508365.8300000266
+    },
+    {
+      "timestamp": 1776313597989,
+      "open_interest": 3509818.8500000266
+    },
+    {
+      "timestamp": 1776313905588,
+      "open_interest": 3511163.3500000266
+    },
+    {
+      "timestamp": 1776314213239,
+      "open_interest": 3512976.300000027
+    },
+    {
+      "timestamp": 1776314520889,
+      "open_interest": 3513441.4700000263
+    },
+    {
+      "timestamp": 1776314830142,
+      "open_interest": 3512580.6100000264
+    },
+    {
+      "timestamp": 1776315137738,
+      "open_interest": 3512406.2700000266
+    },
+    {
+      "timestamp": 1776315445386,
+      "open_interest": 3512979.7500000265
+    },
+    {
+      "timestamp": 1776315753177,
+      "open_interest": 3511094.090000026
+    },
+    {
+      "timestamp": 1776316061334,
+      "open_interest": 3511727.4500000263
+    },
+    {
+      "timestamp": 1776316368932,
+      "open_interest": 3511960.800000026
+    },
+    {
+      "timestamp": 1776316676532,
+      "open_interest": 3513421.8200000254
+    },
+    {
+      "timestamp": 1776316984612,
+      "open_interest": 3516136.9600000256
+    },
+    {
+      "timestamp": 1776317292682,
+      "open_interest": 3518522.140000025
+    },
+    {
+      "timestamp": 1776317600284,
+      "open_interest": 3520116.500000025
+    },
+    {
+      "timestamp": 1776317907881,
+      "open_interest": 3528269.880000025
+    },
+    {
+      "timestamp": 1776318217048,
+      "open_interest": 3530444.9600000265
+    },
+    {
+      "timestamp": 1776318524634,
+      "open_interest": 3529279.0100000254
+    },
+    {
+      "timestamp": 1776318832231,
+      "open_interest": 3530694.280000027
+    },
+    {
+      "timestamp": 1776319139833,
+      "open_interest": 3532536.060000026
+    },
+    {
+      "timestamp": 1776319447555,
+      "open_interest": 3534739.460000027
+    },
+    {
+      "timestamp": 1776319755139,
+      "open_interest": 3534489.4300000276
+    },
+    {
+      "timestamp": 1776320062743,
+      "open_interest": 3536943.0200000266
+    },
+    {
+      "timestamp": 1776320370342,
+      "open_interest": 3539207.580000027
+    },
+    {
+      "timestamp": 1776320678087,
+      "open_interest": 3540261.080000027
+    },
+    {
+      "timestamp": 1776320985741,
+      "open_interest": 3540530.840000027
+    },
+    {
+      "timestamp": 1776321293387,
+      "open_interest": 3540463.450000027
+    },
+    {
+      "timestamp": 1776321600989,
+      "open_interest": 3539610.680000027
+    },
+    {
+      "timestamp": 1776321908839,
+      "open_interest": 3540482.2700000275
+    },
+    {
+      "timestamp": 1776322216539,
+      "open_interest": 3539325.9000000283
+    },
+    {
+      "timestamp": 1776322524189,
+      "open_interest": 3538319.4600000265
+    },
+    {
+      "timestamp": 1776322831939,
+      "open_interest": 3537448.660000027
+    },
+    {
+      "timestamp": 1776323139538,
+      "open_interest": 3537663.520000027
+    },
+    {
+      "timestamp": 1776323447135,
+      "open_interest": 3537568.520000028
+    },
+    {
+      "timestamp": 1776323754789,
+      "open_interest": 3538185.7200000277
+    },
+    {
+      "timestamp": 1776324062536,
+      "open_interest": 3537743.440000028
+    },
+    {
+      "timestamp": 1776324370187,
+      "open_interest": 3537785.720000027
+    },
+    {
+      "timestamp": 1776324677836,
+      "open_interest": 3537085.010000027
+    },
+    {
+      "timestamp": 1776324985485,
+      "open_interest": 3536405.670000027
+    },
+    {
+      "timestamp": 1776325293086,
+      "open_interest": 3535886.5500000273
+    },
+    {
+      "timestamp": 1776325600736,
+      "open_interest": 3523606.480000026
+    },
+    {
+      "timestamp": 1776325908386,
+      "open_interest": 3522741.500000026
+    },
+    {
+      "timestamp": 1776326216136,
+      "open_interest": 3520093.460000028
+    },
+    {
+      "timestamp": 1776326523885,
+      "open_interest": 3518729.930000028
+    },
+    {
+      "timestamp": 1776326831534,
+      "open_interest": 3517033.0200000284
+    },
+    {
+      "timestamp": 1776327139187,
+      "open_interest": 3514992.760000028
+    },
+    {
+      "timestamp": 1776327446893,
+      "open_interest": 3519050.550000028
+    },
+    {
+      "timestamp": 1776327754534,
+      "open_interest": 3520649.820000029
+    },
+    {
+      "timestamp": 1776328062182,
+      "open_interest": 3516112.2000000286
+    },
+    {
+      "timestamp": 1776328369782,
+      "open_interest": 3516442.0200000284
+    },
+    {
+      "timestamp": 1776328677388,
+      "open_interest": 3511883.5700000287
+    },
+    {
+      "timestamp": 1776328985032,
+      "open_interest": 3514559.7600000286
+    },
+    {
+      "timestamp": 1776329292632,
+      "open_interest": 3514603.370000029
+    },
+    {
+      "timestamp": 1776329600236,
+      "open_interest": 3515174.5900000287
+    },
+    {
+      "timestamp": 1776329907834,
+      "open_interest": 3516016.360000029
+    },
+    {
+      "timestamp": 1776330215433,
+      "open_interest": 3512028.8700000294
+    },
+    {
+      "timestamp": 1776330523033,
+      "open_interest": 3509878.330000029
+    },
+    {
+      "timestamp": 1776330830633,
+      "open_interest": 3510649.110000029
+    },
+    {
+      "timestamp": 1776331138238,
+      "open_interest": 3507493.8900000285
+    },
+    {
+      "timestamp": 1776331445985,
+      "open_interest": 3502251.980000028
+    },
+    {
+      "timestamp": 1776331753631,
+      "open_interest": 3503143.5400000294
+    },
+    {
+      "timestamp": 1776332061232,
+      "open_interest": 3505599.33000003
+    },
+    {
+      "timestamp": 1776332368893,
+      "open_interest": 3507808.6700000297
+    },
+    {
+      "timestamp": 1776332676584,
+      "open_interest": 3507158.0000000307
+    },
+    {
+      "timestamp": 1776332984236,
+      "open_interest": 3507882.05000003
+    },
+    {
+      "timestamp": 1776333291830,
+      "open_interest": 3514049.190000031
+    },
+    {
+      "timestamp": 1776333599437,
+      "open_interest": 3514393.4200000307
+    },
+    {
+      "timestamp": 1776333907234,
+      "open_interest": 3513648.2700000317
+    },
+    {
+      "timestamp": 1776334214833,
+      "open_interest": 3517197.4600000284
+    },
+    {
+      "timestamp": 1776334522384,
+      "open_interest": 3520726.430000028
+    },
+    {
+      "timestamp": 1776334829987,
+      "open_interest": 3516302.0100000277
+    },
+    {
+      "timestamp": 1776335137633,
+      "open_interest": 3513670.6900000293
+    },
+    {
+      "timestamp": 1776335445185,
+      "open_interest": 3511003.9000000297
+    },
+    {
+      "timestamp": 1776335753534,
+      "open_interest": 3511802.4000000297
+    },
+    {
+      "timestamp": 1776336059737,
+      "open_interest": 3511380.6100000297
+    },
+    {
+      "timestamp": 1776336365934,
+      "open_interest": 3509090.4100000295
+    },
+    {
+      "timestamp": 1776336672135,
+      "open_interest": 3508828.280000029
+    },
+    {
+      "timestamp": 1776336978289,
+      "open_interest": 3506875.900000029
+    },
+    {
+      "timestamp": 1776337191884,
+      "open_interest": 3507344.920000028
+    },
+    {
+      "timestamp": 1776337498135,
+      "open_interest": 3509699.300000029
+    }
+  ],
+  "SOL-USDT-SWAP": [
+    {
+      "timestamp": 1776186253335,
+      "open_interest": 2662222.9900000016
+    },
+    {
+      "timestamp": 1776186559437,
+      "open_interest": 2655482.670000002
+    },
+    {
+      "timestamp": 1776186865588,
+      "open_interest": 2652955.0900000017
+    },
+    {
+      "timestamp": 1776187171938,
+      "open_interest": 2648317.4400000013
+    },
+    {
+      "timestamp": 1776187477985,
+      "open_interest": 2648061.910000001
+    },
+    {
+      "timestamp": 1776187784087,
+      "open_interest": 2648232.9000000013
+    },
+    {
+      "timestamp": 1776188090187,
+      "open_interest": 2645880.0700000017
+    },
+    {
+      "timestamp": 1776188396286,
+      "open_interest": 2653028.8400000017
+    },
+    {
+      "timestamp": 1776188702638,
+      "open_interest": 2667437.8400000017
+    },
+    {
+      "timestamp": 1776189008786,
+      "open_interest": 2667820.150000002
+    },
+    {
+      "timestamp": 1776189314939,
+      "open_interest": 2664299.780000001
+    },
+    {
+      "timestamp": 1776189621039,
+      "open_interest": 2663144.6600000015
+    },
+    {
+      "timestamp": 1776189927138,
+      "open_interest": 2655743.3100000015
+    },
+    {
+      "timestamp": 1776190233280,
+      "open_interest": 2657817.7000000016
+    },
+    {
+      "timestamp": 1776190539380,
+      "open_interest": 2653489.630000002
+    },
+    {
+      "timestamp": 1776190845430,
+      "open_interest": 2652495.9600000023
+    },
+    {
+      "timestamp": 1776191151533,
+      "open_interest": 2641385.530000002
+    },
+    {
+      "timestamp": 1776191457629,
+      "open_interest": 2640606.150000002
+    },
+    {
+      "timestamp": 1776191763831,
+      "open_interest": 2639565.2300000023
+    },
+    {
+      "timestamp": 1776192069932,
+      "open_interest": 2634155.190000002
+    },
+    {
+      "timestamp": 1776192376031,
+      "open_interest": 2632948.2700000014
+    },
+    {
+      "timestamp": 1776192682131,
+      "open_interest": 2612815.460000002
+    },
+    {
+      "timestamp": 1776192988242,
+      "open_interest": 2606725.9800000014
+    },
+    {
+      "timestamp": 1776193294331,
+      "open_interest": 2587311.720000001
+    },
+    {
+      "timestamp": 1776193600433,
+      "open_interest": 2571739.000000001
+    },
+    {
+      "timestamp": 1776193906534,
+      "open_interest": 2568593.140000001
+    },
+    {
+      "timestamp": 1776194212631,
+      "open_interest": 2562109.430000001
+    },
+    {
+      "timestamp": 1776194518682,
+      "open_interest": 2561761.160000001
+    },
+    {
+      "timestamp": 1776194824882,
+      "open_interest": 2555379.1200000015
+    },
+    {
+      "timestamp": 1776195130986,
+      "open_interest": 2552740.750000002
+    },
+    {
+      "timestamp": 1776195437232,
+      "open_interest": 2550926.350000001
+    },
+    {
+      "timestamp": 1776195743333,
+      "open_interest": 2551138.8900000015
+    },
+    {
+      "timestamp": 1776196049431,
+      "open_interest": 2549486.7300000014
+    },
+    {
+      "timestamp": 1776196355586,
+      "open_interest": 2546102.100000001
+    },
+    {
+      "timestamp": 1776196661785,
+      "open_interest": 2551430.250000001
+    },
+    {
+      "timestamp": 1776196967885,
+      "open_interest": 2551243.0300000007
+    },
+    {
+      "timestamp": 1776197273986,
+      "open_interest": 2545929.480000001
+    },
+    {
+      "timestamp": 1776197580091,
+      "open_interest": 2544075.530000001
+    },
+    {
+      "timestamp": 1776197886286,
+      "open_interest": 2544726.240000001
+    },
+    {
+      "timestamp": 1776198192386,
+      "open_interest": 2540381.9200000013
+    },
+    {
+      "timestamp": 1776198498487,
+      "open_interest": 2548315.0900000012
+    },
+    {
+      "timestamp": 1776198804635,
+      "open_interest": 2549420.8400000017
+    },
+    {
+      "timestamp": 1776199110684,
+      "open_interest": 2549621.5800000015
+    },
+    {
+      "timestamp": 1776199416786,
+      "open_interest": 2547678.6600000015
+    },
+    {
+      "timestamp": 1776199722935,
+      "open_interest": 2549239.150000002
+    },
+    {
+      "timestamp": 1776200029137,
+      "open_interest": 2551463.850000002
+    },
+    {
+      "timestamp": 1776200335238,
+      "open_interest": 2556598.2700000014
+    },
+    {
+      "timestamp": 1776200641338,
+      "open_interest": 2557638.6600000015
+    },
+    {
+      "timestamp": 1776200947538,
+      "open_interest": 2553773.9900000016
+    },
+    {
+      "timestamp": 1776201253834,
+      "open_interest": 2550723.6300000013
+    },
+    {
+      "timestamp": 1776201559832,
+      "open_interest": 2549764.0700000017
+    },
+    {
+      "timestamp": 1776201865882,
+      "open_interest": 2548217.0200000014
+    },
+    {
+      "timestamp": 1776202171934,
+      "open_interest": 2547382.2900000014
+    },
+    {
+      "timestamp": 1776202477983,
+      "open_interest": 2544324.8700000015
+    },
+    {
+      "timestamp": 1776202784084,
+      "open_interest": 2546288.4700000016
+    },
+    {
+      "timestamp": 1776203090133,
+      "open_interest": 2547574.8600000017
+    },
+    {
+      "timestamp": 1776203396232,
+      "open_interest": 2546505.7000000016
+    },
+    {
+      "timestamp": 1776203702483,
+      "open_interest": 2545460.3900000015
+    },
+    {
+      "timestamp": 1776204008584,
+      "open_interest": 2543511.4100000015
+    },
+    {
+      "timestamp": 1776204314782,
+      "open_interest": 2535474.430000002
+    },
+    {
+      "timestamp": 1776204344797,
+      "open_interest": 2535184.7600000016
+    },
+    {
+      "timestamp": 1776204650888,
+      "open_interest": 2534070.920000002
+    },
+    {
+      "timestamp": 1776204956937,
+      "open_interest": 2526533.350000002
+    },
+    {
+      "timestamp": 1776205263138,
+      "open_interest": 2521848.830000002
+    },
+    {
+      "timestamp": 1776205569188,
+      "open_interest": 2520325.6900000023
+    },
+    {
+      "timestamp": 1776205698939,
+      "open_interest": 2517450.2800000017
+    },
+    {
+      "timestamp": 1776206008688,
+      "open_interest": 2519281.230000002
+    },
+    {
+      "timestamp": 1776206318289,
+      "open_interest": 2522660.050000002
+    },
+    {
+      "timestamp": 1776206627640,
+      "open_interest": 2524161.940000002
+    },
+    {
+      "timestamp": 1776206936989,
+      "open_interest": 2522507.2000000016
+    },
+    {
+      "timestamp": 1776207246540,
+      "open_interest": 2523982.7800000017
+    },
+    {
+      "timestamp": 1776207555889,
+      "open_interest": 2509101.2500000014
+    },
+    {
+      "timestamp": 1776207865289,
+      "open_interest": 2504251.730000002
+    },
+    {
+      "timestamp": 1776208171636,
+      "open_interest": 2503924.3100000015
+    },
+    {
+      "timestamp": 1776208481787,
+      "open_interest": 2501891.5300000017
+    },
+    {
+      "timestamp": 1776208789737,
+      "open_interest": 2491366.0900000017
+    },
+    {
+      "timestamp": 1776208977588,
+      "open_interest": 2492089.2300000023
+    },
+    {
+      "timestamp": 1776209284637,
+      "open_interest": 2495824.4800000023
+    },
+    {
+      "timestamp": 1776209591438,
+      "open_interest": 2504678.220000002
+    },
+    {
+      "timestamp": 1776209898238,
+      "open_interest": 2501029.690000002
+    },
+    {
+      "timestamp": 1776210205087,
+      "open_interest": 2500376.690000002
+    },
+    {
+      "timestamp": 1776210442788,
+      "open_interest": 2499350.660000002
+    },
+    {
+      "timestamp": 1776210750337,
+      "open_interest": 2500858.720000002
+    },
+    {
+      "timestamp": 1776211057887,
+      "open_interest": 2499942.0500000017
+    },
+    {
+      "timestamp": 1776211364686,
+      "open_interest": 2495677.890000002
+    },
+    {
+      "timestamp": 1776211671543,
+      "open_interest": 2491950.8000000017
+    },
+    {
+      "timestamp": 1776211979082,
+      "open_interest": 2490090.9600000023
+    },
+    {
+      "timestamp": 1776212285982,
+      "open_interest": 2497336.8000000017
+    },
+    {
+      "timestamp": 1776212593534,
+      "open_interest": 2508218.860000002
+    },
+    {
+      "timestamp": 1776212901033,
+      "open_interest": 2508686.6300000018
+    },
+    {
+      "timestamp": 1776213208584,
+      "open_interest": 2508725.4600000023
+    },
+    {
+      "timestamp": 1776213515430,
+      "open_interest": 2513989.010000002
+    },
+    {
+      "timestamp": 1776213822334,
+      "open_interest": 2512588.420000002
+    },
+    {
+      "timestamp": 1776214129882,
+      "open_interest": 2506566.440000002
+    },
+    {
+      "timestamp": 1776214436686,
+      "open_interest": 2510736.3500000015
+    },
+    {
+      "timestamp": 1776214743631,
+      "open_interest": 2510547.710000002
+    },
+    {
+      "timestamp": 1776215050735,
+      "open_interest": 2513226.2500000014
+    },
+    {
+      "timestamp": 1776215358179,
+      "open_interest": 2511437.4300000016
+    },
+    {
+      "timestamp": 1776215665681,
+      "open_interest": 2492838.0100000016
+    },
+    {
+      "timestamp": 1776215973236,
+      "open_interest": 2490955.6800000016
+    },
+    {
+      "timestamp": 1776216280133,
+      "open_interest": 2494932.010000001
+    },
+    {
+      "timestamp": 1776216587630,
+      "open_interest": 2492822.0500000017
+    },
+    {
+      "timestamp": 1776216894431,
+      "open_interest": 2493789.1500000013
+    },
+    {
+      "timestamp": 1776217201412,
+      "open_interest": 2493649.020000001
+    },
+    {
+      "timestamp": 1776217508980,
+      "open_interest": 2494032.5600000015
+    },
+    {
+      "timestamp": 1776217815882,
+      "open_interest": 2496711.890000001
+    },
+    {
+      "timestamp": 1776218122732,
+      "open_interest": 2500707.9500000016
+    },
+    {
+      "timestamp": 1776218429582,
+      "open_interest": 2499088.7900000014
+    },
+    {
+      "timestamp": 1776218736435,
+      "open_interest": 2497511.1900000013
+    },
+    {
+      "timestamp": 1776219043235,
+      "open_interest": 2499083.8400000017
+    },
+    {
+      "timestamp": 1776219350991,
+      "open_interest": 2497665.350000002
+    },
+    {
+      "timestamp": 1776219658638,
+      "open_interest": 2500574.8200000017
+    },
+    {
+      "timestamp": 1776219965638,
+      "open_interest": 2499296.3900000015
+    },
+    {
+      "timestamp": 1776220273284,
+      "open_interest": 2499218.3500000015
+    },
+    {
+      "timestamp": 1776220580139,
+      "open_interest": 2483505.7500000014
+    },
+    {
+      "timestamp": 1776220887584,
+      "open_interest": 2483676.6000000015
+    },
+    {
+      "timestamp": 1776221194435,
+      "open_interest": 2482334.6800000016
+    },
+    {
+      "timestamp": 1776221501288,
+      "open_interest": 2482260.820000002
+    },
+    {
+      "timestamp": 1776221808139,
+      "open_interest": 2483071.4700000016
+    },
+    {
+      "timestamp": 1776222115745,
+      "open_interest": 2482170.350000002
+    },
+    {
+      "timestamp": 1776222422634,
+      "open_interest": 2484053.810000002
+    },
+    {
+      "timestamp": 1776222730237,
+      "open_interest": 2482993.240000002
+    },
+    {
+      "timestamp": 1776223037834,
+      "open_interest": 2483087.700000002
+    },
+    {
+      "timestamp": 1776223345383,
+      "open_interest": 2482284.240000002
+    },
+    {
+      "timestamp": 1776223652936,
+      "open_interest": 2481663.740000002
+    },
+    {
+      "timestamp": 1776223960486,
+      "open_interest": 2481889.880000002
+    },
+    {
+      "timestamp": 1776224267332,
+      "open_interest": 2486863.9000000022
+    },
+    {
+      "timestamp": 1776224574183,
+      "open_interest": 2490568.410000002
+    },
+    {
+      "timestamp": 1776224881038,
+      "open_interest": 2493775.250000002
+    },
+    {
+      "timestamp": 1776225188735,
+      "open_interest": 2495052.030000002
+    },
+    {
+      "timestamp": 1776225496285,
+      "open_interest": 2493838.450000002
+    },
+    {
+      "timestamp": 1776225803882,
+      "open_interest": 2490657.530000002
+    },
+    {
+      "timestamp": 1776226111432,
+      "open_interest": 2493438.170000002
+    },
+    {
+      "timestamp": 1776226418982,
+      "open_interest": 2493729.950000002
+    },
+    {
+      "timestamp": 1776226725731,
+      "open_interest": 2494081.6400000015
+    },
+    {
+      "timestamp": 1776227033230,
+      "open_interest": 2496105.480000002
+    },
+    {
+      "timestamp": 1776227339931,
+      "open_interest": 2498537.1800000016
+    },
+    {
+      "timestamp": 1776227646781,
+      "open_interest": 2502717.0800000015
+    },
+    {
+      "timestamp": 1776227953629,
+      "open_interest": 2504724.690000002
+    },
+    {
+      "timestamp": 1776228261132,
+      "open_interest": 2500833.9400000013
+    },
+    {
+      "timestamp": 1776228567933,
+      "open_interest": 2496790.6300000013
+    },
+    {
+      "timestamp": 1776228875430,
+      "open_interest": 2503066.000000002
+    },
+    {
+      "timestamp": 1776229182278,
+      "open_interest": 2504677.8600000017
+    },
+    {
+      "timestamp": 1776229489828,
+      "open_interest": 2508271.560000002
+    },
+    {
+      "timestamp": 1776229797332,
+      "open_interest": 2508929.880000002
+    },
+    {
+      "timestamp": 1776230105082,
+      "open_interest": 2514436.000000002
+    },
+    {
+      "timestamp": 1776230412582,
+      "open_interest": 2516394.400000002
+    },
+    {
+      "timestamp": 1776230719383,
+      "open_interest": 2514423.6300000018
+    },
+    {
+      "timestamp": 1776231026182,
+      "open_interest": 2516927.8400000017
+    },
+    {
+      "timestamp": 1776231333731,
+      "open_interest": 2507119.500000002
+    },
+    {
+      "timestamp": 1776231641281,
+      "open_interest": 2509426.730000002
+    },
+    {
+      "timestamp": 1776231948131,
+      "open_interest": 2508686.950000002
+    },
+    {
+      "timestamp": 1776232254934,
+      "open_interest": 2506519.4000000022
+    },
+    {
+      "timestamp": 1776232561839,
+      "open_interest": 2507269.1600000025
+    },
+    {
+      "timestamp": 1776232869431,
+      "open_interest": 2507705.9200000023
+    },
+    {
+      "timestamp": 1776233176238,
+      "open_interest": 2510046.410000002
+    },
+    {
+      "timestamp": 1776233483038,
+      "open_interest": 2512370.600000002
+    },
+    {
+      "timestamp": 1776233789938,
+      "open_interest": 2512677.6800000016
+    },
+    {
+      "timestamp": 1776234096836,
+      "open_interest": 2514978.7200000016
+    },
+    {
+      "timestamp": 1776234403688,
+      "open_interest": 2515872.9200000013
+    },
+    {
+      "timestamp": 1776234710538,
+      "open_interest": 2517575.4200000013
+    },
+    {
+      "timestamp": 1776235017339,
+      "open_interest": 2519690.1300000018
+    },
+    {
+      "timestamp": 1776235324238,
+      "open_interest": 2522832.520000002
+    },
+    {
+      "timestamp": 1776235631088,
+      "open_interest": 2523092.6300000018
+    },
+    {
+      "timestamp": 1776235937938,
+      "open_interest": 2520711.790000002
+    },
+    {
+      "timestamp": 1776236244841,
+      "open_interest": 2525674.9800000014
+    },
+    {
+      "timestamp": 1776236551686,
+      "open_interest": 2539785.520000002
+    },
+    {
+      "timestamp": 1776236858785,
+      "open_interest": 2539968.720000002
+    },
+    {
+      "timestamp": 1776237165583,
+      "open_interest": 2529224.7300000023
+    },
+    {
+      "timestamp": 1776237472436,
+      "open_interest": 2525248.4900000026
+    },
+    {
+      "timestamp": 1776237779286,
+      "open_interest": 2529796.290000002
+    },
+    {
+      "timestamp": 1776238086236,
+      "open_interest": 2523668.4700000025
+    },
+    {
+      "timestamp": 1776238393138,
+      "open_interest": 2512139.5000000023
+    },
+    {
+      "timestamp": 1776238699983,
+      "open_interest": 2519572.0300000026
+    },
+    {
+      "timestamp": 1776239006835,
+      "open_interest": 2521763.7000000025
+    },
+    {
+      "timestamp": 1776239313734,
+      "open_interest": 2523341.2100000028
+    },
+    {
+      "timestamp": 1776239620631,
+      "open_interest": 2517371.780000002
+    },
+    {
+      "timestamp": 1776239927433,
+      "open_interest": 2530201.4600000023
+    },
+    {
+      "timestamp": 1776240234283,
+      "open_interest": 2520943.9900000016
+    },
+    {
+      "timestamp": 1776240541500,
+      "open_interest": 2524884.540000002
+    },
+    {
+      "timestamp": 1776240848539,
+      "open_interest": 2527526.8700000015
+    },
+    {
+      "timestamp": 1776241155441,
+      "open_interest": 2531327.250000002
+    },
+    {
+      "timestamp": 1776241462291,
+      "open_interest": 2531491.4400000023
+    },
+    {
+      "timestamp": 1776241769142,
+      "open_interest": 2531156.3200000017
+    },
+    {
+      "timestamp": 1776242075939,
+      "open_interest": 2525737.170000002
+    },
+    {
+      "timestamp": 1776242382840,
+      "open_interest": 2527631.3200000017
+    },
+    {
+      "timestamp": 1776242689637,
+      "open_interest": 2531833.060000002
+    },
+    {
+      "timestamp": 1776242996435,
+      "open_interest": 2533418.650000002
+    },
+    {
+      "timestamp": 1776243303448,
+      "open_interest": 2532642.6900000013
+    },
+    {
+      "timestamp": 1776243610339,
+      "open_interest": 2532629.260000001
+    },
+    {
+      "timestamp": 1776243917239,
+      "open_interest": 2532512.7400000016
+    },
+    {
+      "timestamp": 1776244224140,
+      "open_interest": 2534034.6800000016
+    },
+    {
+      "timestamp": 1776244530886,
+      "open_interest": 2527127.3700000015
+    },
+    {
+      "timestamp": 1776244837738,
+      "open_interest": 2529517.510000001
+    },
+    {
+      "timestamp": 1776245144637,
+      "open_interest": 2530895.4600000014
+    },
+    {
+      "timestamp": 1776245451486,
+      "open_interest": 2528425.9500000016
+    },
+    {
+      "timestamp": 1776245758836,
+      "open_interest": 2530494.7000000016
+    },
+    {
+      "timestamp": 1776246065790,
+      "open_interest": 2530462.1600000015
+    },
+    {
+      "timestamp": 1776246372639,
+      "open_interest": 2529851.180000001
+    },
+    {
+      "timestamp": 1776246679435,
+      "open_interest": 2529374.9200000013
+    },
+    {
+      "timestamp": 1776246986340,
+      "open_interest": 2528692.070000001
+    },
+    {
+      "timestamp": 1776247293238,
+      "open_interest": 2531410.5800000015
+    },
+    {
+      "timestamp": 1776247600151,
+      "open_interest": 2526164.650000002
+    },
+    {
+      "timestamp": 1776247907092,
+      "open_interest": 2522935.3700000015
+    },
+    {
+      "timestamp": 1776248213989,
+      "open_interest": 2529191.9000000022
+    },
+    {
+      "timestamp": 1776248520840,
+      "open_interest": 2530460.6400000015
+    },
+    {
+      "timestamp": 1776248827742,
+      "open_interest": 2532052.1300000018
+    },
+    {
+      "timestamp": 1776249134590,
+      "open_interest": 2535063.5500000017
+    },
+    {
+      "timestamp": 1776249441388,
+      "open_interest": 2557912.660000001
+    },
+    {
+      "timestamp": 1776249748241,
+      "open_interest": 2554149.6000000015
+    },
+    {
+      "timestamp": 1776250055145,
+      "open_interest": 2548619.0100000007
+    },
+    {
+      "timestamp": 1776250361989,
+      "open_interest": 2552284.5800000005
+    },
+    {
+      "timestamp": 1776250668890,
+      "open_interest": 2555288.190000001
+    },
+    {
+      "timestamp": 1776250975738,
+      "open_interest": 2559574.330000001
+    },
+    {
+      "timestamp": 1776251282733,
+      "open_interest": 2561020.610000001
+    },
+    {
+      "timestamp": 1776251589635,
+      "open_interest": 2561047.9600000004
+    },
+    {
+      "timestamp": 1776251896482,
+      "open_interest": 2560746.550000001
+    },
+    {
+      "timestamp": 1776252203385,
+      "open_interest": 2559734.4300000006
+    },
+    {
+      "timestamp": 1776252510234,
+      "open_interest": 2558471.2300000004
+    },
+    {
+      "timestamp": 1776252817087,
+      "open_interest": 2564146.0800000005
+    },
+    {
+      "timestamp": 1776253123932,
+      "open_interest": 2564292.2500000005
+    },
+    {
+      "timestamp": 1776253430787,
+      "open_interest": 2563716.8300000005
+    },
+    {
+      "timestamp": 1776253737684,
+      "open_interest": 2575023.7500000005
+    },
+    {
+      "timestamp": 1776254044635,
+      "open_interest": 2590583.8700000006
+    },
+    {
+      "timestamp": 1776254351535,
+      "open_interest": 2588857.5500000003
+    },
+    {
+      "timestamp": 1776254658381,
+      "open_interest": 2587692.960000001
+    },
+    {
+      "timestamp": 1776254965284,
+      "open_interest": 2585325.7400000007
+    },
+    {
+      "timestamp": 1776255272233,
+      "open_interest": 2585570.7000000007
+    },
+    {
+      "timestamp": 1776255579137,
+      "open_interest": 2586062.460000001
+    },
+    {
+      "timestamp": 1776255886032,
+      "open_interest": 2586515.7600000007
+    },
+    {
+      "timestamp": 1776256192880,
+      "open_interest": 2589649.860000001
+    },
+    {
+      "timestamp": 1776256499733,
+      "open_interest": 2589320.340000001
+    },
+    {
+      "timestamp": 1776256806786,
+      "open_interest": 2597695.8300000015
+    },
+    {
+      "timestamp": 1776257113683,
+      "open_interest": 2602875.5100000016
+    },
+    {
+      "timestamp": 1776257420531,
+      "open_interest": 2603904.730000002
+    },
+    {
+      "timestamp": 1776257727433,
+      "open_interest": 2604496.8000000017
+    },
+    {
+      "timestamp": 1776258034283,
+      "open_interest": 2606243.700000001
+    },
+    {
+      "timestamp": 1776258341187,
+      "open_interest": 2595771.840000001
+    },
+    {
+      "timestamp": 1776258648041,
+      "open_interest": 2596736.4600000014
+    },
+    {
+      "timestamp": 1776258954940,
+      "open_interest": 2604433.7500000014
+    },
+    {
+      "timestamp": 1776259261899,
+      "open_interest": 2605539.530000001
+    },
+    {
+      "timestamp": 1776259568789,
+      "open_interest": 2604022.2000000016
+    },
+    {
+      "timestamp": 1776259875637,
+      "open_interest": 2610655.320000001
+    },
+    {
+      "timestamp": 1776260182544,
+      "open_interest": 2607055.6400000015
+    },
+    {
+      "timestamp": 1776260489389,
+      "open_interest": 2605740.510000001
+    },
+    {
+      "timestamp": 1776260796237,
+      "open_interest": 2603080.720000001
+    },
+    {
+      "timestamp": 1776261103089,
+      "open_interest": 2606061.970000001
+    },
+    {
+      "timestamp": 1776261409940,
+      "open_interest": 2605400.530000001
+    },
+    {
+      "timestamp": 1776261716839,
+      "open_interest": 2606275.910000001
+    },
+    {
+      "timestamp": 1776262023789,
+      "open_interest": 2600550.0600000015
+    },
+    {
+      "timestamp": 1776262330686,
+      "open_interest": 2601083.640000001
+    },
+    {
+      "timestamp": 1776262637585,
+      "open_interest": 2593280.5700000017
+    },
+    {
+      "timestamp": 1776262944437,
+      "open_interest": 2594085.720000002
+    },
+    {
+      "timestamp": 1776263251285,
+      "open_interest": 2585027.2000000016
+    },
+    {
+      "timestamp": 1776263558137,
+      "open_interest": 2582674.800000001
+    },
+    {
+      "timestamp": 1776263864986,
+      "open_interest": 2583484.030000001
+    },
+    {
+      "timestamp": 1776264171836,
+      "open_interest": 2573192.990000001
+    },
+    {
+      "timestamp": 1776264478736,
+      "open_interest": 2573829.280000001
+    },
+    {
+      "timestamp": 1776264785736,
+      "open_interest": 2576593.650000001
+    },
+    {
+      "timestamp": 1776265092634,
+      "open_interest": 2575990.5000000014
+    },
+    {
+      "timestamp": 1776265399485,
+      "open_interest": 2580471.2100000014
+    },
+    {
+      "timestamp": 1776265706337,
+      "open_interest": 2580859.180000001
+    },
+    {
+      "timestamp": 1776266013438,
+      "open_interest": 2581836.910000001
+    },
+    {
+      "timestamp": 1776266320338,
+      "open_interest": 2583708.250000001
+    },
+    {
+      "timestamp": 1776266627189,
+      "open_interest": 2583418.450000001
+    },
+    {
+      "timestamp": 1776266934039,
+      "open_interest": 2581031.950000001
+    },
+    {
+      "timestamp": 1776267240989,
+      "open_interest": 2578226.4300000016
+    },
+    {
+      "timestamp": 1776267547937,
+      "open_interest": 2580574.3700000015
+    },
+    {
+      "timestamp": 1776267854838,
+      "open_interest": 2584541.060000001
+    },
+    {
+      "timestamp": 1776268161746,
+      "open_interest": 2566443.1600000006
+    },
+    {
+      "timestamp": 1776268468647,
+      "open_interest": 2569510.9900000007
+    },
+    {
+      "timestamp": 1776268775435,
+      "open_interest": 2566742.9000000004
+    },
+    {
+      "timestamp": 1776269082338,
+      "open_interest": 2570364.780000001
+    },
+    {
+      "timestamp": 1776269389188,
+      "open_interest": 2573614.6500000013
+    },
+    {
+      "timestamp": 1776269696088,
+      "open_interest": 2575667.6900000013
+    },
+    {
+      "timestamp": 1776270003291,
+      "open_interest": 2571765.220000001
+    },
+    {
+      "timestamp": 1776270310488,
+      "open_interest": 2570585.650000002
+    },
+    {
+      "timestamp": 1776270617387,
+      "open_interest": 2559130.5600000015
+    },
+    {
+      "timestamp": 1776270924286,
+      "open_interest": 2568582.1700000023
+    },
+    {
+      "timestamp": 1776271231186,
+      "open_interest": 2566922.200000002
+    },
+    {
+      "timestamp": 1776271538088,
+      "open_interest": 2565519.9700000016
+    },
+    {
+      "timestamp": 1776271844934,
+      "open_interest": 2563890.480000002
+    },
+    {
+      "timestamp": 1776272151744,
+      "open_interest": 2556953.060000002
+    },
+    {
+      "timestamp": 1776272458602,
+      "open_interest": 2558904.910000002
+    },
+    {
+      "timestamp": 1776272765540,
+      "open_interest": 2554711.770000002
+    },
+    {
+      "timestamp": 1776273072439,
+      "open_interest": 2548834.220000002
+    },
+    {
+      "timestamp": 1776273379344,
+      "open_interest": 2555561.7800000017
+    },
+    {
+      "timestamp": 1776273686289,
+      "open_interest": 2555762.6400000015
+    },
+    {
+      "timestamp": 1776273993292,
+      "open_interest": 2562367.5800000024
+    },
+    {
+      "timestamp": 1776274300344,
+      "open_interest": 2559773.480000002
+    },
+    {
+      "timestamp": 1776274607444,
+      "open_interest": 2563798.440000002
+    },
+    {
+      "timestamp": 1776274914397,
+      "open_interest": 2561961.520000002
+    },
+    {
+      "timestamp": 1776275221294,
+      "open_interest": 2563892.970000002
+    },
+    {
+      "timestamp": 1776275528237,
+      "open_interest": 2566887.6400000025
+    },
+    {
+      "timestamp": 1776275835191,
+      "open_interest": 2566981.7300000023
+    },
+    {
+      "timestamp": 1776276142042,
+      "open_interest": 2571880.700000002
+    },
+    {
+      "timestamp": 1776276448889,
+      "open_interest": 2571322.7300000023
+    },
+    {
+      "timestamp": 1776276755738,
+      "open_interest": 2570569.4000000027
+    },
+    {
+      "timestamp": 1776277062590,
+      "open_interest": 2571059.8900000025
+    },
+    {
+      "timestamp": 1776277369490,
+      "open_interest": 2571117.7400000026
+    },
+    {
+      "timestamp": 1776277676339,
+      "open_interest": 2570376.5800000024
+    },
+    {
+      "timestamp": 1776277983289,
+      "open_interest": 2570565.3500000024
+    },
+    {
+      "timestamp": 1776278290140,
+      "open_interest": 2568084.690000002
+    },
+    {
+      "timestamp": 1776278596989,
+      "open_interest": 2565262.4100000015
+    },
+    {
+      "timestamp": 1776278903839,
+      "open_interest": 2566467.430000002
+    },
+    {
+      "timestamp": 1776279210690,
+      "open_interest": 2566442.230000002
+    },
+    {
+      "timestamp": 1776279517596,
+      "open_interest": 2568115.440000002
+    },
+    {
+      "timestamp": 1776279824444,
+      "open_interest": 2567649.160000002
+    },
+    {
+      "timestamp": 1776280132044,
+      "open_interest": 2564299.2700000014
+    },
+    {
+      "timestamp": 1776280439639,
+      "open_interest": 2561157.8900000015
+    },
+    {
+      "timestamp": 1776280746488,
+      "open_interest": 2561059.4100000015
+    },
+    {
+      "timestamp": 1776281053435,
+      "open_interest": 2559637.7200000016
+    },
+    {
+      "timestamp": 1776281360337,
+      "open_interest": 2559486.8900000015
+    },
+    {
+      "timestamp": 1776281667937,
+      "open_interest": 2555079.8600000013
+    },
+    {
+      "timestamp": 1776281974986,
+      "open_interest": 2535325.650000001
+    },
+    {
+      "timestamp": 1776282282634,
+      "open_interest": 2533643.840000001
+    },
+    {
+      "timestamp": 1776282590235,
+      "open_interest": 2530147.920000001
+    },
+    {
+      "timestamp": 1776282897135,
+      "open_interest": 2531182.22
+    },
+    {
+      "timestamp": 1776283204235,
+      "open_interest": 2529316.4500000007
+    },
+    {
+      "timestamp": 1776283511888,
+      "open_interest": 2523942.74
+    },
+    {
+      "timestamp": 1776283819485,
+      "open_interest": 2522388.3000000007
+    },
+    {
+      "timestamp": 1776284126285,
+      "open_interest": 2520598.8300000005
+    },
+    {
+      "timestamp": 1776284433886,
+      "open_interest": 2523507.0100000002
+    },
+    {
+      "timestamp": 1776284741487,
+      "open_interest": 2524201.8200000008
+    },
+    {
+      "timestamp": 1776285048336,
+      "open_interest": 2527481.720000001
+    },
+    {
+      "timestamp": 1776285355937,
+      "open_interest": 2524439.680000001
+    },
+    {
+      "timestamp": 1776285662888,
+      "open_interest": 2524368.6000000015
+    },
+    {
+      "timestamp": 1776285970538,
+      "open_interest": 2525544.8600000013
+    },
+    {
+      "timestamp": 1776286277434,
+      "open_interest": 2527612.970000001
+    },
+    {
+      "timestamp": 1776286584284,
+      "open_interest": 2526537.5900000012
+    },
+    {
+      "timestamp": 1776286891136,
+      "open_interest": 2527377.540000001
+    },
+    {
+      "timestamp": 1776287197983,
+      "open_interest": 2527475.9400000013
+    },
+    {
+      "timestamp": 1776287505532,
+      "open_interest": 2525350.120000001
+    },
+    {
+      "timestamp": 1776287813134,
+      "open_interest": 2519556.570000001
+    },
+    {
+      "timestamp": 1776288120031,
+      "open_interest": 2514934.4200000013
+    },
+    {
+      "timestamp": 1776288426984,
+      "open_interest": 2509060.400000002
+    },
+    {
+      "timestamp": 1776288733882,
+      "open_interest": 2508777.600000001
+    },
+    {
+      "timestamp": 1776289040730,
+      "open_interest": 2511611.0700000017
+    },
+    {
+      "timestamp": 1776289347629,
+      "open_interest": 2509797.2800000017
+    },
+    {
+      "timestamp": 1776289654532,
+      "open_interest": 2510053.7300000014
+    },
+    {
+      "timestamp": 1776289961379,
+      "open_interest": 2508170.2700000014
+    },
+    {
+      "timestamp": 1776290268880,
+      "open_interest": 2506539.100000001
+    },
+    {
+      "timestamp": 1776290576478,
+      "open_interest": 2508445.2100000014
+    },
+    {
+      "timestamp": 1776290884132,
+      "open_interest": 2511898.110000001
+    },
+    {
+      "timestamp": 1776291191032,
+      "open_interest": 2510789.740000001
+    },
+    {
+      "timestamp": 1776291498628,
+      "open_interest": 2509985.320000001
+    },
+    {
+      "timestamp": 1776291805480,
+      "open_interest": 2511722.680000001
+    },
+    {
+      "timestamp": 1776292113131,
+      "open_interest": 2510595.070000001
+    },
+    {
+      "timestamp": 1776292419980,
+      "open_interest": 2506598.830000001
+    },
+    {
+      "timestamp": 1776292726782,
+      "open_interest": 2514897.4400000013
+    },
+    {
+      "timestamp": 1776293033780,
+      "open_interest": 2510923.4000000013
+    },
+    {
+      "timestamp": 1776293340631,
+      "open_interest": 2512766.3700000015
+    },
+    {
+      "timestamp": 1776293647630,
+      "open_interest": 2513837.1400000015
+    },
+    {
+      "timestamp": 1776293955230,
+      "open_interest": 2510879.8700000015
+    },
+    {
+      "timestamp": 1776294262832,
+      "open_interest": 2510942.890000001
+    },
+    {
+      "timestamp": 1776294570437,
+      "open_interest": 2524652.8600000017
+    },
+    {
+      "timestamp": 1776294877986,
+      "open_interest": 2524043.4500000016
+    },
+    {
+      "timestamp": 1776295185132,
+      "open_interest": 2522713.660000002
+    },
+    {
+      "timestamp": 1776295492035,
+      "open_interest": 2518264.3000000017
+    },
+    {
+      "timestamp": 1776295798933,
+      "open_interest": 2517677.180000002
+    },
+    {
+      "timestamp": 1776296106032,
+      "open_interest": 2519483.110000002
+    },
+    {
+      "timestamp": 1776296412930,
+      "open_interest": 2520467.490000002
+    },
+    {
+      "timestamp": 1776296720530,
+      "open_interest": 2524905.960000002
+    },
+    {
+      "timestamp": 1776297028131,
+      "open_interest": 2525445.8200000017
+    },
+    {
+      "timestamp": 1776297335729,
+      "open_interest": 2526379.2000000016
+    },
+    {
+      "timestamp": 1776297642630,
+      "open_interest": 2526309.500000002
+    },
+    {
+      "timestamp": 1776297949534,
+      "open_interest": 2526387.7500000014
+    },
+    {
+      "timestamp": 1776298256433,
+      "open_interest": 2526082.8400000012
+    },
+    {
+      "timestamp": 1776298564084,
+      "open_interest": 2525868.8800000013
+    },
+    {
+      "timestamp": 1776298870983,
+      "open_interest": 2525423.400000002
+    },
+    {
+      "timestamp": 1776299177885,
+      "open_interest": 2525389.350000001
+    },
+    {
+      "timestamp": 1776299485533,
+      "open_interest": 2520388.870000001
+    },
+    {
+      "timestamp": 1776299792389,
+      "open_interest": 2514586.2400000016
+    },
+    {
+      "timestamp": 1776300099282,
+      "open_interest": 2514163.5400000014
+    },
+    {
+      "timestamp": 1776300406888,
+      "open_interest": 2513332.870000001
+    },
+    {
+      "timestamp": 1776300714482,
+      "open_interest": 2512973.890000001
+    },
+    {
+      "timestamp": 1776301021387,
+      "open_interest": 2514345.040000001
+    },
+    {
+      "timestamp": 1776301329034,
+      "open_interest": 2519113.180000001
+    },
+    {
+      "timestamp": 1776301635987,
+      "open_interest": 2520159.0300000007
+    },
+    {
+      "timestamp": 1776301943738,
+      "open_interest": 2517346.1500000013
+    },
+    {
+      "timestamp": 1776302251538,
+      "open_interest": 2517067.1900000013
+    },
+    {
+      "timestamp": 1776302558438,
+      "open_interest": 2516463.300000001
+    },
+    {
+      "timestamp": 1776302865286,
+      "open_interest": 2518156.1100000013
+    },
+    {
+      "timestamp": 1776303172241,
+      "open_interest": 2518567.5800000015
+    },
+    {
+      "timestamp": 1776303479139,
+      "open_interest": 2519402.870000001
+    },
+    {
+      "timestamp": 1776303786087,
+      "open_interest": 2519143.3600000013
+    },
+    {
+      "timestamp": 1776304093687,
+      "open_interest": 2519337.530000001
+    },
+    {
+      "timestamp": 1776304401336,
+      "open_interest": 2519908.530000001
+    },
+    {
+      "timestamp": 1776304708336,
+      "open_interest": 2520844.2400000016
+    },
+    {
+      "timestamp": 1776305015937,
+      "open_interest": 2520725.900000001
+    },
+    {
+      "timestamp": 1776305322885,
+      "open_interest": 2516925.5600000015
+    },
+    {
+      "timestamp": 1776305629785,
+      "open_interest": 2516790.1400000015
+    },
+    {
+      "timestamp": 1776305937431,
+      "open_interest": 2515319.7900000014
+    },
+    {
+      "timestamp": 1776306245138,
+      "open_interest": 2516238.4000000013
+    },
+    {
+      "timestamp": 1776306552783,
+      "open_interest": 2521653.100000001
+    },
+    {
+      "timestamp": 1776306859786,
+      "open_interest": 2517261.0900000012
+    },
+    {
+      "timestamp": 1776307166733,
+      "open_interest": 2520068.8000000007
+    },
+    {
+      "timestamp": 1776307473783,
+      "open_interest": 2521693.4500000007
+    },
+    {
+      "timestamp": 1776307780734,
+      "open_interest": 2517661.260000001
+    },
+    {
+      "timestamp": 1776308087687,
+      "open_interest": 2515672.9400000013
+    },
+    {
+      "timestamp": 1776308395383,
+      "open_interest": 2515523.240000001
+    },
+    {
+      "timestamp": 1776308702488,
+      "open_interest": 2503535.380000001
+    },
+    {
+      "timestamp": 1776309009646,
+      "open_interest": 2506077.2400000007
+    },
+    {
+      "timestamp": 1776309316636,
+      "open_interest": 2508720.2700000005
+    },
+    {
+      "timestamp": 1776309623543,
+      "open_interest": 2508721.3800000004
+    },
+    {
+      "timestamp": 1776309930438,
+      "open_interest": 2510216.8200000003
+    },
+    {
+      "timestamp": 1776310237386,
+      "open_interest": 2509999.3700000006
+    },
+    {
+      "timestamp": 1776310309037,
+      "open_interest": 2510097.3700000006
+    },
+    {
+      "timestamp": 1776310334873,
+      "open_interest": 2509772.3300000005
+    },
+    {
+      "timestamp": 1776310388991,
+      "open_interest": 2513048.1900000004
+    },
+    {
+      "timestamp": 1776310395224,
+      "open_interest": 2513944.8500000006
+    },
+    {
+      "timestamp": 1776310522089,
+      "open_interest": 2513082.9500000007
+    },
+    {
+      "timestamp": 1776310830887,
+      "open_interest": 2512334.7000000007
+    },
+    {
+      "timestamp": 1776311138488,
+      "open_interest": 2512942.770000001
+    },
+    {
+      "timestamp": 1776311446088,
+      "open_interest": 2512926.770000001
+    },
+    {
+      "timestamp": 1776311753687,
+      "open_interest": 2519672.2000000007
+    },
+    {
+      "timestamp": 1776312061302,
+      "open_interest": 2519441.1800000006
+    },
+    {
+      "timestamp": 1776312368986,
+      "open_interest": 2518329.350000001
+    },
+    {
+      "timestamp": 1776312676586,
+      "open_interest": 2521047.2800000003
+    },
+    {
+      "timestamp": 1776312984186,
+      "open_interest": 2521371.96
+    },
+    {
+      "timestamp": 1776313291887,
+      "open_interest": 2526332.2900000005
+    },
+    {
+      "timestamp": 1776313600085,
+      "open_interest": 2529097.610000001
+    },
+    {
+      "timestamp": 1776313907683,
+      "open_interest": 2526595.95
+    },
+    {
+      "timestamp": 1776314215334,
+      "open_interest": 2526922.0800000005
+    },
+    {
+      "timestamp": 1776314523206,
+      "open_interest": 2533661.3200000008
+    },
+    {
+      "timestamp": 1776314832236,
+      "open_interest": 2542061.6200000006
+    },
+    {
+      "timestamp": 1776315139833,
+      "open_interest": 2538035.43
+    },
+    {
+      "timestamp": 1776315447487,
+      "open_interest": 2535892.9600000004
+    },
+    {
+      "timestamp": 1776315755839,
+      "open_interest": 2537389.9500000007
+    },
+    {
+      "timestamp": 1776316063432,
+      "open_interest": 2542436.2900000005
+    },
+    {
+      "timestamp": 1776316371032,
+      "open_interest": 2541937.380000001
+    },
+    {
+      "timestamp": 1776316678632,
+      "open_interest": 2542042.0600000005
+    },
+    {
+      "timestamp": 1776316987183,
+      "open_interest": 2543789.8500000006
+    },
+    {
+      "timestamp": 1776317294783,
+      "open_interest": 2543245.5100000007
+    },
+    {
+      "timestamp": 1776317602382,
+      "open_interest": 2543710.900000001
+    },
+    {
+      "timestamp": 1776317909932,
+      "open_interest": 2545546.520000001
+    },
+    {
+      "timestamp": 1776318219131,
+      "open_interest": 2544601.0100000007
+    },
+    {
+      "timestamp": 1776318526734,
+      "open_interest": 2544220.5600000005
+    },
+    {
+      "timestamp": 1776318834334,
+      "open_interest": 2544476.9700000007
+    },
+    {
+      "timestamp": 1776319141977,
+      "open_interest": 2545123.5300000007
+    },
+    {
+      "timestamp": 1776319449634,
+      "open_interest": 2543803.2600000007
+    },
+    {
+      "timestamp": 1776319757238,
+      "open_interest": 2545524.910000001
+    },
+    {
+      "timestamp": 1776320064836,
+      "open_interest": 2546225.270000001
+    },
+    {
+      "timestamp": 1776320372494,
+      "open_interest": 2547425.070000001
+    },
+    {
+      "timestamp": 1776320680236,
+      "open_interest": 2545274.1200000006
+    },
+    {
+      "timestamp": 1776320987840,
+      "open_interest": 2545365.5600000005
+    },
+    {
+      "timestamp": 1776321295436,
+      "open_interest": 2545954.4800000004
+    },
+    {
+      "timestamp": 1776321603290,
+      "open_interest": 2547711.650000001
+    },
+    {
+      "timestamp": 1776321910990,
+      "open_interest": 2545672.1100000003
+    },
+    {
+      "timestamp": 1776322218636,
+      "open_interest": 2554631.3900000006
+    },
+    {
+      "timestamp": 1776322526288,
+      "open_interest": 2555529.460000001
+    },
+    {
+      "timestamp": 1776322834036,
+      "open_interest": 2557878.660000001
+    },
+    {
+      "timestamp": 1776323141636,
+      "open_interest": 2559065.700000001
+    },
+    {
+      "timestamp": 1776323449231,
+      "open_interest": 2564539.400000002
+    },
+    {
+      "timestamp": 1776323756882,
+      "open_interest": 2563924.1700000013
+    },
+    {
+      "timestamp": 1776324064634,
+      "open_interest": 2561883.6300000018
+    },
+    {
+      "timestamp": 1776324372282,
+      "open_interest": 2564965.5200000014
+    },
+    {
+      "timestamp": 1776324679935,
+      "open_interest": 2564988.150000002
+    },
+    {
+      "timestamp": 1776324987580,
+      "open_interest": 2564601.4700000016
+    },
+    {
+      "timestamp": 1776325295183,
+      "open_interest": 2563936.5000000014
+    },
+    {
+      "timestamp": 1776325602830,
+      "open_interest": 2564097.700000001
+    },
+    {
+      "timestamp": 1776325910633,
+      "open_interest": 2566026.950000001
+    },
+    {
+      "timestamp": 1776326218234,
+      "open_interest": 2562143.430000001
+    },
+    {
+      "timestamp": 1776326525985,
+      "open_interest": 2561151.970000001
+    },
+    {
+      "timestamp": 1776326833631,
+      "open_interest": 2564053.6400000015
+    },
+    {
+      "timestamp": 1776327141334,
+      "open_interest": 2560097.4900000016
+    },
+    {
+      "timestamp": 1776327448984,
+      "open_interest": 2559787.4400000013
+    },
+    {
+      "timestamp": 1776327756633,
+      "open_interest": 2561190.800000001
+    },
+    {
+      "timestamp": 1776328064285,
+      "open_interest": 2562444.1500000013
+    },
+    {
+      "timestamp": 1776328371828,
+      "open_interest": 2562720.670000001
+    },
+    {
+      "timestamp": 1776328679479,
+      "open_interest": 2564534.2700000014
+    },
+    {
+      "timestamp": 1776328987137,
+      "open_interest": 2564635.8100000015
+    },
+    {
+      "timestamp": 1776329294733,
+      "open_interest": 2566562.0600000015
+    },
+    {
+      "timestamp": 1776329602331,
+      "open_interest": 2564437.120000001
+    },
+    {
+      "timestamp": 1776329909931,
+      "open_interest": 2564932.270000001
+    },
+    {
+      "timestamp": 1776330217541,
+      "open_interest": 2567548.770000001
+    },
+    {
+      "timestamp": 1776330525141,
+      "open_interest": 2568042.850000001
+    },
+    {
+      "timestamp": 1776330832737,
+      "open_interest": 2569622.540000001
+    },
+    {
+      "timestamp": 1776331140391,
+      "open_interest": 2565771.1000000006
+    },
+    {
+      "timestamp": 1776331448086,
+      "open_interest": 2568780.760000001
+    },
+    {
+      "timestamp": 1776331755735,
+      "open_interest": 2565210.710000001
+    },
+    {
+      "timestamp": 1776332063334,
+      "open_interest": 2567390.7500000005
+    },
+    {
+      "timestamp": 1776332370984,
+      "open_interest": 2565064.0200000005
+    },
+    {
+      "timestamp": 1776332678689,
+      "open_interest": 2568058.180000001
+    },
+    {
+      "timestamp": 1776332986337,
+      "open_interest": 2571241.4600000014
+    },
+    {
+      "timestamp": 1776333293936,
+      "open_interest": 2570722.900000001
+    },
+    {
+      "timestamp": 1776333601626,
+      "open_interest": 2570397.6700000013
+    },
+    {
+      "timestamp": 1776333909337,
+      "open_interest": 2572294.290000001
+    },
+    {
+      "timestamp": 1776334216888,
+      "open_interest": 2569776.770000001
+    },
+    {
+      "timestamp": 1776334524489,
+      "open_interest": 2568817.3700000015
+    },
+    {
+      "timestamp": 1776334832088,
+      "open_interest": 2565781.930000001
+    },
+    {
+      "timestamp": 1776335139687,
+      "open_interest": 2561063.060000001
+    },
+    {
+      "timestamp": 1776335447234,
+      "open_interest": 2568211.100000001
+    },
+    {
+      "timestamp": 1776335755636,
+      "open_interest": 2569237.3700000006
+    },
+    {
+      "timestamp": 1776336061902,
+      "open_interest": 2568309.520000001
+    },
+    {
+      "timestamp": 1776336368038,
+      "open_interest": 2568513.230000001
+    },
+    {
+      "timestamp": 1776336674238,
+      "open_interest": 2570942.37
+    },
+    {
+      "timestamp": 1776336980387,
+      "open_interest": 2568126.7100000004
+    },
+    {
+      "timestamp": 1776337194089,
+      "open_interest": 2568108.7900000005
+    },
+    {
+      "timestamp": 1776337500242,
+      "open_interest": 2567129.4800000004
+    }
+  ]
+}
