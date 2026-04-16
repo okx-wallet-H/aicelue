@@ -48,7 +48,16 @@ class LLMAnalyzer:
         except json.JSONDecodeError:
             pass
 
-        match = re.search(r"\{.*\}", raw, flags=re.S)
+        # 去掉可能的markdown代码块包裹
+        cleaned = re.sub(r'^```(?:json)?\s*', '', raw, flags=re.MULTILINE)
+        cleaned = re.sub(r'```\s*$', '', cleaned, flags=re.MULTILINE).strip()
+        try:
+            parsed = json.loads(cleaned)
+            if isinstance(parsed, dict):
+                return parsed
+        except json.JSONDecodeError:
+            pass
+        match = re.search(r"\{.*\}", cleaned, flags=re.S)
         if not match:
             raise ValueError("未在大模型响应中找到 JSON 对象。")
         parsed = json.loads(match.group(0))
@@ -284,7 +293,8 @@ class LLMAnalyzer:
             "你是 OKX 合约量化策略的资深交易分析师。"
             "请基于给定的 BTC 与 SOL 多周期行情、技术指标、持仓、资金费率、未平仓量变化、"
             "市场状态识别结果、近期交易记录与盈亏情况，对目标标的给出严格 JSON。"
-            "不要输出 Markdown，不要输出代码块，不要省略字段。"
+            "【重要】你必须只输出一个纯JSON对象，不要输出任何其他文字、Markdown、代码块或解释。"
+            "不要用```json包裹，直接输出{开头}结尾的JSON。"
             "trade_advice.action 只能是 OPEN_LONG、OPEN_SHORT、HOLD 之一；"
             "trade_advice.direction 只能是 buy、sell、none 之一；"
             "trade_advice.confidence 必须是 0 到 1 之间的小数。"
