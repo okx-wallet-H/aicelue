@@ -98,7 +98,7 @@ class ExecutionEngine:
         contract_notional_usdt = self._contract_notional_usdt(symbol, entry_price)
         if contract_notional_usdt <= 0:
             return requested_size
-        max_loss_usdt = safe_float(settings.max_single_loss_usdt)
+        max_loss_usdt = safe_float(settings.initial_capital) * safe_float(settings.max_single_loss_pct)
         if max_loss_usdt <= 0:
             return requested_size
         max_notional_usdt = max_loss_usdt / stop_loss_pct
@@ -157,7 +157,7 @@ class ExecutionEngine:
 
         loss_capped_size = self._single_loss_size_cap(symbol=symbol, size=size, entry_price=entry_price, stop_loss_pct=stop_loss_pct)
         if loss_capped_size < self._normalize_contracts(size):
-            engine_logger.info("%s 单笔亏损保护生效：请求sz=%.2f，按最大亏损%.2fU与止损%.4f反算后缩减至 %.2f。", symbol, size, settings.max_single_loss_usdt, stop_loss_pct, loss_capped_size)
+            engine_logger.info("%s 单笔亏损保护生效：请求sz=%.2f，按固定本金%.2fU × %.2f%% = 最大亏损%.2fU，并结合止损%.4f反算后缩减至 %.2f。", symbol, size, settings.initial_capital, settings.max_single_loss_pct * 100, safe_float(settings.initial_capital) * safe_float(settings.max_single_loss_pct), stop_loss_pct, loss_capped_size)
         final_size, max_avail_rows = self._okx_max_avail_size_cap(symbol=symbol, size=loss_capped_size, td_mode=td_mode, leverage=leverage)
         if final_size <= 0:
             return {
