@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 from typing import Any
 
 from app.config import settings
@@ -166,6 +164,136 @@ class StrategyEngine:
             "upl_ratio": safe_float(info.get("upl_ratio"), 0.0),
         }
 
+    def _btc_weathervane_signal(self, btc_tf_indicators: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
+        """基于 BTC 1H ADX、均线与 RSI 生成全市场风向标。"""
+        default_signal = {
+            "status": "NEUTRAL",
+            "trend": "震荡",
+            "adx": 0.0,
+            "rsi": 50.0,
+            "ema20": 0.0,
+            "ema60": 0.0,
+            "close": 0.0,
+            "ma_signal": "MA20=MA60",
+            "reason": "[BTC风向标] BTC 信号获取失败，按中性处理，不影响 SOL 正常决策。",
+        }
+        if not btc_tf_indicators:
+            return default_signal
+
+        try:
+            h1 = btc_tf_indicators.get("1H") or {}
+            if not h1:
+                return default_signal
+
+            adx = safe_float(h1.get("adx"), 0.0)
+            rsi = safe_float(h1.get("rsi14"), 50.0)
+            ema20 = safe_float(h1.get("ema20"), 0.0)
+            ema60 = safe_float(h1.get("ema60"), 0.0)
+            close = safe_float(h1.get("close"), 0.0)
+
+            if ema20 > ema60:
+                ma_signal = "MA20>MA60"
+            elif ema20 < ema60:
+                ma_signal = "MA20<MA60"
+            else:
+                ma_signal = "MA20=MA60"
+
+            bullish = adx >= settings.adx_high and ema20 > ema60 and rsi >= 55 and close >= ema20
+            bearish = adx >= settings.adx_high and ema20 < ema60 and rsi <= 45 and close <= ema20
+
+            # 对临界值做一次宽松容错，避免 BTC 短暂抖动导致风向标频繁翻转
+            if not bullish and not bearish:
+                bullish = adx >= settings.adx_low and ema20 > ema60 and rsi >= 52
+                bearish = adx >= settings.adx_low and ema20 < ema60 and rsi <= 48
+
+            if bullish:
+                status = "BULLISH"
+                trend = "多头"
+            elif bearish:
+                status = "BEARISH"
+                trend = "空头"
+            else:
+                status = "NEUTRAL"
+                trend = "震荡"
+
+            return {
+                "status": status,
+                "trend": trend,
+                "adx": round(adx, 4),
+                "rsi": round(rsi, 4),
+                "ema20": round(ema20, 4),
+                "ema60": round(ema60, 4),
+                "close": round(close, 4),
+                "ma_signal": ma_signal,
+                "reason": f"[BTC风向标] BTC 1H趋势：{trend}（ADX={adx:.0f}, {ma_signal}, RSI={rsi:.0f}）",
+            }
+        except Exception:
+            return default_signal
+
+    @staticmethod
+    def _unique_notes(notes: list[str]) -> list[str]:
+        ordered: list[str] = []
+        for note in notes:
+            text = str(note or "").strip()
+            if text and text not in ordered:
+                ordered.append(text)
+        return ordered
+
+    def _sol_btc_weathervane_adjustment(
+        self,
+        state_name: str,
+        h1: dict[str, float],
+        m15: dict[str, float],
+        btc_weathervane: dict[str, Any] | None = None,
+        btc_turn_alert: str | None = None,
+    ) -> dict[str, Any]:
+        """将 BTC 风向标映射为 SOL 的置信度、仓位与止盈风控调整。"""
+        signal = btc_weathervane or {}
+        status = str(signal.get("status") or "NEUTRAL").upper()
+        notes: list[str] = [str(signal.get("reason") or "[BTC风向标] BTC 信号缺失，SOL 按常规逻辑决策。")]
+
+        adjustment = {
+            "confidence_delta": 0.0,
+            "position_scale": 1.0,
+            "tight_take_profit_to_1r": False,
+            "pause_add_position": False,
+            "notes": notes,
+        }
+
+        if btc_turn_alert:
+            adjustment["notes"].append(btc_turn_alert)
+
+        if status == "NEUTRAL":
+            return adjustment
+
+        sol_long_bias = state_name in {"强势上涨", "弱势上涨"} or (h1["ema20"] > h1["ema60"] and m15["ema20"] > m15["ema60"])
+        sol_short_bias = state_name in {"强势下跌", "弱势下跌"} or (h1["ema20"] < h1["ema60"] and m15["ema20"] < m15["ema60"])
+
+        if status == "BULLISH":
+            if sol_long_bias:
+                adjustment["confidence_delta"] = 0.05
+                adjustment["position_scale"] = 1.15
+                adjustment["notes"].append("[BTC风向标] BTC 偏多 → SOL做多信号获得+0.05置信度加分，并允许更大仓位。")
+            elif sol_short_bias:
+                adjustment["confidence_delta"] = -0.05
+                adjustment["position_scale"] = 0.85
+                adjustment["tight_take_profit_to_1r"] = True
+                adjustment["pause_add_position"] = True
+                adjustment["notes"].append("[BTC风向标] BTC 偏多 → SOL做空信号削减0.05置信度，止盈收紧至1R并暂停加仓。")
+        elif status == "BEARISH":
+            if sol_short_bias:
+                adjustment["confidence_delta"] = 0.05
+                adjustment["position_scale"] = 1.15
+                adjustment["notes"].append("[BTC风向标] BTC 偏空 → SOL做空信号获得+0.05置信度加分，并允许更大仓位。")
+            elif sol_long_bias:
+                adjustment["confidence_delta"] = -0.05
+                adjustment["position_scale"] = 0.85
+                adjustment["tight_take_profit_to_1r"] = True
+                adjustment["pause_add_position"] = True
+                adjustment["notes"].append("[BTC风向标] BTC 偏空 → SOL做多信号削减0.05置信度，止盈收紧至1R并暂停加仓。")
+
+        return adjustment
+
     def _entry_signal(
         self,
         state_name: str,
@@ -260,12 +388,15 @@ class StrategyEngine:
 
     def _close_signal(
         self,
+        symbol: str,
         state_name: str,
         h1: dict[str, float],
         m15: dict[str, float],
         weighted_score: float,
         confidence_threshold: float,
         position_snapshot: dict[str, Any],
+        btc_weathervane: dict[str, Any] | None = None,
+        btc_turn_alert: str | None = None,
     ) -> tuple[str | None, str]:
         pos_side = position_snapshot["side"]
         if not pos_side:
@@ -275,13 +406,22 @@ class StrategyEngine:
         low_confidence = weighted_score < max(confidence_threshold * 0.92, confidence_threshold - 0.06)
         long_reversal = h1["ema20"] < h1["ema60"] or (m15["ema20"] < m15["ema60"] and m15["rsi14"] < 48)
         short_reversal = h1["ema20"] > h1["ema60"] or (m15["ema20"] > m15["ema60"] and m15["rsi14"] > 52)
+        btc_status = str((btc_weathervane or {}).get("status") or "NEUTRAL").upper()
+        alert_prefix = f"{btc_turn_alert} " if btc_turn_alert else ""
+
+        btc_pressure_on_sol_long = symbol == "SOL-USDT-SWAP" and pos_side == "buy" and btc_status == "BEARISH"
+        btc_pressure_on_sol_short = symbol == "SOL-USDT-SWAP" and pos_side == "sell" and btc_status == "BULLISH"
 
         # Hotfix 4: 增加"反向强信号（Score > 0.6）强制平仓"逻辑
         if pos_side == "buy":
             # 如果当前是多单，但市场状态是下跌且加权分较高（说明空头信号强）
             if state_name in {"强势下跌", "弱势下跌"} and weighted_score > 0.6:
                 return "CLOSE_LONG", f"检测到反向强信号(Score={weighted_score:.2f})，多单强制平仓。"
-            
+
+            if btc_pressure_on_sol_long and upl_ratio >= 0.01:
+                return "CLOSE_LONG", f"{alert_prefix}BTC风向标偏空，SOL多单止盈收紧至1R，当前浮盈{upl_ratio * 100:.1f}%后执行保护性离场。"
+            if btc_pressure_on_sol_long and (long_reversal or low_confidence):
+                return "CLOSE_LONG", f"{alert_prefix}BTC风向标偏空，且SOL多头结构转弱，多单风控升级后主动平仓。"
             if state_name in {"强势下跌", "弱势下跌"}:
                 return "CLOSE_LONG", "市场状态已转入下跌区间，多单按策略退出。"
             if long_reversal and low_confidence:
@@ -299,6 +439,10 @@ class StrategyEngine:
             if state_name in {"强势上涨", "弱势上涨"} and weighted_score > 0.6:
                 return "CLOSE_SHORT", f"检测到反向强信号(Score={weighted_score:.2f})，空单强制平仓。"
 
+            if btc_pressure_on_sol_short and upl_ratio >= 0.01:
+                return "CLOSE_SHORT", f"{alert_prefix}BTC风向标偏多，SOL空单止盈收紧至1R，当前浮盈{upl_ratio * 100:.1f}%后执行保护性离场。"
+            if btc_pressure_on_sol_short and (short_reversal or low_confidence):
+                return "CLOSE_SHORT", f"{alert_prefix}BTC风向标偏多，且SOL空头结构转弱，空单风控升级后主动平仓。"
             if state_name in {"强势上涨", "弱势上涨"}:
                 return "CLOSE_SHORT", "市场状态已转入上涨区间，空单按策略退出。"
             if short_reversal and low_confidence:
@@ -320,7 +464,10 @@ class StrategyEngine:
         market_state: dict[str, Any],
         position_info: dict[str, Any] | None = None,
         rootdata_metrics: dict[str, Any] | None = None,
+        btc_weathervane: dict[str, Any] | None = None,
+        btc_turn_alert: str | None = None,
     ) -> dict[str, Any]:
+        symbol = str(symbol_snapshot["symbol"])
         h1 = tf_indicators["1H"]
         m15 = tf_indicators["15M"]
         state_name = str(market_state["overall_state"])
@@ -334,7 +481,7 @@ class StrategyEngine:
         adaptive_params = self.risk_manager.adaptive_params
         state_confidence_bonus = safe_float(adaptive_params.get("state_confidence_bonus", {}).get(state_name), 0.0)
         scores = self._strategy_scores(state_name, tf_indicators)
-        
+
         # 集成 RootData 信号
         rd_bonus = 0.0
         if rootdata_metrics:
@@ -347,7 +494,7 @@ class StrategyEngine:
             # 增长指数
             if rootdata_metrics.get("growth_index", 0) > 2.0:
                 rd_bonus += 0.02
-        
+
         weighted_score = clamp(self._weighted_score(scores) + rd_bonus, 0.0, 1.0)
         confidence_threshold = clamp(
             safe_float(adaptive_params.get("confidence_threshold"), settings.confidence_threshold_default) + state_confidence_bonus,
@@ -355,15 +502,45 @@ class StrategyEngine:
             settings.confidence_threshold_max,
         )
         position_ratio = self.risk_manager.position_ratio(
-            symbol=symbol_snapshot["symbol"],
+            symbol=symbol,
             market_state=state_name,
             funding_rate=funding_rate,
             atr_change_rate=float(market_state["atr_change_rate"]),
             orderbook_factor=orderbook_factor,
         )
-        leverage = self._leverage(symbol_snapshot["symbol"], state_name, weighted_score=weighted_score)
+        leverage = self._leverage(symbol, state_name, weighted_score=weighted_score)
         position_ratio = clamp(position_ratio, settings.min_position_ratio, settings.max_position_ratio)
         position_snapshot = self._position_snapshot(position_info)
+
+        weathervane_notes: list[str] = []
+        sol_risk_overrides = {
+            "tight_take_profit_to_1r": False,
+            "pause_add_position": False,
+            "confidence_delta": 0.0,
+        }
+
+        if symbol == "BTC-USDT-SWAP":
+            if btc_weathervane:
+                weathervane_notes.append("[BTC风向标] 当前标的即 BTC，自身趋势同时作为全市场锚点信号。")
+                weathervane_notes.append(str(btc_weathervane.get("reason") or ""))
+        elif symbol == "SOL-USDT-SWAP":
+            sol_adjustment = self._sol_btc_weathervane_adjustment(
+                state_name=state_name,
+                h1=h1,
+                m15=m15,
+                btc_weathervane=btc_weathervane,
+                btc_turn_alert=btc_turn_alert,
+            )
+            sol_risk_overrides["confidence_delta"] = safe_float(sol_adjustment.get("confidence_delta"), 0.0)
+            sol_risk_overrides["tight_take_profit_to_1r"] = bool(sol_adjustment.get("tight_take_profit_to_1r"))
+            sol_risk_overrides["pause_add_position"] = bool(sol_adjustment.get("pause_add_position"))
+            weighted_score = clamp(weighted_score + sol_risk_overrides["confidence_delta"], 0.0, 1.0)
+            position_ratio = clamp(
+                position_ratio * safe_float(sol_adjustment.get("position_scale"), 1.0),
+                settings.min_position_ratio,
+                settings.max_position_ratio,
+            )
+            weathervane_notes.extend(sol_adjustment.get("notes") or [])
 
         action, side, position_ratio, entry_bias, final_reason = self._entry_signal(
             state_name=state_name,
@@ -378,12 +555,15 @@ class StrategyEngine:
         )
 
         close_action, close_reason = self._close_signal(
+            symbol=symbol,
             state_name=state_name,
             h1=h1,
             m15=m15,
             weighted_score=weighted_score,
             confidence_threshold=confidence_threshold,
             position_snapshot=position_snapshot,
+            btc_weathervane=btc_weathervane,
+            btc_turn_alert=btc_turn_alert,
         )
         if close_action:
             action = close_action
@@ -396,6 +576,8 @@ class StrategyEngine:
             side = None
             entry_bias = "持仓续持"
             final_reason = f"当前已持有同向仓位 {position_snapshot['abs_pos']:.2f} 张，避免重复加仓，继续观察。"
+            if symbol == "SOL-USDT-SWAP" and sol_risk_overrides["pause_add_position"]:
+                final_reason += " BTC风向标处于逆风方向，暂停 SOL 同向加仓。"
         elif position_snapshot["side"] and action in {"OPEN_LONG", "OPEN_SHORT"}:
             action = "HOLD"
             side = None
@@ -421,6 +603,14 @@ class StrategyEngine:
             and position_snapshot["abs_pos"] == 0
         )
 
+        # BTC 风向标逆风时，不允许 SOL 继续使用更激进的尖刀连进攻仓
+        if symbol == "SOL-USDT-SWAP" and sol_risk_overrides["pause_add_position"]:
+            knife_attack_eligible = False
+
+        unique_weathervane_notes = self._unique_notes(weathervane_notes)
+        if unique_weathervane_notes:
+            final_reason = f"{' '.join(unique_weathervane_notes)} {final_reason}"
+
         final_reason = (
             f"动作={action}，方向={side or 'none'}，常规仓位比例={position_ratio:.4f}，常规杠杆={leverage}，"
             f"加权分={weighted_score:.4f}，自适应门槛={confidence_threshold:.4f}，信号等级={signal_grade}，进攻分={attack_score:.4f}。"
@@ -433,12 +623,29 @@ class StrategyEngine:
         if knife_attack_eligible:
             final_reason += " 满足尖刀连A+触发条件，可参与30U逐仓50倍进攻仓。"
 
+        if rootdata_metrics:
+            rootdata_summary = (
+                f"RootData：热度排名={rootdata_metrics.get('heat_rank', 'N/A')}，"
+                f"影响力={rootdata_metrics.get('influence_index', 'N/A')}，"
+                f"增长指数={rootdata_metrics.get('growth_index', 'N/A')}。"
+            )
+        else:
+            rootdata_summary = "RootData 数据不可用，使用默认值。"
+
+        if unique_weathervane_notes:
+            btc_reasoning_summary = " ".join(unique_weathervane_notes)
+        else:
+            btc_reasoning_summary = "[BTC风向标] 当前未触发额外联动调整。"
+
         reasoning = ReasoningChain(
             market_state=(
                 f"4H状态={state_name}，ADX={float(market_state['adx']):.2f}，"
                 f"EMA结构={market_state['ema_structure']}，波动={market_state['volatility_state']}。"
             ),
-            symbol_selection=f"仅在 BTC 与 SOL 中择优，当前标的={symbol_snapshot['symbol']}，并排除 ETH。",
+            symbol_selection=(
+                f"仅在 BTC 与 SOL 中择优，当前标的={symbol}，并排除 ETH。"
+                f" {btc_reasoning_summary} {rootdata_summary}"
+            ),
             rhythm_1h=(
                 f"1H EMA20={h1['ema20']:.2f}，EMA60={h1['ema60']:.2f}，RSI={h1['rsi14']:.2f}，"
                 f"用于判断节奏与趋势延续性。"
@@ -455,17 +662,11 @@ class StrategyEngine:
                 f"OBI={obi:.4f}，盘口因子={orderbook_factor:.2f}，决策偏向={entry_bias}，"
                 f"尖刀连进攻分={attack_score:.4f}。"
             ),
-            rootdata=(
-                f"热度排名={rootdata_metrics.get('heat_rank', 'N/A')}，"
-                f"影响力={rootdata_metrics.get('influence_index', 'N/A')}，"
-                f"增长指数={rootdata_metrics.get('growth_index', 'N/A')}。"
-                if rootdata_metrics else "RootData 数据不可用，使用默认值。"
-            ),
             final_action=final_reason,
         )
 
         return {
-            "symbol": symbol_snapshot["symbol"],
+            "symbol": symbol,
             "action": action,
             "side": side,
             "position_ratio": position_ratio,
@@ -479,4 +680,7 @@ class StrategyEngine:
             "sub_strategy_scores": scores,
             "reasoning": reasoning,
             "position_snapshot": position_snapshot,
+            "btc_weathervane": btc_weathervane or {"status": "NEUTRAL", "trend": "震荡"},
+            "tight_take_profit_to_1r": bool(sol_risk_overrides["tight_take_profit_to_1r"]),
+            "pause_add_position": bool(sol_risk_overrides["pause_add_position"]),
         }

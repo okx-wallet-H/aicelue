@@ -66,6 +66,25 @@ class AgentTradeKitApp:
         except ValueError:
             return len(settings.symbol_priority)
 
+    def _symbol_capital_ratio(self, symbol: str) -> float:
+        """按标的返回专属资金占比上限。"""
+        if symbol == "BTC-USDT-SWAP":
+            return settings.btc_weathervane_capital_ratio
+        if symbol == "SOL-USDT-SWAP":
+            return settings.sol_main_attack_capital_ratio
+        return settings.max_single_symbol_margin_ratio
+
+    def _total_capital_limit_ratio(self) -> float:
+        """确保 BTC+SOL 组合资金分配与历史总仓位上限兼容。"""
+        return max(
+            settings.max_total_margin_ratio,
+            settings.btc_weathervane_capital_ratio + settings.sol_main_attack_capital_ratio,
+        )
+
+    def _reserve_capital_ratio(self) -> float:
+        """统一手续费缓冲与最低可用余额保留比例。"""
+        return max(settings.min_available_balance_ratio, settings.fee_buffer_capital_ratio)
+
     def _margin_budget_snapshot(self, equity_usdt: float | None = None) -> dict[str, Any]:
         detail = self._account_balance_detail()
         equity = safe_float(equity_usdt) or safe_float(detail.get("eqUsd") or detail.get("eq")) or self._account_equity()
@@ -97,9 +116,9 @@ class AgentTradeKitApp:
         avail_balance = safe_float(budget.get("avail_balance"))
         total_margin = safe_float(budget.get("total_margin"))
         symbol_margin = safe_float((budget.get("symbol_margin") or {}).get(symbol))
-        per_symbol_limit = equity * settings.max_single_symbol_margin_ratio
-        total_limit = equity * settings.max_total_margin_ratio
-        reserve_floor = equity * settings.min_available_balance_ratio
+        per_symbol_limit = equity * self._symbol_capital_ratio(symbol)
+        total_limit = equity * self._total_capital_limit_ratio()
+        reserve_floor = equity * self._reserve_capital_ratio()
         safety_buffer = settings.order_margin_safety_buffer_usdt
         allowed = min(
             max(requested_margin, 0.0),
@@ -146,6 +165,26 @@ class AgentTradeKitApp:
 
     def _build_indicators(self, snapshot: dict[str, Any]) -> dict[str, dict[str, float]]:
         return {tf: self.indicator_engine.calculate(candles) for tf, candles in snapshot["klines"].items()}
+
+    @staticmethod
+    def _btc_turn_alert_message(previous_status: str, current_status: str) -> str | None:
+        prev = str(previous_status or "NEUTRAL").upper()
+        curr = str(current_status or "NEUTRAL").upper()
+        if prev == curr:
+            return None
+
+        label_map = {
+            "BULLISH": "多头",
+            "BEARISH": "空头",
+            "NEUTRAL": "震荡",
+        }
+        prev_label = label_map.get(prev, prev)
+
+        if curr == "BEARISH":
+            return f"[BTC风向标] 警告：BTC趋势由{prev_label}转向空头 → BTC风向标转向[空头]，SOL多单风控升级，止盈收紧至1R，暂停加仓"
+        if curr == "BULLISH":
+            return f"[BTC风向标] 警告：BTC趋势由{prev_label}转向多头 → BTC风向标转向[多头]，SOL空单风控升级，止盈收紧至1R，暂停加仓"
+        return f"[BTC风向标] 提示：BTC趋势由{prev_label}转为震荡 → SOL恢复常规决策，不做额外方向倾斜"
 
     def _pick_best_knife_candidate(self, records: list[dict[str, Any]]) -> dict[str, Any] | None:
         candidates = [r for r in records if bool(r.get("knife_attack_eligible")) and r.get("action") in {"OPEN_LONG", "OPEN_SHORT"}]
@@ -380,16 +419,65 @@ class AgentTradeKitApp:
         decisions: list[dict[str, Any]] = []
         runtime_records: list[dict[str, Any]] = []
 
-        for symbol, snapshot in market_data["symbols"].items():
-            tf_indicators = self._build_indicators(snapshot)
-            market_state = self.state_recognizer.recognize(
-                symbol=symbol,
-                tf_indicators=tf_indicators,
-                funding_rate=float(snapshot["funding_rate"]),
-                oi_change_rate=float(snapshot["oi_change_rate"]),
+        btc_weathervane = {
+            "status": "NEUTRAL",
+            "trend": "震荡",
+            "reason": "[BTC风向标] BTC 行情缺失，按中性处理，不影响 SOL 正常决策。",
+        }
+        btc_turn_alert = None
+        btc_snapshot = (market_data.get("symbols") or {}).get("BTC-USDT-SWAP")
+        btc_tf_indicators: dict[str, dict[str, float]] | None = None
+        btc_market_state: dict[str, Any] | None = None
+
+        if isinstance(btc_snapshot, dict):
+            btc_tf_indicators = self._build_indicators(btc_snapshot)
+            btc_market_state = self.state_recognizer.recognize(
+                symbol="BTC-USDT-SWAP",
+                tf_indicators=btc_tf_indicators,
+                funding_rate=float(btc_snapshot["funding_rate"]),
+                oi_change_rate=float(btc_snapshot["oi_change_rate"]),
             )
+            btc_weathervane = self.strategy_engine._btc_weathervane_signal(btc_tf_indicators)
+
+        previous_btc_status = str(self.kb.state.get("btc_weathervane_status") or "NEUTRAL").upper()
+        current_btc_status = str(btc_weathervane.get("status") or "NEUTRAL").upper()
+        btc_turn_alert = self._btc_turn_alert_message(previous_btc_status, current_btc_status)
+        self.kb.state["btc_weathervane_status"] = current_btc_status
+        self.kb.state["btc_weathervane_snapshot"] = btc_weathervane
+
+        if btc_turn_alert:
+            sol_position = self._symbol_position_info("SOL-USDT-SWAP")
+            if abs(safe_float(sol_position.get("net_pos"))) > 0:
+                engine_logger.warning(
+                    "%s 当前SOL净持仓=%.4f，浮盈率=%.4f。",
+                    btc_turn_alert,
+                    safe_float(sol_position.get("net_pos")),
+                    safe_float(sol_position.get("upl_ratio")),
+                )
+            else:
+                engine_logger.warning("%s 当前SOL无持仓，后续信号将按升级风控处理。", btc_turn_alert)
+
+        for symbol, snapshot in market_data["symbols"].items():
+            if symbol == "BTC-USDT-SWAP" and btc_tf_indicators and btc_market_state:
+                tf_indicators = btc_tf_indicators
+                market_state = btc_market_state
+            else:
+                tf_indicators = self._build_indicators(snapshot)
+                market_state = self.state_recognizer.recognize(
+                    symbol=symbol,
+                    tf_indicators=tf_indicators,
+                    funding_rate=float(snapshot["funding_rate"]),
+                    oi_change_rate=float(snapshot["oi_change_rate"]),
+                )
             position_info = self._symbol_position_info(symbol)
-            decision = self.strategy_engine.decide(snapshot, tf_indicators, market_state, position_info=position_info)
+            decision = self.strategy_engine.decide(
+                snapshot,
+                tf_indicators,
+                market_state,
+                position_info=position_info,
+                btc_weathervane=btc_weathervane,
+                btc_turn_alert=btc_turn_alert if symbol == "SOL-USDT-SWAP" else None,
+            )
             reasoning_text = decision["reasoning"].to_markdown()
             reasoning_logger.info("%s\n%s", symbol, reasoning_text)
 
@@ -413,6 +501,12 @@ class AgentTradeKitApp:
                 "sub_strategy_scores": decision["sub_strategy_scores"],
                 "reasoning": decision["reasoning"].to_dict(),
                 "position_snapshot": decision.get("position_snapshot") or position_info,
+                "btc_weathervane": decision.get("btc_weathervane") or btc_weathervane,
+                "btc_turn_alert": btc_turn_alert if symbol == "SOL-USDT-SWAP" else None,
+                "risk_overrides": {
+                    "tight_take_profit_to_1r": bool(decision.get("tight_take_profit_to_1r")),
+                    "pause_add_position": bool(decision.get("pause_add_position")),
+                },
                 "trade_status": "pending",
                 "realized_pnl": None,
                 "order_result": {"entry": [], "algo": []},
@@ -432,10 +526,11 @@ class AgentTradeKitApp:
 
         budget_snapshot = self._margin_budget_snapshot(equity_usdt=equity)
         engine_logger.info(
-            "资金分配限制已加载: 单标的保证金上限=%.0f%%, 总保证金上限=%.0f%%, 最低可用余额保留=%.0f%%, 优先级=%s, 当前权益=%.2f, 当前可用=%.2f, 当前总保证金=%.2f, 当前分标的=%s",
-            settings.max_single_symbol_margin_ratio * 100,
-            settings.max_total_margin_ratio * 100,
-            settings.min_available_balance_ratio * 100,
+            "资金分配限制已加载: BTC风向标仓位=%.0f%%, SOL主攻仓位=%.0f%%, 手续费缓冲=%.0f%%, 总保证金上限=%.0f%%, 优先级=%s, 当前权益=%.2f, 当前可用=%.2f, 当前总保证金=%.2f, 当前分标的=%s",
+            settings.btc_weathervane_capital_ratio * 100,
+            settings.sol_main_attack_capital_ratio * 100,
+            self._reserve_capital_ratio() * 100,
+            self._total_capital_limit_ratio() * 100,
             settings.symbol_priority,
             budget_snapshot["equity"],
             budget_snapshot["avail_balance"],
@@ -477,6 +572,8 @@ class AgentTradeKitApp:
                         atr_change_rate=float(market_state["atr_change_rate"]),
                     )
                     take_profit_pct = round(max(stop_loss_pct * 1.8, stop_loss_pct + 0.005), 4)
+                    if bool(decision.get("tight_take_profit_to_1r")):
+                        take_profit_pct = round(stop_loss_pct, 4)
                     requested_margin = round(equity * safe_float(decision["position_ratio"]), 6)
                     allowed_margin = self._allowed_additional_margin(budget_snapshot, symbol, requested_margin)
                     effective_position_ratio = 0.0 if equity <= 0 else allowed_margin / equity
@@ -487,20 +584,22 @@ class AgentTradeKitApp:
                         "avail_balance_before": budget_snapshot["avail_balance"],
                         "total_margin_before": budget_snapshot["total_margin"],
                         "symbol_margin_before": safe_float(budget_snapshot["symbol_margin"].get(symbol)),
-                        "reserve_floor": round(budget_snapshot["equity"] * settings.min_available_balance_ratio, 6),
+                        "per_symbol_limit": round(budget_snapshot["equity"] * self._symbol_capital_ratio(symbol), 6),
+                        "total_limit": round(budget_snapshot["equity"] * self._total_capital_limit_ratio(), 6),
+                        "reserve_floor": round(budget_snapshot["equity"] * self._reserve_capital_ratio(), 6),
                         "safety_buffer": settings.order_margin_safety_buffer_usdt,
                     }
                     minimum_required_margin = max(equity * settings.min_position_ratio_initial, 5.0)
                     if allowed_margin < minimum_required_margin:
                         record["trade_status"] = "skipped_budget_guard"
                         engine_logger.warning(
-                            "%s 因资金分配限制跳过开仓: 请求保证金=%.2f, 允许保证金=%.2f, 单标的上限=%.2f, 总保证金上限=%.2f, 最低可用余额保留=%.2f, 安全缓冲=%.2f",
+                            "%s 因资金分配限制跳过开仓: 请求保证金=%.2f, 允许保证金=%.2f, 标的资金上限=%.2f, 总保证金上限=%.2f, 手续费缓冲保留=%.2f, 安全缓冲=%.2f",
                             symbol,
                             requested_margin,
                             allowed_margin,
-                            budget_snapshot["equity"] * settings.max_single_symbol_margin_ratio,
-                            budget_snapshot["equity"] * settings.max_total_margin_ratio,
-                            budget_snapshot["equity"] * settings.min_available_balance_ratio,
+                            budget_snapshot["equity"] * self._symbol_capital_ratio(symbol),
+                            budget_snapshot["equity"] * self._total_capital_limit_ratio(),
+                            budget_snapshot["equity"] * self._reserve_capital_ratio(),
                             settings.order_margin_safety_buffer_usdt,
                         )
                     else:
