@@ -154,6 +154,7 @@ class LLMAnalyzer:
                 "action": "HOLD",
                 "direction": "none",
                 "confidence": 0.0,
+                "position_pct": 0.0,
                 "thesis": "大模型调用失败或未启用，本轮不提供额外方向加权。",
                 "alignment_note": "降级模式",
             },
@@ -224,6 +225,7 @@ class LLMAnalyzer:
                 "action": action,
                 "direction": direction,
                 "confidence": round(clamp(safe_float(trade_advice.get("confidence")), 0.0, 1.0), 4),
+                "position_pct": round(clamp(safe_float(trade_advice.get("position_pct")), 0.0, 0.50), 4),
                 "thesis": str(trade_advice.get("thesis") or ""),
                 "alignment_note": str(trade_advice.get("alignment_note") or ""),
             },
@@ -298,8 +300,11 @@ class LLMAnalyzer:
             "trade_advice.action 只能是 OPEN_LONG、OPEN_SHORT、HOLD 之一；"
             "trade_advice.direction 只能是 buy、sell、none 之一；"
             "trade_advice.confidence 必须是 0 到 1 之间的小数。"
+            "trade_advice.position_pct 必须是 0.10 到 0.50 之间的小数，表示本次交易建议使用本金多少比例作为保证金。"
             "【比赛背景】当前正在参加OKX合约交易赛，比赛2026年4月23日16:00截止，本金1500U，剩余不到6天。"
-            "核心策略是高频小仓位交易、积少成多，每笔赚2-5U即可。"
+            "核心策略是高频交易、积少成多，单笔止盈目标1.5%-3%，盈利1.5%-3%即可止盈锁定利润。"
+            "你还需要输出 position_pct（建议仓位比例，范围0.10-0.50），资金利用率要高，不要浪费闲置资金。"
+            "强信号高置信度时建议 0.30-0.50；中等信号建议 0.20-0.30；弱信号但仍值得交易时建议 0.10-0.20。"
             "你应该倾向于给出OPEN_LONG或OPEN_SHORT的建议，积极寻找交易机会。"
             "只有在市场极度危险（如暴跌暴涨超5%、流动性枯竭）时才建议HOLD。"
             "不要过于保守，比赛需要不停交易来积累收益。"
@@ -308,7 +313,7 @@ class LLMAnalyzer:
             "请分析目标标的并仅返回 JSON，结构如下："
             "{"
             '"market_analysis":{"overall_trend":"字符串","trend_strength":"字符串","key_supports":[数字或字符串],"key_resistances":[数字或字符串],"state_interpretation":"字符串"},'
-            '"trade_advice":{"action":"OPEN_LONG|OPEN_SHORT|HOLD","direction":"buy|sell|none","confidence":0.0,"thesis":"字符串","alignment_note":"字符串"},'
+            '"trade_advice":{"action":"OPEN_LONG|OPEN_SHORT|HOLD","direction":"buy|sell|none","confidence":0.0,"position_pct":0.30,"thesis":"字符串","alignment_note":"字符串"},'
             '"risk_assessment":{"level":"低|中|高","warnings":["字符串"],"positioning_note":"字符串"},'
             '"reasoning_process":["字符串1","字符串2","字符串3"]'
             "}。"

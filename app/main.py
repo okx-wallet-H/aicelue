@@ -614,7 +614,10 @@ class AgentTradeKitApp:
                     take_profit_pct = round(max(stop_loss_pct * 1.5, stop_loss_pct + 0.005), 4)
                     if bool(decision.get("tight_take_profit_to_1r")):
                         take_profit_pct = round(stop_loss_pct, 4)
-                    requested_margin = round(equity * safe_float(decision["position_ratio"]), 6)
+                    _initial_cap = safe_float(settings.initial_capital, 1500.0)
+                    requested_margin = round(_initial_cap * safe_float(decision["position_ratio"]), 6)
+                    if 0 < requested_margin < 150.0:
+                        requested_margin = 150.0
                     symbol_margin_before = safe_float(budget_snapshot["symbol_margin"].get(symbol))
                     symbol_margin_limit = max(budget_snapshot["equity"] * self._symbol_capital_ratio(symbol) - symbol_margin_before, 0.0)
                     total_margin_limit = max(budget_snapshot["equity"] * self._total_capital_limit_ratio() - budget_snapshot["total_margin"], 0.0)

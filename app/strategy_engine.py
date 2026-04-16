@@ -12,6 +12,7 @@ class StrategyEngine:
         self.weights = weights
         self.risk_manager = risk_manager
         self.llm_analyzer = LLMAnalyzer()
+        self.trailing_stop_state: dict[str, dict[str, Any]] = {}
 
     def _strategy_scores(self, state: str, tf_indicators: dict[str, dict[str, float]]) -> dict[str, float]:
         h4 = tf_indicators.get("4H", tf_indicators.get("1H", {}))
@@ -182,6 +183,42 @@ class StrategyEngine:
             return "OPEN_SHORT"
         return "HOLD"
 
+    def _trailing_stop_lock(self, symbol: str, position_snapshot: dict[str, Any]) -> tuple[float, float]:
+        pos_side = position_snapshot["side"]
+        abs_pos = safe_float(position_snapshot.get("abs_pos"), 0.0)
+        if not pos_side or abs_pos <= 0:
+            self.trailing_stop_state.pop(symbol, None)
+            return 0.0, 0.0
+
+        upl_ratio = safe_float(position_snapshot.get("upl_ratio"), 0.0)
+        entry_px = safe_float(position_snapshot.get("entry_px"), 0.0)
+        state = self.trailing_stop_state.get(symbol) or {}
+        same_position = state.get("side") == pos_side and abs(safe_float(state.get("entry_px"), 0.0) - entry_px) < 1e-8
+        if same_position:
+            peak_upl_ratio = max(safe_float(state.get("peak_upl_ratio"), upl_ratio), upl_ratio)
+        else:
+            peak_upl_ratio = upl_ratio
+
+        self.trailing_stop_state[symbol] = {
+            "side": pos_side,
+            "entry_px": entry_px,
+            "peak_upl_ratio": peak_upl_ratio,
+        }
+
+        trailing_stop_levels = [
+            (0.02, 0.01),
+            (0.03, 0.02),
+            (0.05, 0.03),
+            (0.08, 0.05),
+            (0.10, 0.07),
+        ]
+        lock_pct = 0.0
+        for threshold, lock in trailing_stop_levels:
+            if peak_upl_ratio >= threshold:
+                lock_pct = lock
+
+        return peak_upl_ratio, lock_pct
+
     def _apply_llm_weighting(
         self,
         weighted_score: float,
@@ -259,10 +296,11 @@ class StrategyEngine:
         trend = str(market_analysis.get("overall_trend") or "未知")
         confidence = safe_float(trade_advice.get("confidence"))
         action = str(trade_advice.get("action") or "HOLD")
+        position_pct = safe_float(trade_advice.get("position_pct"))
         risk_level = str(risk_assessment.get("level") or "中")
         relation = str(adjustment.get("relation") or "neutral")
         core_reason = "；".join(str(item) for item in list(reasoning_process)[:3])
-        return f"趋势={trend}，建议={action}，置信度={confidence:.2f}，风险={risk_level}，关系={relation}，推理={core_reason}"
+        return f"趋势={trend}，建议={action}，置信度={confidence:.2f}，建议仓位={position_pct:.2f}，风险={risk_level}，关系={relation}，推理={core_reason}"
 
     def _btc_weathervane_signal(self, btc_tf_indicators: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
         """基于 BTC 1H ADX、均线与 RSI 生成全市场风向标。"""
@@ -515,9 +553,17 @@ class StrategyEngine:
     ) -> tuple[str | None, str]:
         pos_side = position_snapshot["side"]
         if not pos_side:
+            self.trailing_stop_state.pop(symbol, None)
             return None, "当前无持仓，无需平仓。"
 
         upl_ratio = position_snapshot["upl_ratio"]
+        peak_upl_ratio, lock_pct = self._trailing_stop_lock(symbol=symbol, position_snapshot=position_snapshot)
+        if lock_pct > 0 and upl_ratio <= lock_pct:
+            close_action = "CLOSE_LONG" if pos_side == "buy" else "CLOSE_SHORT"
+            return close_action, (
+                f"阶梯移动止盈：持仓峰值浮盈{peak_upl_ratio * 100:.1f}%，当前回撤至{upl_ratio * 100:.1f}%，"
+                f"触发{lock_pct * 100:.1f}%锁利线，执行保护性市价平仓。"
+            )
 
         # 高频移动止盈：快进快出，赚2-5U就锁定
         if pos_side == "buy":
@@ -646,7 +692,7 @@ class StrategyEngine:
         llm_analysis: dict[str, Any] = {
             "enabled": False,
             "degraded": True,
-            "trade_advice": {"action": "HOLD", "direction": "none", "confidence": 0.0},
+            "trade_advice": {"action": "HOLD", "direction": "none", "confidence": 0.0, "position_pct": 0.0},
             "reasoning_process": ["尚未触发 LLM 分析。"],
         }
         llm_adjustment: dict[str, Any] = {
@@ -709,6 +755,8 @@ class StrategyEngine:
         llm_trade_advice = llm_analysis.get("trade_advice") or {}
         llm_direction = str(llm_trade_advice.get("direction") or "none").lower()
         llm_action = str(llm_trade_advice.get("action") or "HOLD").upper()
+        llm_position_pct = safe_float(llm_trade_advice.get("position_pct"), 0.0)
+        llm_position_valid = 0.10 <= llm_position_pct <= 0.50
 
         action, side, position_ratio, entry_bias, final_reason = self._entry_signal(
             state_name=state_name,
@@ -741,8 +789,14 @@ class StrategyEngine:
             entry_bias = "持仓退出"
             position_ratio = 0.0
             final_reason = close_reason
-        elif position_snapshot["side"] == side and action in {"OPEN_LONG", "OPEN_SHORT"}:
-            position_ratio = clamp(position_ratio * 0.7, settings.min_position_ratio_initial, position_ratio)
+        elif action in {"OPEN_LONG", "OPEN_SHORT"} and llm_position_valid:
+            position_ratio = clamp(llm_position_pct, 0.10, 0.50)
+            entry_bias = f"{entry_bias}+LLM仓位"
+            final_reason = f"{final_reason} LLM返回建议仓位比例 {position_ratio:.2f}，本轮直接采用。"
+        elif action in {"OPEN_LONG", "OPEN_SHORT"}:
+            position_ratio = clamp(position_ratio, 0.10, 0.50)
+        if close_action is None and position_snapshot["side"] == side and action in {"OPEN_LONG", "OPEN_SHORT"}:
+            position_ratio = clamp(position_ratio * 0.7, 0.10, position_ratio)
             entry_bias = "同向加仓"
             final_reason = f"当前已持有同向仓位 {position_snapshot['abs_pos']:.2f} 张，以70%仓位追加同向加仓积累收益。"
         elif position_snapshot["side"] and action in {"OPEN_LONG", "OPEN_SHORT"}:
