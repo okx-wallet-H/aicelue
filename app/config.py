@@ -54,16 +54,16 @@ class Settings:
     kelly_fraction_aggressive: float = 0.50
     min_position_ratio: float = 0.0
     max_position_ratio: float = 0.40
-    min_position_ratio_initial: float = 0.05
+    min_position_ratio_initial: float = 0.02
     max_single_symbol_margin_ratio: float = 0.40
     max_total_margin_ratio: float = 0.70
-    min_available_balance_ratio: float = 0.12
+    min_available_balance_ratio: float = 0.05
     order_margin_safety_buffer_usdt: float = 12.0
     duplicate_entry_cooldown_seconds: int = 900
 
     single_loss_pct: float = 0.02
     single_loss_pct_strong_trend: float = 0.015
-    daily_loss_fuse_pct: float = 0.06
+    daily_loss_fuse_pct: float = 0.08
     total_drawdown_fuse_pct: float = 0.20
     consecutive_loss_half: int = 2
     consecutive_loss_stop: int = 3
@@ -71,13 +71,13 @@ class Settings:
 
     btc_leverage_normal: int = 4
     btc_leverage_strong: int = 6
-    sol_leverage_normal: int = 4
-    sol_leverage_strong: int = 7
+    sol_leverage_normal: int = 10
+    sol_leverage_strong: int = 10
     symbol_priority: tuple[str, ...] = ("BTC-USDT-SWAP", "SOL-USDT-SWAP")
 
     knife_attack_enabled: bool = True
-    knife_attack_margin_usdt: float = 30.0
-    knife_attack_leverage: int = 15
+    knife_attack_margin_usdt: float = 40.0
+    knife_attack_leverage: int = 20
     knife_attack_td_mode: str = "isolated"
     knife_attack_stop_loss_pct: float = 0.015
     knife_attack_take_profit_pct: float = 0.03
@@ -88,7 +88,7 @@ class Settings:
     min_strategy_weight: float = 0.10
     ewma_alpha: float = 0.35
 
-    confidence_threshold_default: float = 0.35
+    confidence_threshold_default: float = 0.30
     confidence_threshold_min: float = 0.20
     confidence_threshold_max: float = 0.75
     overall_position_scale_min: float = 0.60
@@ -98,6 +98,15 @@ class Settings:
     adaptive_stop_loss_min: float = 0.012
     adaptive_stop_loss_max: float = 0.020
     adaptive_stop_loss_default: float = 0.016
+
+    # Hotfix: 权重调整
+    trend_following_weight: float = 0.30
+    mean_reversion_weight: float = 0.15
+    breakout_weight: float = 0.35
+    momentum_confirmation_weight: float = 0.20
+
+    # RootData API 配置
+    rootdata_api_key: str = field(default_factory=lambda: os.getenv("ROOTDATA_API_KEY", ""))
 
     engine_log_file: Path = field(init=False)
     reasoning_log_file: Path = field(init=False)

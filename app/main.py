@@ -347,6 +347,7 @@ class AgentTradeKitApp:
                     continue
                 if fill["timestamp"] + 60_000 < int(campaign.get("opened_at", 0)):
                     continue
+                # _normalize_fill 已经处理了 fillId/tradeId 的兼容性，这里直接使用 fill_id
                 processed_fill_ids.add(fill["fill_id"])
                 if fill["side"] == campaign.get("side"):
                     campaign.setdefault("entry_fills", []).append(fill)

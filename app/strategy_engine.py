@@ -276,7 +276,12 @@ class StrategyEngine:
         long_reversal = h1["ema20"] < h1["ema60"] or (m15["ema20"] < m15["ema60"] and m15["rsi14"] < 48)
         short_reversal = h1["ema20"] > h1["ema60"] or (m15["ema20"] > m15["ema60"] and m15["rsi14"] > 52)
 
+        # Hotfix 4: 增加"反向强信号（Score > 0.6）强制平仓"逻辑
         if pos_side == "buy":
+            # 如果当前是多单，但市场状态是下跌且加权分较高（说明空头信号强）
+            if state_name in {"强势下跌", "弱势下跌"} and weighted_score > 0.6:
+                return "CLOSE_LONG", f"检测到反向强信号(Score={weighted_score:.2f})，多单强制平仓。"
+            
             if state_name in {"强势下跌", "弱势下跌"}:
                 return "CLOSE_LONG", "市场状态已转入下跌区间，多单按策略退出。"
             if long_reversal and low_confidence:
@@ -290,6 +295,10 @@ class StrategyEngine:
             return None, "持有多单，当前结构未触发退出条件。"
 
         if pos_side == "sell":
+            # 如果当前是空单，但市场状态是上涨且加权分较高（说明多头信号强）
+            if state_name in {"强势上涨", "弱势上涨"} and weighted_score > 0.6:
+                return "CLOSE_SHORT", f"检测到反向强信号(Score={weighted_score:.2f})，空单强制平仓。"
+
             if state_name in {"强势上涨", "弱势上涨"}:
                 return "CLOSE_SHORT", "市场状态已转入上涨区间，空单按策略退出。"
             if short_reversal and low_confidence:
@@ -310,6 +319,7 @@ class StrategyEngine:
         tf_indicators: dict[str, dict[str, float]],
         market_state: dict[str, Any],
         position_info: dict[str, Any] | None = None,
+        rootdata_metrics: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         h1 = tf_indicators["1H"]
         m15 = tf_indicators["15M"]
@@ -324,7 +334,21 @@ class StrategyEngine:
         adaptive_params = self.risk_manager.adaptive_params
         state_confidence_bonus = safe_float(adaptive_params.get("state_confidence_bonus", {}).get(state_name), 0.0)
         scores = self._strategy_scores(state_name, tf_indicators)
-        weighted_score = self._weighted_score(scores)
+        
+        # 集成 RootData 信号
+        rd_bonus = 0.0
+        if rootdata_metrics:
+            # 热度排名变化作为趋势确认辅助
+            if rootdata_metrics.get("heat_rank", 999) <= 10:
+                rd_bonus += 0.05
+            # 影响力指数作为基本面参考
+            if rootdata_metrics.get("influence_index", 0) > 80:
+                rd_bonus += 0.03
+            # 增长指数
+            if rootdata_metrics.get("growth_index", 0) > 2.0:
+                rd_bonus += 0.02
+        
+        weighted_score = clamp(self._weighted_score(scores) + rd_bonus, 0.0, 1.0)
         confidence_threshold = clamp(
             safe_float(adaptive_params.get("confidence_threshold"), settings.confidence_threshold_default) + state_confidence_bonus,
             settings.confidence_threshold_min,
@@ -430,6 +454,12 @@ class StrategyEngine:
             orderbook=(
                 f"OBI={obi:.4f}，盘口因子={orderbook_factor:.2f}，决策偏向={entry_bias}，"
                 f"尖刀连进攻分={attack_score:.4f}。"
+            ),
+            rootdata=(
+                f"热度排名={rootdata_metrics.get('heat_rank', 'N/A')}，"
+                f"影响力={rootdata_metrics.get('influence_index', 'N/A')}，"
+                f"增长指数={rootdata_metrics.get('growth_index', 'N/A')}。"
+                if rootdata_metrics else "RootData 数据不可用，使用默认值。"
             ),
             final_action=final_reason,
         )

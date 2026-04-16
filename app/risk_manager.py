@@ -15,6 +15,13 @@ class RiskManager:
     def should_stop_new_trades(self) -> bool:
         return bool(self.state.get("daily_fuse_triggered") or self.state.get("drawdown_fuse_triggered"))
 
+    def reset_daily_stats(self) -> None:
+        """每日熔断重置逻辑。"""
+        self.state["daily_pnl"] = 0.0
+        self.state["consecutive_losses"] = 0
+        self.state["daily_fuse_triggered"] = False
+        # 不重置 equity_peak，以保持对总回撤的监控
+
     def _recent_symbol_trades(self, symbol: str) -> list[dict[str, Any]]:
         completed = [r for r in self.completed_trades if r.get("symbol") == symbol and r.get("realized_pnl") is not None]
         return completed[-settings.kelly_window:]
@@ -66,6 +73,12 @@ class RiskManager:
 
         ratio = base * kelly_fraction * funding_factor * atr_factor * drawdown_factor * orderbook_factor
         ratio *= overall_scale * symbol_scale * state_scale
+        
+        # Hotfix 1: 增加最小开仓保底逻辑
+        equity = max(safe_float(self.state.get("current_equity")), 1.0)
+        if ratio * equity < 20:
+            ratio = 20 / equity
+            
         return clamp(ratio, settings.min_position_ratio_initial, settings.max_position_ratio)
 
     def adaptive_stop_loss_pct(self, symbol: str, market_state: str, atr_change_rate: float) -> float:
