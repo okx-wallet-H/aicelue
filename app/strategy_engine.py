@@ -1,6 +1,7 @@
 from typing import Any
 
 from app.config import settings
+from app.llm_analyzer import LLMAnalyzer
 from app.reasoning import ReasoningChain
 from app.risk_manager import RiskManager
 from app.utils import clamp, safe_float
@@ -10,6 +11,7 @@ class StrategyEngine:
     def __init__(self, weights: dict[str, float], risk_manager: RiskManager) -> None:
         self.weights = weights
         self.risk_manager = risk_manager
+        self.llm_analyzer = LLMAnalyzer()
 
     def _strategy_scores(self, state: str, tf_indicators: dict[str, dict[str, float]]) -> dict[str, float]:
         h4 = tf_indicators.get("4H", tf_indicators.get("1H", {}))
@@ -163,6 +165,104 @@ class StrategyEngine:
             "mark_px": safe_float(info.get("mark_px"), 0.0),
             "upl_ratio": safe_float(info.get("upl_ratio"), 0.0),
         }
+
+    def _technical_direction(self, state_name: str, h1: dict[str, float], m15: dict[str, float], obi: float) -> str:
+        """根据技术指标提炼当前技术方向，用于与 LLM 建议做一致性比较。"""
+        if state_name in {"强势上涨", "弱势上涨"}:
+            return "OPEN_LONG"
+        if state_name in {"强势下跌", "弱势下跌"}:
+            return "OPEN_SHORT"
+        if h1["ema20"] > h1["ema60"] and m15["ema20"] >= m15["ema60"]:
+            return "OPEN_LONG"
+        if h1["ema20"] < h1["ema60"] and m15["ema20"] <= m15["ema60"]:
+            return "OPEN_SHORT"
+        if obi >= 0.08:
+            return "OPEN_LONG"
+        if obi <= -0.08:
+            return "OPEN_SHORT"
+        return "HOLD"
+
+    def _apply_llm_weighting(
+        self,
+        weighted_score: float,
+        technical_direction: str,
+        llm_analysis: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """把 LLM 方向与置信度映射为技术分的附加加减权。"""
+        analysis = llm_analysis or {}
+        trade_advice = analysis.get("trade_advice") or {}
+        llm_action = str(trade_advice.get("action") or "HOLD").upper()
+        llm_confidence = clamp(safe_float(trade_advice.get("confidence")), 0.0, 1.0)
+        adjustment = {
+            "llm_action": llm_action,
+            "llm_confidence": round(llm_confidence, 4),
+            "technical_direction": technical_direction,
+            "relation": "degraded",
+            "score_delta": 0.0,
+            "adjusted_weighted_score": round(weighted_score, 4),
+            "should_skip_entry": False,
+            "notes": [],
+        }
+
+        if not analysis or bool(analysis.get("degraded")) or not bool(analysis.get("enabled")):
+            adjustment["notes"].append("LLM 当前不可用，本轮沿用纯技术指标模式。")
+            return adjustment
+
+        delta = llm_confidence * safe_float(settings.llm_confidence_weight)
+        aligned_boost = llm_confidence * safe_float(settings.llm_alignment_boost)
+        conflict_penalty = llm_confidence * safe_float(settings.llm_conflict_penalty)
+        hold_penalty = llm_confidence * safe_float(settings.llm_hold_penalty)
+        adjusted_score = weighted_score
+
+        if llm_action == technical_direction and llm_action in {"OPEN_LONG", "OPEN_SHORT"}:
+            adjusted_score += delta + aligned_boost
+            adjustment["relation"] = "aligned"
+            adjustment["notes"].append(f"LLM 与技术方向一致（{llm_action}），提高总分。")
+        elif technical_direction == "HOLD" and llm_action in {"OPEN_LONG", "OPEN_SHORT"}:
+            adjusted_score += delta * 0.5
+            adjustment["relation"] = "lead"
+            adjustment["notes"].append(f"技术面暂中性，但 LLM 给出 {llm_action} 倾向，轻度提高总分。")
+        elif llm_action == "HOLD" and technical_direction in {"OPEN_LONG", "OPEN_SHORT"}:
+            adjusted_score -= hold_penalty
+            adjustment["relation"] = "hold_conflict"
+            adjustment["notes"].append("LLM 建议观望，适度压低技术分。")
+        elif llm_action in {"OPEN_LONG", "OPEN_SHORT"} and technical_direction in {"OPEN_LONG", "OPEN_SHORT"} and llm_action != technical_direction:
+            adjusted_score -= delta + conflict_penalty
+            adjustment["relation"] = "conflict"
+            adjustment["notes"].append(f"LLM 与技术方向冲突（技术={technical_direction}, LLM={llm_action}），降低总分。")
+        else:
+            adjustment["relation"] = "neutral"
+            adjustment["notes"].append("LLM 未提供明确增益方向，维持原技术分。")
+
+        adjusted_score = clamp(adjusted_score, 0.0, 1.0)
+        adjustment["score_delta"] = round(adjusted_score - weighted_score, 4)
+        adjustment["adjusted_weighted_score"] = round(adjusted_score, 4)
+        adjustment["should_skip_entry"] = adjustment["relation"] in {"conflict", "hold_conflict"} and llm_confidence >= safe_float(settings.llm_skip_conflict_threshold)
+        return adjustment
+
+    @staticmethod
+    def _llm_summary_text(llm_analysis: dict[str, Any] | None = None, llm_adjustment: dict[str, Any] | None = None) -> str:
+        analysis = llm_analysis or {}
+        adjustment = llm_adjustment or {}
+        trade_advice = analysis.get("trade_advice") or {}
+        market_analysis = analysis.get("market_analysis") or {}
+        risk_assessment = analysis.get("risk_assessment") or {}
+        reasoning_process = analysis.get("reasoning_process") or []
+        if isinstance(reasoning_process, str):
+            reasoning_process = [reasoning_process]
+
+        if bool(analysis.get("degraded")) or not analysis:
+            notes = adjustment.get("notes") or [analysis.get("error") or "LLM 不可用"]
+            note_text = "；".join(str(item) for item in notes if str(item).strip())
+            return f"LLM降级，说明={note_text}"
+
+        trend = str(market_analysis.get("overall_trend") or "未知")
+        confidence = safe_float(trade_advice.get("confidence"))
+        action = str(trade_advice.get("action") or "HOLD")
+        risk_level = str(risk_assessment.get("level") or "中")
+        relation = str(adjustment.get("relation") or "neutral")
+        core_reason = "；".join(str(item) for item in list(reasoning_process)[:3])
+        return f"趋势={trend}，建议={action}，置信度={confidence:.2f}，风险={risk_level}，关系={relation}，推理={core_reason}"
 
     def _btc_weathervane_signal(self, btc_tf_indicators: dict[str, dict[str, float]] | None = None) -> dict[str, Any]:
         """基于 BTC 1H ADX、均线与 RSI 生成全市场风向标。"""
@@ -466,6 +566,10 @@ class StrategyEngine:
         rootdata_metrics: dict[str, Any] | None = None,
         btc_weathervane: dict[str, Any] | None = None,
         btc_turn_alert: str | None = None,
+        market_context: dict[str, Any] | None = None,
+        positions: dict[str, Any] | None = None,
+        recent_records: list[dict[str, Any]] | None = None,
+        recent_trades: list[dict[str, Any]] | None = None,
     ) -> dict[str, Any]:
         symbol = str(symbol_snapshot["symbol"])
         h1 = tf_indicators["1H"]
@@ -511,6 +615,22 @@ class StrategyEngine:
         leverage = self._leverage(symbol, state_name, weighted_score=weighted_score)
         position_ratio = clamp(position_ratio, settings.min_position_ratio, settings.max_position_ratio)
         position_snapshot = self._position_snapshot(position_info)
+        llm_analysis: dict[str, Any] = {
+            "enabled": False,
+            "degraded": True,
+            "trade_advice": {"action": "HOLD", "direction": "none", "confidence": 0.0},
+            "reasoning_process": ["尚未触发 LLM 分析。"],
+        }
+        llm_adjustment: dict[str, Any] = {
+            "llm_action": "HOLD",
+            "llm_confidence": 0.0,
+            "technical_direction": "HOLD",
+            "relation": "degraded",
+            "score_delta": 0.0,
+            "adjusted_weighted_score": round(weighted_score, 4),
+            "should_skip_entry": False,
+            "notes": ["尚未应用 LLM 加权。"],
+        }
 
         weathervane_notes: list[str] = []
         sol_risk_overrides = {
@@ -541,6 +661,23 @@ class StrategyEngine:
                 settings.max_position_ratio,
             )
             weathervane_notes.extend(sol_adjustment.get("notes") or [])
+
+        technical_direction = self._technical_direction(state_name=state_name, h1=h1, m15=m15, obi=obi)
+        llm_analysis = self.llm_analyzer.analyze_trade_decision(
+            target_symbol=symbol,
+            market_context=market_context or {},
+            positions=positions or {symbol: position_info or {}},
+            recent_records=recent_records or [],
+            recent_trades=recent_trades or [],
+            btc_weathervane=btc_weathervane,
+            btc_turn_alert=btc_turn_alert,
+        )
+        llm_adjustment = self._apply_llm_weighting(
+            weighted_score=weighted_score,
+            technical_direction=technical_direction,
+            llm_analysis=llm_analysis,
+        )
+        weighted_score = safe_float(llm_adjustment.get("adjusted_weighted_score"), weighted_score)
 
         action, side, position_ratio, entry_bias, final_reason = self._entry_signal(
             state_name=state_name,
@@ -584,6 +721,15 @@ class StrategyEngine:
             entry_bias = "等待反手前先平旧仓"
             final_reason = f"当前存在反向持仓 {position_snapshot['abs_pos']:.2f} 张，需先完成平仓，再考虑反手。"
 
+        if close_action is None and action in {"OPEN_LONG", "OPEN_SHORT"} and bool(llm_adjustment.get("should_skip_entry")):
+            llm_action = str((llm_analysis.get("trade_advice") or {}).get("action") or "HOLD")
+            llm_confidence = safe_float((llm_analysis.get("trade_advice") or {}).get("confidence"))
+            action = "HOLD"
+            side = None
+            position_ratio = 0.0
+            entry_bias = "LLM冲突过滤"
+            final_reason = f"大模型以 {llm_confidence:.2f} 的高置信度给出 {llm_action}，与技术方向明显冲突，本轮跳过新开仓。"
+
         attack_score = self._attack_score(
             state_name=state_name,
             weighted_score=weighted_score,
@@ -611,10 +757,12 @@ class StrategyEngine:
         if unique_weathervane_notes:
             final_reason = f"{' '.join(unique_weathervane_notes)} {final_reason}"
 
+        llm_summary = self._llm_summary_text(llm_analysis=llm_analysis, llm_adjustment=llm_adjustment)
         final_reason = (
             f"动作={action}，方向={side or 'none'}，常规仓位比例={position_ratio:.4f}，常规杠杆={leverage}，"
-            f"加权分={weighted_score:.4f}，自适应门槛={confidence_threshold:.4f}，信号等级={signal_grade}，进攻分={attack_score:.4f}。"
-            f" 当前净持仓={position_snapshot['net_pos']:.2f}。说明：{final_reason}"
+            f"加权分={weighted_score:.4f}，自适应门槛={confidence_threshold:.4f}，信号等级={signal_grade}，进攻分={attack_score:.4f}，"
+            f"LLM分数增量={safe_float(llm_adjustment.get('score_delta')):.4f}。当前净持仓={position_snapshot['net_pos']:.2f}。"
+            f"说明：{final_reason} LLM摘要：{llm_summary}"
         )
         if crowded:
             final_reason += " 当前资金费率提示拥挤。"
@@ -644,7 +792,7 @@ class StrategyEngine:
             ),
             symbol_selection=(
                 f"仅在 BTC 与 SOL 中择优，当前标的={symbol}，并排除 ETH。"
-                f" {btc_reasoning_summary} {rootdata_summary}"
+                f" {btc_reasoning_summary} {rootdata_summary} LLM摘要={llm_summary}"
             ),
             rhythm_1h=(
                 f"1H EMA20={h1['ema20']:.2f}，EMA60={h1['ema60']:.2f}，RSI={h1['rsi14']:.2f}，"
@@ -683,4 +831,6 @@ class StrategyEngine:
             "btc_weathervane": btc_weathervane or {"status": "NEUTRAL", "trend": "震荡"},
             "tight_take_profit_to_1r": bool(sol_risk_overrides["tight_take_profit_to_1r"]),
             "pause_add_position": bool(sol_risk_overrides["pause_add_position"]),
+            "llm_analysis": llm_analysis,
+            "llm_adjustment": llm_adjustment,
         }

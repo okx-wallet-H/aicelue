@@ -5,6 +5,7 @@ from copy import deepcopy
 from typing import Any
 
 from app.config import settings
+from app.llm_analyzer import LLMAnalyzer
 from app.utils import clamp, now_ts_ms, safe_float
 
 
@@ -12,6 +13,7 @@ class EvolutionEngine:
     def __init__(self, weights: dict[str, float], adaptive_params: dict[str, Any]) -> None:
         self.weights = weights
         self.adaptive_params = adaptive_params
+        self.llm_analyzer = LLMAnalyzer()
 
     def summarize_performance(self, completed_trades: list[dict[str, Any]]) -> dict[str, Any]:
         window = completed_trades[-settings.evaluation_trade_window :]
@@ -115,16 +117,30 @@ class EvolutionEngine:
                 "weights_after": deepcopy(self.weights),
                 "params_before": deepcopy(self.adaptive_params),
                 "params_after": deepcopy(self.adaptive_params),
+                "llm_review": {
+                    "enabled": False,
+                    "degraded": True,
+                    "review_summary": "最近窗口内暂无已完成交易，暂不调用 LLM 复盘。",
+                    "parameter_adjustments": {},
+                    "reasoning_process": [],
+                },
             }
 
         weights_before = deepcopy(self.weights)
         params_before = deepcopy(self.adaptive_params)
         reasons: list[str] = []
+        llm_review = self.llm_analyzer.review_recent_trades(
+            completed_trades=completed_trades,
+            performance_metrics=metrics,
+            current_weights=weights_before,
+            adaptive_params=params_before,
+        )
 
         self._update_strategy_weights(metrics, reasons)
         self._update_confidence_and_position(metrics, reasons)
         self._update_symbol_and_state_scales(metrics, reasons)
         self._update_stop_loss(metrics, reasons)
+        self._apply_llm_review(llm_review, reasons)
 
         return {
             "timestamp": now_ts_ms(),
@@ -135,7 +151,63 @@ class EvolutionEngine:
             "weights_after": deepcopy(self.weights),
             "params_before": params_before,
             "params_after": deepcopy(self.adaptive_params),
+            "llm_review": llm_review,
         }
+
+    def _apply_llm_review(self, llm_review: dict[str, Any], reasons: list[str]) -> None:
+        """把 LLM 复盘建议以保守方式映射为参数调整。"""
+        if not llm_review or bool(llm_review.get("degraded")) or not bool(llm_review.get("enabled")):
+            reasons.append(str(llm_review.get("review_summary") or llm_review.get("error") or "LLM 复盘不可用，沿用规则自适应结果。"))
+            return
+
+        scale = safe_float(settings.llm_review_bias_scale, 0.50)
+        adjustments = llm_review.get("parameter_adjustments") or {}
+
+        confidence = safe_float(self.adaptive_params.get("confidence_threshold"), settings.confidence_threshold_default)
+        position_scale = safe_float(self.adaptive_params.get("overall_position_scale"), 1.0)
+        leverage_scale = safe_float(self.adaptive_params.get("overall_leverage_scale"), 1.0)
+        confidence += safe_float(adjustments.get("confidence_threshold_delta")) * scale
+        position_scale += safe_float(adjustments.get("overall_position_scale_delta")) * scale
+        leverage_scale += safe_float(adjustments.get("overall_leverage_scale_delta")) * scale
+        self.adaptive_params["confidence_threshold"] = round(clamp(confidence, settings.confidence_threshold_min, settings.confidence_threshold_max), 4)
+        self.adaptive_params["overall_position_scale"] = round(clamp(position_scale, settings.overall_position_scale_min, settings.overall_position_scale_max), 4)
+        self.adaptive_params["overall_leverage_scale"] = round(clamp(leverage_scale, settings.leverage_scale_min, settings.leverage_scale_max), 4)
+
+        strategy_weight_bias = adjustments.get("strategy_weight_bias") or {}
+        if strategy_weight_bias:
+            adjusted_weights: dict[str, float] = {}
+            total = 0.0
+            for name, current_weight in self.weights.items():
+                candidate = current_weight + safe_float(strategy_weight_bias.get(name)) * scale
+                candidate = max(settings.min_strategy_weight, candidate)
+                adjusted_weights[name] = candidate
+                total += candidate
+            total = total or 1.0
+            for name, value in adjusted_weights.items():
+                self.weights[name] = round(value / total, 4)
+
+        state_confidence_bonus = self.adaptive_params.setdefault("state_confidence_bonus", {})
+        for market_state, delta in (adjustments.get("state_confidence_bonus_delta") or {}).items():
+            current_value = safe_float(state_confidence_bonus.get(market_state))
+            state_confidence_bonus[market_state] = round(clamp(current_value + safe_float(delta) * scale, -0.12, 0.12), 4)
+
+        state_stop_loss_pct = self.adaptive_params.setdefault("state_stop_loss_pct", {})
+        for market_state, delta in (adjustments.get("state_stop_loss_delta") or {}).items():
+            current_value = safe_float(state_stop_loss_pct.get(market_state), settings.adaptive_stop_loss_default)
+            state_stop_loss_pct[market_state] = round(
+                clamp(current_value + safe_float(delta) * scale, settings.adaptive_stop_loss_min, settings.adaptive_stop_loss_max),
+                4,
+            )
+
+        summary = str(llm_review.get("review_summary") or "LLM 已完成最近交易复盘。")
+        strengths = "；".join(str(item) for item in (llm_review.get("strengths") or [])[:3] if str(item).strip())
+        mistakes = "；".join(str(item) for item in (llm_review.get("mistakes") or [])[:3] if str(item).strip())
+        reasons.append(f"LLM复盘摘要：{summary}")
+        if strengths:
+            reasons.append(f"LLM认为近期做对了：{strengths}。")
+        if mistakes:
+            reasons.append(f"LLM认为近期做错了：{mistakes}。")
+        reasons.append("已按保守缩放系数吸收 LLM 给出的参数偏置建议，并继续保留原有规则自适应框架。")
 
     def _update_strategy_weights(self, metrics: dict[str, Any], reasons: list[str]) -> None:
         learning_rate = settings.strategy_learning_rate

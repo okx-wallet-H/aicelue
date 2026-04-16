@@ -113,6 +113,22 @@ class Settings:
     # RootData API 配置
     rootdata_api_key: str = field(default_factory=lambda: os.getenv("ROOTDATA_API_KEY", ""))
 
+    # LLM 分析配置
+    llm_enabled: bool = field(default_factory=lambda: os.getenv("LLM_ENABLED", "true").lower() == "true")
+    llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gemini-2.5-flash"))
+    llm_timeout_seconds: int = field(default_factory=lambda: int(os.getenv("LLM_TIMEOUT_SECONDS", "12")))
+    llm_max_candles_per_tf: int = field(default_factory=lambda: int(os.getenv("LLM_MAX_CANDLES_PER_TF", "24")))
+    llm_recent_record_window: int = field(default_factory=lambda: int(os.getenv("LLM_RECENT_RECORD_WINDOW", "12")))
+    llm_recent_trade_window: int = field(default_factory=lambda: int(os.getenv("LLM_RECENT_TRADE_WINDOW", "20")))
+    llm_confidence_weight: float = field(default_factory=lambda: float(os.getenv("LLM_CONFIDENCE_WEIGHT", "0.10")))
+    llm_alignment_boost: float = field(default_factory=lambda: float(os.getenv("LLM_ALIGNMENT_BOOST", "0.08")))
+    llm_conflict_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_CONFLICT_PENALTY", "0.12")))
+    llm_hold_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_HOLD_PENALTY", "0.08")))
+    llm_skip_conflict_threshold: float = field(default_factory=lambda: float(os.getenv("LLM_SKIP_CONFLICT_THRESHOLD", "0.85")))
+    llm_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_TEMPERATURE", "0.15")))
+    llm_review_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_REVIEW_TEMPERATURE", "0.10")))
+    llm_review_bias_scale: float = field(default_factory=lambda: float(os.getenv("LLM_REVIEW_BIAS_SCALE", "0.50")))
+
     engine_log_file: Path = field(init=False)
     reasoning_log_file: Path = field(init=False)
     trades_log_file: Path = field(init=False)

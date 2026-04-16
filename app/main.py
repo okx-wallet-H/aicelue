@@ -252,6 +252,8 @@ class AgentTradeKitApp:
             "td_mode": record.get("td_mode", "isolated"),
             "sub_strategy_scores": record.get("sub_strategy_scores") or {},
             "reasoning": record.get("reasoning") or {},
+            "llm_analysis": record.get("llm_analysis") or {},
+            "llm_adjustment": record.get("llm_adjustment") or {},
             "requested_tag": "agentTradeKit",
             "stop_loss_pct": safe_float((record.get("order_result") or {}).get("stop_loss_pct")),
             "take_profit_pct": safe_float((record.get("order_result") or {}).get("take_profit_pct")),
@@ -343,6 +345,8 @@ class AgentTradeKitApp:
             "td_mode": campaign.get("td_mode", "isolated"),
             "sub_strategy_scores": campaign.get("sub_strategy_scores") or {},
             "reasoning": campaign.get("reasoning") or {},
+            "llm_analysis": campaign.get("llm_analysis") or {},
+            "llm_adjustment": campaign.get("llm_adjustment") or {},
             "entry_order_ids": campaign.get("entry_order_ids") or [],
             "algo_ids": campaign.get("algo_ids") or [],
             "entry_fills": campaign.get("entry_fills") or [],
@@ -457,6 +461,14 @@ class AgentTradeKitApp:
             else:
                 engine_logger.warning("%s 当前SOL无持仓，后续信号将按升级风控处理。", btc_turn_alert)
 
+        recent_records_window = int(getattr(settings, "llm_recent_record_window", 12))
+        recent_trades_window = int(getattr(settings, "llm_recent_trade_window", 20))
+        recent_records = self.kb.knowledge_records[-recent_records_window:]
+        recent_trades = self.kb.completed_trades[-recent_trades_window:]
+        positions_context: dict[str, dict[str, Any]] = {}
+        prepared_runtime_records: list[dict[str, Any]] = []
+        llm_market_context: dict[str, dict[str, Any]] = {}
+
         for symbol, snapshot in market_data["symbols"].items():
             if symbol == "BTC-USDT-SWAP" and btc_tf_indicators and btc_market_state:
                 tf_indicators = btc_tf_indicators
@@ -470,6 +482,28 @@ class AgentTradeKitApp:
                     oi_change_rate=float(snapshot["oi_change_rate"]),
                 )
             position_info = self._symbol_position_info(symbol)
+            positions_context[symbol] = position_info
+            llm_market_context[symbol] = {
+                "snapshot": snapshot,
+                "tf_indicators": tf_indicators,
+                "market_state": market_state,
+            }
+            prepared_runtime_records.append(
+                {
+                    "symbol": symbol,
+                    "snapshot": snapshot,
+                    "tf_indicators": tf_indicators,
+                    "market_state": market_state,
+                    "position_info": position_info,
+                }
+            )
+
+        for item in prepared_runtime_records:
+            symbol = item["symbol"]
+            snapshot = item["snapshot"]
+            tf_indicators = item["tf_indicators"]
+            market_state = item["market_state"]
+            position_info = item["position_info"]
             decision = self.strategy_engine.decide(
                 snapshot,
                 tf_indicators,
@@ -477,6 +511,10 @@ class AgentTradeKitApp:
                 position_info=position_info,
                 btc_weathervane=btc_weathervane,
                 btc_turn_alert=btc_turn_alert if symbol == "SOL-USDT-SWAP" else None,
+                market_context=llm_market_context,
+                positions=positions_context,
+                recent_records=recent_records,
+                recent_trades=recent_trades,
             )
             reasoning_text = decision["reasoning"].to_markdown()
             reasoning_logger.info("%s\n%s", symbol, reasoning_text)
@@ -500,6 +538,8 @@ class AgentTradeKitApp:
                 "knife_attack_eligible": decision.get("knife_attack_eligible", False),
                 "sub_strategy_scores": decision["sub_strategy_scores"],
                 "reasoning": decision["reasoning"].to_dict(),
+                "llm_analysis": decision.get("llm_analysis") or {},
+                "llm_adjustment": decision.get("llm_adjustment") or {},
                 "position_snapshot": decision.get("position_snapshot") or position_info,
                 "btc_weathervane": decision.get("btc_weathervane") or btc_weathervane,
                 "btc_turn_alert": btc_turn_alert if symbol == "SOL-USDT-SWAP" else None,
