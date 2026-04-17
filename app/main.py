@@ -66,24 +66,54 @@ class AgentTradeKitApp:
         except ValueError:
             return len(settings.symbol_priority)
 
-    def _symbol_capital_ratio(self, symbol: str) -> float:
-        """按标的返回专属资金占比上限。"""
-        if symbol == "BTC-USDT-SWAP":
-            return settings.btc_weathervane_capital_ratio
-        if symbol == "SOL-USDT-SWAP":
-            return settings.sol_main_attack_capital_ratio
-        return settings.max_single_symbol_margin_ratio
+    @staticmethod
+    def _signal_strength(record: dict[str, Any]) -> float:
+        action = str(record.get("action") or "")
+        if action not in {"OPEN_LONG", "OPEN_SHORT"}:
+            return 0.0
+        weighted_score = safe_float(record.get("weighted_score"))
+        confidence_threshold = safe_float(record.get("confidence_threshold"), settings.confidence_threshold_default)
+        attack_score = safe_float(record.get("attack_score"))
+        position_ratio = max(safe_float(record.get("position_ratio")), 0.0)
+        signal_grade = str(record.get("signal_grade") or "C").upper()
+        grade_bonus = {
+            "A+": 0.18,
+            "A": 0.12,
+            "B": 0.06,
+            "C": 0.0,
+        }.get(signal_grade, 0.0)
+        excess_score = max(weighted_score - confidence_threshold, 0.0)
+        strength = excess_score + attack_score * 0.35 + position_ratio * 0.15 + grade_bonus
+        return round(max(strength, 0.0), 6)
 
-    def _total_capital_limit_ratio(self) -> float:
-        """确保 BTC+SOL 组合资金分配与历史总仓位上限兼容。"""
-        return max(
-            settings.max_total_margin_ratio,
-            settings.btc_weathervane_capital_ratio + settings.sol_main_attack_capital_ratio,
-        )
+    def _dynamic_capital_plan(self, runtime_records: list[dict[str, Any]]) -> dict[str, float]:
+        open_records = [item["record"] for item in runtime_records if str((item.get("decision") or {}).get("action") or "") in {"OPEN_LONG", "OPEN_SHORT"}]
+        if not open_records:
+            return {}
+        if len(open_records) == 1:
+            return {str(open_records[0].get("symbol") or ""): 1.0}
+        raw_strengths: dict[str, float] = {}
+        for record in open_records:
+            symbol = str(record.get("symbol") or "")
+            raw_strengths[symbol] = max(self._signal_strength(record), 0.01)
+        total_strength = sum(raw_strengths.values())
+        if total_strength <= 0:
+            equal_share = round(1.0 / max(len(raw_strengths), 1), 6)
+            return {symbol: equal_share for symbol in raw_strengths}
+        return {symbol: round(strength / total_strength, 6) for symbol, strength in raw_strengths.items()}
 
     def _reserve_capital_ratio(self) -> float:
         """统一手续费缓冲与最低可用余额保留比例。"""
         return max(settings.min_available_balance_ratio, settings.fee_buffer_capital_ratio)
+
+    def _deployable_margin(self, budget: dict[str, Any]) -> float:
+        equity = safe_float(budget.get("equity"))
+        avail_balance = safe_float(budget.get("avail_balance"))
+        if equity <= 0 or avail_balance <= 0:
+            return 0.0
+        reserve_floor = equity * self._reserve_capital_ratio()
+        safety_buffer = settings.order_margin_safety_buffer_usdt
+        return round(max(avail_balance - reserve_floor - safety_buffer, 0.0), 6)
 
     def _margin_budget_snapshot(self, equity_usdt: float | None = None) -> dict[str, Any]:
         detail = self._account_balance_detail()
@@ -110,22 +140,9 @@ class AgentTradeKitApp:
         }
 
     def _allowed_additional_margin(self, budget: dict[str, Any], symbol: str, requested_margin: float) -> float:
-        equity = safe_float(budget.get("equity"))
-        if equity <= 0:
-            return 0.0
-        avail_balance = safe_float(budget.get("avail_balance"))
-        total_margin = safe_float(budget.get("total_margin"))
-        symbol_margin = safe_float((budget.get("symbol_margin") or {}).get(symbol))
-        per_symbol_limit = equity * self._symbol_capital_ratio(symbol)
-        total_limit = equity * self._total_capital_limit_ratio()
-        reserve_floor = equity * self._reserve_capital_ratio()
-        safety_buffer = settings.order_margin_safety_buffer_usdt
-        allowed = min(
-            max(requested_margin, 0.0),
-            max(per_symbol_limit - symbol_margin, 0.0),
-            max(total_limit - total_margin, 0.0),
-            max(avail_balance - reserve_floor - safety_buffer, 0.0),
-        )
+        del symbol
+        deployable_margin = self._deployable_margin(budget)
+        allowed = min(max(requested_margin, 0.0), deployable_margin)
         return round(max(allowed, 0.0), 6)
 
     def _consume_margin_budget(self, budget: dict[str, Any], symbol: str, used_margin: float) -> None:
@@ -565,21 +582,28 @@ class AgentTradeKitApp:
             )
 
         budget_snapshot = self._margin_budget_snapshot(equity_usdt=equity)
+        capital_plan = self._dynamic_capital_plan(runtime_records)
+        planned_deployable_margin = self._deployable_margin(budget_snapshot)
         engine_logger.info(
-            "资金分配限制已加载: BTC风向标仓位=%.0f%%, SOL主攻仓位=%.0f%%, 手续费缓冲=%.0f%%, 总保证金上限=%.0f%%, 优先级=%s, 当前权益=%.2f, 当前可用=%.2f, 当前总保证金=%.2f, 当前分标的=%s",
-            settings.btc_weathervane_capital_ratio * 100,
-            settings.sol_main_attack_capital_ratio * 100,
+            "动态资金分配已加载: 手续费缓冲=%.0f%%, 优先级=%s, 当前权益=%.2f, 当前可用=%.2f, 当前总保证金=%.2f, 当前分标的=%s, 本轮可动用保证金=%.2f, 分配方案=%s",
             self._reserve_capital_ratio() * 100,
-            self._total_capital_limit_ratio() * 100,
             settings.symbol_priority,
             budget_snapshot["equity"],
             budget_snapshot["avail_balance"],
             budget_snapshot["total_margin"],
             budget_snapshot["symbol_margin"],
+            planned_deployable_margin,
+            capital_plan,
         )
         knife_candidate = self._pick_best_knife_candidate([item["record"] for item in runtime_records])
         knife_symbol = knife_candidate["symbol"] if knife_candidate else None
-        runtime_records.sort(key=lambda item: self._symbol_priority(str(item["symbol"])))
+        runtime_records.sort(
+            key=lambda item: (
+                -safe_float(capital_plan.get(str(item["symbol"])), 0.0),
+                -self._signal_strength(item["record"]),
+                self._symbol_priority(str(item["symbol"])),
+            )
+        )
 
         for item in runtime_records:
             symbol = item["symbol"]
@@ -624,39 +648,26 @@ class AgentTradeKitApp:
                     if bool(decision.get("tight_take_profit_to_1r")):
                         take_profit_pct = round(stop_loss_pct, 4)
                     _initial_cap = safe_float(settings.initial_capital, 1500.0)
-                    requested_margin = round(_initial_cap * safe_float(decision["position_ratio"]), 6)
+                    base_requested_margin = round(_initial_cap * safe_float(decision["position_ratio"]), 6)
+                    allocation_share = safe_float(capital_plan.get(symbol), 0.0)
+                    allocation_target_margin = round(planned_deployable_margin * allocation_share, 6)
+                    requested_margin = allocation_target_margin if allocation_target_margin > 0 else base_requested_margin
                     if 0 < requested_margin < 150.0:
                         requested_margin = 150.0
-                    symbol_margin_before = safe_float(budget_snapshot["symbol_margin"].get(symbol))
-                    symbol_margin_limit = max(budget_snapshot["equity"] * self._symbol_capital_ratio(symbol) - symbol_margin_before, 0.0)
-                    total_margin_limit = max(budget_snapshot["equity"] * self._total_capital_limit_ratio() - budget_snapshot["total_margin"], 0.0)
+                    deployable_margin_before = self._deployable_margin(budget_snapshot)
                     reserve_floor = budget_snapshot["equity"] * self._reserve_capital_ratio()
                     raw_allowed_margin = self._allowed_additional_margin(budget_snapshot, symbol, requested_margin)
                     adapted_margin = raw_allowed_margin
-                    margin_adapted = False
-                    adapt_reason = ""
+                    margin_adapted = requested_margin > raw_allowed_margin and raw_allowed_margin > 0
+                    adapt_reason = "可用余额与手续费缓冲限制" if margin_adapted else ""
                     original_requested_margin = requested_margin
-
-                    # 自动适配：如果请求保证金超过各类资金限制，则缩减后继续开仓，而不是直接跳过
-                    if requested_margin > symbol_margin_limit and symbol_margin_limit > 0:
-                        adapted_margin = min(adapted_margin, symbol_margin_limit * 0.90)
-                        margin_adapted = True
-                        adapt_reason = "标的资金上限"
-                    if requested_margin > total_margin_limit and total_margin_limit > 0:
-                        adapted_margin = min(adapted_margin, total_margin_limit * 0.90)
-                        margin_adapted = True
-                        adapt_reason = adapt_reason or "总保证金上限"
-                    if requested_margin > raw_allowed_margin and raw_allowed_margin > 0:
-                        adapted_margin = min(adapted_margin, raw_allowed_margin * 0.90)
-                        margin_adapted = True
-                        adapt_reason = adapt_reason or "可用余额与缓冲限制"
-
-                    if adapted_margin <= 0 and raw_allowed_margin > 0:
-                        adapted_margin = raw_allowed_margin
 
                     effective_margin = round(max(adapted_margin, 0.0), 6)
                     effective_position_ratio = 0.0 if equity <= 0 else effective_margin / equity
                     record["budget_guard"] = {
+                        "base_requested_margin": round(base_requested_margin, 6),
+                        "allocation_share": round(allocation_share, 6),
+                        "allocation_target_margin": round(allocation_target_margin, 6),
                         "requested_margin": original_requested_margin,
                         "allowed_margin": round(raw_allowed_margin, 6),
                         "effective_margin": round(effective_margin, 6),
@@ -664,32 +675,29 @@ class AgentTradeKitApp:
                         "equity": budget_snapshot["equity"],
                         "avail_balance_before": budget_snapshot["avail_balance"],
                         "total_margin_before": budget_snapshot["total_margin"],
-                        "symbol_margin_before": symbol_margin_before,
-                        "per_symbol_limit": round(budget_snapshot["equity"] * self._symbol_capital_ratio(symbol), 6),
-                        "total_limit": round(budget_snapshot["equity"] * self._total_capital_limit_ratio(), 6),
+                        "deployable_margin_before": round(deployable_margin_before, 6),
+                        "planned_deployable_margin": round(planned_deployable_margin, 6),
                         "reserve_floor": round(reserve_floor, 6),
                         "safety_buffer": settings.order_margin_safety_buffer_usdt,
                     }
                     if effective_margin <= 0:
                         record["trade_status"] = "skipped_budget_guard"
                         engine_logger.warning(
-                            "%s 因资金分配限制跳过开仓: 请求保证金=%.2f, 允许保证金=%.2f, 标的资金上限=%.2f, 总保证金上限=%.2f, 手续费缓冲保留=%.2f, 安全缓冲=%.2f",
+                            "%s 因可动用资金不足跳过开仓: 请求保证金=%.2f, 当前可动用保证金=%.2f, 预留手续费缓冲=%.2f, 安全缓冲=%.2f",
                             symbol,
                             original_requested_margin,
-                            raw_allowed_margin,
-                            budget_snapshot["equity"] * self._symbol_capital_ratio(symbol),
-                            budget_snapshot["equity"] * self._total_capital_limit_ratio(),
+                            deployable_margin_before,
                             reserve_floor,
                             settings.order_margin_safety_buffer_usdt,
                         )
                     else:
                         if margin_adapted:
                             engine_logger.info(
-                                "%s 请求保证金 %.2f 超过资金分配限制，已自动缩减到 %.2f（原因：%s）后继续开仓。",
+                                "%s 动态资金分配请求 %.2f 已按当前剩余可动用资金缩减至 %.2f（原因：%s）后继续开仓。",
                                 symbol,
                                 original_requested_margin,
                                 effective_margin,
-                                adapt_reason or "综合限制",
+                                adapt_reason or "当前剩余资金不足",
                             )
                         size = self.execution_engine.estimate_fixed_margin_order_size(
                             symbol=symbol,
