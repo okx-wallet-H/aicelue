@@ -4,20 +4,43 @@ import json
 import subprocess
 from typing import Any
 
+import requests
+
 from app.config import settings
 from app.logger import engine_logger
 
 DEFAULT_ORDER_TAG = "agentTradeKit"
 
 
+class OKXCLIError(RuntimeError):
+    """OKX CLI 调用异常，区分可恢复错误与致命错误。"""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        recoverable: bool,
+        command: list[str],
+        returncode: int | None = None,
+        stdout: str = "",
+        stderr: str = "",
+    ) -> None:
+        super().__init__(message)
+        self.recoverable = recoverable
+        self.command = command
+        self.returncode = returncode
+        self.stdout = stdout
+        self.stderr = stderr
+
+
 class OKXClient:
     def __init__(self) -> None:
         self.profile = settings.okx_profile
         self.use_demo = settings.okx_use_demo
+        self._instrument_cache: dict[str, dict[str, Any]] = {}
 
     def _base_command(self) -> list[str]:
         mode_flag = "--demo" if self.use_demo else "--live"
-        # 修正为服务器实际路径
         okx_path = "/usr/bin/okx"
         return [okx_path, mode_flag, "--json"]
 
@@ -27,6 +50,24 @@ class OKXClient:
             return []
         return json.loads(raw)
 
+    @staticmethod
+    def _is_fatal_error(message: str) -> bool:
+        lowered = (message or "").lower()
+        fatal_keywords = (
+            "api key",
+            "passphrase",
+            "signature",
+            "unauthorized",
+            "forbidden",
+            "permission denied",
+            "invalid auth",
+            "authentication",
+            "unknown command",
+            "no such file",
+            "not found",
+        )
+        return any(keyword in lowered for keyword in fatal_keywords)
+
     def run(self, args: list[str]) -> Any:
         command = self._base_command() + args
         engine_logger.info("执行 OKX CLI 命令: %s", " ".join(command))
@@ -34,17 +75,39 @@ class OKXClient:
             result = subprocess.run(command, capture_output=True, text=True, check=True)
             return self._parse_json_output(result.stdout)
         except FileNotFoundError as exc:
-            raise RuntimeError("未检测到 okx 命令，请先安装 @okx_ai/okx-trade-cli。") from exc
+            raise OKXCLIError(
+                "未检测到 okx 命令，请先安装 @okx_ai/okx-trade-cli。",
+                recoverable=False,
+                command=command,
+            ) from exc
         except subprocess.CalledProcessError as exc:
             stdout = (exc.stdout or "").strip()
             stderr = (exc.stderr or "").strip()
+            message = stderr or stdout or str(exc)
+            parsed_output: Any | None = None
             if stdout:
                 try:
-                    engine_logger.warning("OKX CLI 返回非零退出码，但stdout中包含可解析JSON，继续按有效结果处理。")
-                    return self._parse_json_output(stdout)
+                    parsed_output = self._parse_json_output(stdout)
                 except Exception:
-                    pass
-            raise RuntimeError(f"OKX CLI 调用失败: {stderr or stdout or exc}") from exc
+                    parsed_output = None
+
+            fatal = self._is_fatal_error(message)
+            if parsed_output is not None and not fatal:
+                engine_logger.warning(
+                    "OKX CLI 返回非零退出码，判定为可恢复错误，继续解析 JSON。returncode=%s message=%s",
+                    exc.returncode,
+                    message[:240],
+                )
+                return parsed_output
+
+            raise OKXCLIError(
+                f"OKX CLI 调用失败（{'可恢复' if not fatal else '致命'}）: {message}",
+                recoverable=not fatal,
+                command=command,
+                returncode=exc.returncode,
+                stdout=stdout,
+                stderr=stderr,
+            ) from exc
 
     @staticmethod
     def _attach_requested_tag(data: Any, tag: str) -> list[dict[str, Any]]:
@@ -53,6 +116,29 @@ class OKXClient:
         for row in data:
             if isinstance(row, dict) and not row.get("requestedTag"):
                 row["requestedTag"] = tag
+        return data
+
+    @staticmethod
+    def _assert_algo_success(data: Any, operation_name: str) -> list[dict[str, Any]]:
+        if not isinstance(data, list) or not data:
+            raise RuntimeError(f"{operation_name} 返回为空，无法确认算法单成功。")
+
+        failed_rows: list[dict[str, Any]] = []
+        for row in data:
+            if not isinstance(row, dict):
+                failed_rows.append({"sCode": "INVALID_ROW", "sMsg": str(row)})
+                continue
+            s_code = str(row.get("sCode", "")).strip()
+            if s_code != "0":
+                failed_rows.append({
+                    "sCode": s_code or "MISSING",
+                    "sMsg": str(row.get("sMsg", "缺少 sMsg")),
+                    "ordId": str(row.get("ordId", "")),
+                    "algoId": str(row.get("algoId", "")),
+                })
+
+        if failed_rows:
+            raise RuntimeError(f"{operation_name} 失败: {failed_rows}")
         return data
 
     def get_account_balance(self) -> list[dict[str, Any]]:
@@ -102,6 +188,27 @@ class OKXClient:
             return data[0] if data else {}
         return data if isinstance(data, dict) else {}
 
+    def get_instrument_spec(self, inst_id: str) -> dict[str, Any]:
+        cached = self._instrument_cache.get(inst_id)
+        if cached:
+            return cached
+
+        response = requests.get(
+            f"{settings.okx_public_api_base.rstrip('/')}/api/v5/public/instruments",
+            params={"instType": "SWAP", "instId": inst_id},
+            timeout=10,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        data = payload.get("data") if isinstance(payload, dict) else None
+        if not isinstance(data, list) or not data:
+            raise RuntimeError(f"未获取到 {inst_id} 的合约规格。")
+        spec = data[0]
+        if not isinstance(spec, dict):
+            raise RuntimeError(f"{inst_id} 合约规格格式异常: {spec}")
+        self._instrument_cache[inst_id] = spec
+        return spec
+
     def get_positions(self, inst_id: str | None = None) -> list[dict[str, Any]]:
         args = ["swap", "positions"]
         if inst_id:
@@ -133,11 +240,16 @@ class OKXClient:
 
     def set_leverage(self, inst_id: str, lever: int, mgn_mode: str = "isolated", pos_side: str = "net") -> list[dict[str, Any]]:
         args = [
-            "swap", "leverage",
-            "--instId", inst_id,
-            "--lever", str(lever),
-            "--mgnMode", mgn_mode,
-            "--posSide", pos_side,
+            "swap",
+            "leverage",
+            "--instId",
+            inst_id,
+            "--lever",
+            str(lever),
+            "--mgnMode",
+            mgn_mode,
+            "--posSide",
+            pos_side,
         ]
         data = self.run(args) or []
         return data if isinstance(data, list) else []
@@ -167,23 +279,28 @@ class OKXClient:
         px: float | None = None,
     ) -> list[dict[str, Any]]:
         args = [
-            "swap", "place",
-            "--instId", inst_id,
-            "--side", side,
-            "--ordType", ord_type,
-            "--sz", str(size),
-            "--tdMode", td_mode,
-            "--tag", tag,
+            "swap",
+            "place",
+            "--instId",
+            inst_id,
+            "--side",
+            side,
+            "--ordType",
+            ord_type,
+            "--sz",
+            str(size),
+            "--tdMode",
+            td_mode,
+            "--tag",
+            tag,
         ]
         if pos_side:
             args.extend(["--posSide", pos_side])
         if px is not None:
             args.extend(["--px", str(px)])
         if reduce_only:
-            # 经服务器验证，CLI 的 swap place 暂不支持 --reduceOnly，但支持平仓逻辑
             args.append("--reduceOnly")
         data = self.run(args) or []
-        # 经服务器验证，CLI 返回的 tag 字段可能为空或固定为 CLI，这里手动补全以供逻辑判断
         return self._attach_requested_tag(data, tag)
 
     def place_algo_order(
@@ -203,42 +320,55 @@ class OKXClient:
         callback_ratio: float | None = None,
         active_px: float | None = None,
     ) -> list[dict[str, Any]]:
-        # 经服务器验证，移动止盈需使用 trail 子命令
         if algo_ord_type == "move_order_stop":
             args = [
-                "swap", "algo", "trail",
-                "--instId", inst_id,
-                "--side", side,
-                "--sz", str(sz),
-                "--callbackRatio", str(callback_ratio),
-                "--tdMode", td_mode,
-                "--tag", tag,
+                "swap",
+                "algo",
+                "trail",
+                "--instId",
+                inst_id,
+                "--side",
+                side,
+                "--sz",
+                str(sz),
+                "--callbackRatio",
+                str(callback_ratio),
+                "--tdMode",
+                td_mode,
+                "--tag",
+                tag,
             ]
-            if active_px:
+            if active_px is not None:
                 args.extend(["--activePx", str(active_px)])
         else:
-            # 普通止盈止损使用 place 子命令
             args = [
-                "swap", "algo", "place",
-                "--instId", inst_id,
-                "--tdMode", td_mode,
-                "--side", side,
-                "--sz", str(sz),
-                "--tag", tag,
+                "swap",
+                "algo",
+                "place",
+                "--instId",
+                inst_id,
+                "--tdMode",
+                td_mode,
+                "--side",
+                side,
+                "--sz",
+                str(sz),
+                "--tag",
+                tag,
             ]
-            # 映射 algo_ord_type 到 CLI 支持的 --ordType
-            cli_ord_type = "conditional" if algo_ord_type in ["stop", "limit"] else algo_ord_type
+            cli_ord_type = "conditional" if algo_ord_type in {"stop", "limit"} else algo_ord_type
             args.extend(["--ordType", cli_ord_type])
-            
+
             if tp_trigger_px is not None:
                 args.extend(["--tpTriggerPx", str(tp_trigger_px), f"--tpOrdPx={tp_ord_px}"])
             if sl_trigger_px is not None:
                 args.extend(["--slTriggerPx", str(sl_trigger_px), f"--slOrdPx={sl_ord_px}"])
-        
+
         if pos_side:
             args.extend(["--posSide", pos_side])
         if reduce_only:
             args.append("--reduceOnly")
-            
+
         data = self.run(args) or []
-        return self._attach_requested_tag(data, tag)
+        data = self._attach_requested_tag(data, tag)
+        return self._assert_algo_success(data, f"{inst_id} {algo_ord_type} 算法单")

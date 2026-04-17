@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import re
 import time
+from datetime import datetime, timezone
 from typing import Any
 
 try:
@@ -20,18 +21,38 @@ class LLMAnalyzer:
 
     def __init__(self) -> None:
         self.enabled = bool(getattr(settings, "llm_enabled", True))
-        self.model = str(getattr(settings, "llm_model", "qwen-plus-latest"))
         self.timeout_seconds = int(getattr(settings, "llm_timeout_seconds", 30))
         self.max_candles = int(getattr(settings, "llm_max_candles_per_tf", 24))
-        self.temperature = float(getattr(settings, "llm_temperature", 0.35))
-        self._client: OpenAI | None = None
+        self.temperature = float(getattr(settings, "llm_temperature", 0.30))
+        self.primary_provider = {
+            "name": "qwen",
+            "api_key": str(getattr(settings, "llm_primary_api_key", "")),
+            "base_url": str(getattr(settings, "llm_primary_base_url", "https://dashscope.aliyuncs.com/compatible-mode/v1")),
+            "model": str(getattr(settings, "llm_primary_model", "qwen-plus-latest")),
+        }
+        self.backup_provider = {
+            "name": "deepseek",
+            "api_key": str(getattr(settings, "llm_backup_api_key", "")),
+            "base_url": str(getattr(settings, "llm_backup_base_url", "https://api.deepseek.com/v1")),
+            "model": str(getattr(settings, "llm_backup_model", "deepseek-chat")),
+        }
+        self._clients: dict[str, OpenAI] = {}
 
-    def _get_client(self) -> OpenAI:
+    def _get_client(self, provider: dict[str, str]) -> OpenAI:
         if OpenAI is None:
             raise RuntimeError("openai 依赖未安装，无法调用大模型。")
-        if self._client is None:
-            self._client = OpenAI()
-        return self._client
+        provider_name = provider["name"]
+        client = self._clients.get(provider_name)
+        if client is None:
+            if not provider.get("api_key"):
+                raise RuntimeError(f"{provider_name} API Key 未配置。")
+            client = OpenAI(
+                api_key=provider["api_key"],
+                base_url=provider["base_url"],
+                timeout=self.timeout_seconds,
+            )
+            self._clients[provider_name] = client
+        return client
 
     @staticmethod
     def _extract_json_block(text: str) -> dict[str, Any]:
@@ -39,19 +60,19 @@ class LLMAnalyzer:
         if not raw:
             raise ValueError("大模型返回为空。")
 
-        for candidate in (raw, re.sub(r'^```(?:json)?\s*', '', raw, flags=re.MULTILINE),):
+        for candidate in (raw, re.sub(r'^```(?:json)?\s*', '', raw, flags=re.MULTILINE)):
             cleaned = re.sub(r'```\s*$', '', candidate, flags=re.MULTILINE).strip()
             try:
                 parsed = json.loads(cleaned)
                 if isinstance(parsed, dict):
                     return parsed
             except json.JSONDecodeError:
-                pass
+                continue
 
         match = re.search(r"\{.*\}", raw, flags=re.S)
         if match:
             return json.loads(match.group(0))
-        raise ValueError(f"无法从响应中解析 JSON: {raw[:120]}...")
+        raise ValueError(f"无法从响应中解析 JSON: {raw[:160]}...")
 
     def _compress_candles(self, candles: list[dict[str, Any]] | None) -> list[dict[str, Any]]:
         compact: list[dict[str, Any]] = []
@@ -68,6 +89,102 @@ class LLMAnalyzer:
             )
         return compact
 
+    def _competition_context(self, account_context: dict[str, Any]) -> dict[str, Any]:
+        now_utc = datetime.now(timezone.utc)
+        competition_left = "未知"
+        configured_end = str(getattr(settings, "competition_end_at_utc", "") or "").strip()
+        if configured_end:
+            try:
+                end_at = datetime.fromisoformat(configured_end.replace("Z", "+00:00"))
+                delta = end_at - now_utc
+                competition_left = str(delta) if delta.total_seconds() > 0 else "已结束"
+            except ValueError:
+                competition_left = "配置格式错误"
+        return {
+            "current_time_utc": now_utc.isoformat(),
+            "competition_time_left": competition_left,
+            "equity_usdt": round(safe_float(account_context.get("equity")), 4),
+            "available_usdt": round(safe_float(account_context.get("available")), 4),
+        }
+
+    @staticmethod
+    def _normalize_action(action: str) -> str:
+        normalized = str(action or "SKIP").upper().strip()
+        if normalized in {"OPEN_LONG", "OPEN_SHORT", "CLOSE", "CLOSE_LONG", "CLOSE_SHORT", "HOLD", "SKIP"}:
+            return normalized
+        return "SKIP"
+
+    def _normalize_decisions(self, target_symbols: list[str], parsed: dict[str, Any]) -> list[dict[str, Any]]:
+        decisions = parsed.get("decisions")
+        if not isinstance(decisions, list):
+            raise ValueError("AI 未返回 decisions 数组。")
+
+        indexed: dict[str, dict[str, Any]] = {}
+        for item in decisions:
+            if not isinstance(item, dict):
+                continue
+            symbol = str(item.get("symbol", "")).upper().strip()
+            if symbol not in target_symbols:
+                continue
+            normalized = dict(item)
+            normalized["symbol"] = symbol
+            normalized["action"] = self._normalize_action(normalized.get("action", "SKIP"))
+            normalized["confidence_score"] = round(safe_float(normalized.get("confidence_score")), 4)
+            normalized["position_pct"] = max(0.0, min(0.6, safe_float(normalized.get("position_pct"))))
+            normalized["leverage"] = max(1, int(safe_float(normalized.get("leverage"), 1)))
+            indexed[symbol] = normalized
+
+        final_decisions: list[dict[str, Any]] = []
+        for symbol in target_symbols:
+            final_decisions.append(
+                indexed.get(
+                    symbol,
+                    {
+                        "action": "SKIP",
+                        "symbol": symbol,
+                        "confidence_score": 0.0,
+                        "reasoning": "模型未返回该标的决策，已自动跳过。",
+                        "position_pct": 0.0,
+                        "leverage": 1,
+                    },
+                )
+            )
+        return final_decisions
+
+    def _skip_decisions(self, target_symbols: list[str], reason: str) -> dict[str, Any]:
+        normalized_reason = str(reason or "未知错误")[:180]
+        return {
+            "decisions": [
+                {
+                    "action": "SKIP",
+                    "symbol": symbol,
+                    "confidence_score": 0.0,
+                    "reasoning": normalized_reason,
+                    "position_pct": 0.0,
+                    "leverage": 1,
+                }
+                for symbol in target_symbols
+            ]
+        }
+
+    def _request_once(self, provider: dict[str, str], system_prompt: str, user_prompt: str) -> tuple[str, int]:
+        client = self._get_client(provider)
+        started = time.time()
+        response = client.chat.completions.create(
+            model=provider["model"],
+            temperature=self.temperature,
+            timeout=self.timeout_seconds,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ],
+            response_format={"type": "json_object"},
+        )
+        latency_ms = int((time.time() - started) * 1000)
+        raw_response = response.choices[0].message.content or ""
+        reasoning_logger.info("[AI多标的决策] provider=%s latency_ms=%s response=%s", provider["name"], latency_ms, raw_response)
+        return raw_response, latency_ms
+
     def analyze_trade_decision(
         self,
         *,
@@ -75,10 +192,10 @@ class LLMAnalyzer:
         account_context: dict[str, Any],
         recent_trades: list[dict[str, Any]],
     ) -> dict[str, Any]:
-        if not self.enabled:
-            return {"decisions": []}
-
         target_symbols = ["BTC-USDT-SWAP", "ETH-USDT-SWAP", "SOL-USDT-SWAP"]
+        if not self.enabled:
+            return self._skip_decisions(target_symbols, "LLM 已禁用")
+
         compact_market: dict[str, Any] = {}
         for symbol in target_symbols:
             data = market_context.get(symbol, {})
@@ -96,87 +213,79 @@ class LLMAnalyzer:
 
         payload = {
             "timestamp": now_ts_ms(),
+            "strategy_context": self._competition_context(account_context),
             "target_symbols": target_symbols,
             "market_data": compact_market,
             "account": account_context,
-            "recent_trades": recent_trades[-8:],
+            "recent_trades": recent_trades[-int(getattr(settings, "llm_recent_trade_window", 8)) :],
         }
 
         system_prompt = (
-            "你是 OKX 交易赛中的专业加密货币量化交易员，现在距离比赛结束还剩约 6 天，账户权益约 1095U。\n"
-            "你的任务是在风险可控的前提下积极寻找交易机会，提高资金利用率。你必须同时评估 BTC-USDT-SWAP、ETH-USDT-SWAP、SOL-USDT-SWAP 三个标的，并分别给出独立决策。\n"
-            "只要某个标的综合优势明确且置信度超过阈值，就可以开仓；多个标的同时满足条件时，可以同时开仓。不要因为其中一个标的不确定，就让全部标的一起 SKIP。\n"
+            "你是 OKX 交易赛中的专业加密货币量化交易员。AI 是唯一决策者，代码只负责执行与风控兜底。\n"
+            "你必须同时分析 BTC-USDT-SWAP、ETH-USDT-SWAP、SOL-USDT-SWAP 三个标的，并分别输出独立决策。\n"
+            "请基于输入中的当前 UTC 时间、比赛剩余时间、账户权益、可用余额、现有持仓、最近交易和多周期市场数据做判断。\n"
             "\n"
             "【必须执行的分析框架】\n"
-            "对每个标的都必须逐项分析并独立打分：\n"
-            "1. 趋势分析：结合 4H、1H、15M 三个周期，查看 EMA20/EMA60 的相对位置、交叉方向、价格相对均线位置，以及 K 线结构是否顺势。\n"
-            "2. 动量分析：评估 RSI 的绝对位置与方向，结合资金费率 funding_rate 的正负和大小，判断多空拥挤与趋势延续性。\n"
-            "3. 市场结构：评估持仓量变化率 oi_change_rate 与盘口买卖比 OBI，判断是否存在资金推动和主动买卖盘偏向。\n"
-            "4. 持仓与账户约束：查看当前已有持仓，避免同方向过度重复开仓；若已有持仓则可给出 CLOSE 或 SKIP。\n"
-            "5. 综合评分：综合趋势、动量、结构与账户约束，给出独立置信度和执行建议。\n"
+            "1. 趋势分析：结合 4H、1H、15M 周期的均线关系、价格结构与波段方向。\n"
+            "2. 动量分析：结合 RSI、成交量、资金费率，判断顺势还是衰竭。\n"
+            "3. 市场结构：结合 OI 变化率与订单簿不平衡值 OBI，判断资金推动方向。\n"
+            "4. 仓位约束：检查当前已有持仓，避免重复开同一标的同方向仓位。\n"
+            "5. 风险收益：止损必须明确，position_pct 是拟使用的保证金占权益比例，总和不超过 0.60。\n"
             "\n"
-            "【行动原则】\n"
-            "- 这是交易比赛，风险可控时应积极利用资金。\n"
-            "- 对每个标的独立判断，不能笼统输出一个总观点。\n"
-            "- 置信度超过 0.5 且止损清晰、盈亏比合理时，可以考虑开仓。\n"
-            "- 如果多个标的都满足条件，可以同时开仓。\n"
+            "【动作枚举】\n"
+            "- OPEN_LONG：开多\n"
+            "- OPEN_SHORT：开空\n"
+            "- CLOSE_LONG：平多\n"
+            "- CLOSE_SHORT：平空\n"
+            "- HOLD：保持当前仓位不动\n"
+            "- SKIP：跳过，不开新仓也不建议调整\n"
             "\n"
             "【风控约束】\n"
-            "- 单笔交易风险不得超过账户权益的 2%，因此 stop_loss 必须合理。\n"
-            "- 多个标的合计建议的 position_pct 不应超过 0.60。\n"
-            "- position_pct 表示该标的拟使用的保证金占总权益比例；若多个标的信号都强，可分配不同仓位，但总和不要超过 0.60。\n"
-            "- leverage 在 1-15 之间。\n"
+            "- 单笔交易真实风险必须可落在账户权益的 2% 以内，因此 stop_loss 必须可执行。\n"
+            "- leverage 取值在 1 到 15 之间。\n"
+            "- 若没有清晰优势，优先输出 HOLD 或 SKIP，而不是强行交易。\n"
             "\n"
-            "【输出格式】\n"
-            "禁止任何解释文字，只输出一个 JSON 对象，格式如下：\n"
+            "【输出要求】\n"
+            "只输出一个 JSON 对象，禁止输出任何额外说明。格式如下：\n"
             "{\n"
             "  \"decisions\": [\n"
             "    {\n"
-            "      \"action\": \"OPEN_LONG\" | \"OPEN_SHORT\" | \"CLOSE\" | \"SKIP\",\n"
+            "      \"action\": \"OPEN_LONG\" | \"OPEN_SHORT\" | \"CLOSE_LONG\" | \"CLOSE_SHORT\" | \"HOLD\" | \"SKIP\",\n"
             "      \"symbol\": \"BTC-USDT-SWAP\" | \"ETH-USDT-SWAP\" | \"SOL-USDT-SWAP\",\n"
             "      \"confidence_score\": 0.0-1.0,\n"
-            "      \"reasoning\": \"简短分析理由（50字以内），说明看了什么指标、得出什么结论\",\n"
+            "      \"reasoning\": \"50字以内，简洁说明核心依据\",\n"
             "      \"position_pct\": 0.0-0.6,\n"
             "      \"leverage\": 1-15,\n"
             "      \"stop_loss\": 止损触发价,\n"
-            "      \"take_profit_price\": 固定止盈触发价 (可选),\n"
-            "      \"trailing_callback\": 移动止盈回调比例 (可选),\n"
-            "      \"active_px\": 移动止盈激活价 (可选)\n"
+            "      \"take_profit_price\": 固定止盈触发价（可选）,\n"
+            "      \"trailing_callback\": 移动止盈回调比例（可选）,\n"
+            "      \"active_px\": 移动止盈激活价（可选）\n"
             "    }\n"
             "  ]\n"
             "}\n"
-            "必须返回 3 条 decisions，分别对应 BTC-USDT-SWAP、ETH-USDT-SWAP、SOL-USDT-SWAP。"
+            "必须返回恰好 3 条 decisions，分别对应 BTC-USDT-SWAP、ETH-USDT-SWAP、SOL-USDT-SWAP。"
         )
         user_prompt = f"当前市场数据与账户状态：\n{json.dumps(payload, ensure_ascii=False)}"
 
-        started = time.time()
         try:
-            client = self._get_client()
-            response = client.chat.completions.create(
-                model=self.model,
-                temperature=self.temperature,
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                response_format={"type": "json_object"},
-            )
-            raw_response = response.choices[0].message.content
-            latency_ms = int((time.time() - started) * 1000)
-            reasoning_logger.info(f"[AI多标的决策] 耗时:{latency_ms}ms 响应:{raw_response}")
+            raw_response, _ = self._request_once(self.primary_provider, system_prompt, user_prompt)
             parsed = self._extract_json_block(raw_response)
-            decisions = parsed.get("decisions")
-            if not isinstance(decisions, list):
-                raise ValueError("AI 未返回 decisions 数组")
-            return {"decisions": decisions}
-        except Exception as exc:
-            reasoning_logger.error(f"LLM 决策失败: {exc}")
-            return {
-                "decisions": [
-                    {"action": "SKIP", "symbol": symbol, "confidence_score": 0.0, "reasoning": f"Error: {exc}", "position_pct": 0.0, "leverage": 1}
-                    for symbol in target_symbols
-                ]
-            }
+            return {"decisions": self._normalize_decisions(target_symbols, parsed), "provider": self.primary_provider["name"]}
+        except Exception as primary_exc:  # noqa: BLE001
+            reasoning_logger.warning("Qwen 调用失败，准备切换 DeepSeek。原因: %s", primary_exc)
+            try:
+                raw_response, _ = self._request_once(self.backup_provider, system_prompt, user_prompt)
+                parsed = self._extract_json_block(raw_response)
+                reasoning_logger.warning("已从 Qwen 切换到 DeepSeek 完成决策。")
+                return {
+                    "decisions": self._normalize_decisions(target_symbols, parsed),
+                    "provider": self.backup_provider["name"],
+                    "fallback_reason": str(primary_exc),
+                }
+            except Exception as backup_exc:  # noqa: BLE001
+                error_reason = f"Qwen失败:{primary_exc}; DeepSeek失败:{backup_exc}"
+                reasoning_logger.error("LLM 主备均失败，返回 SKIP。原因: %s", error_reason)
+                return self._skip_decisions(target_symbols, error_reason)
 
     def review_recent_trades(self, **kwargs):
         return {"status": "skipped"}
