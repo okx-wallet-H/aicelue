@@ -590,19 +590,28 @@ class AgentTradeKitApp:
 
             if execute_orders and decision["action"] in {"OPEN_LONG", "OPEN_SHORT", "CLOSE_LONG", "CLOSE_SHORT"}:
                 if decision["action"] in {"CLOSE_LONG", "CLOSE_SHORT"}:
+                    close_ratio = min(max(safe_float(decision.get("close_ratio"), 1.0), 0.0), 1.0)
                     close_result = self.execution_engine.close_position(
                         symbol=symbol,
                         td_mode=str(decision.get("td_mode", "isolated")),
                         reason="signal_exit",
+                        close_ratio=close_ratio,
                     )
                     record["order_result"] = close_result
-                    record["trade_status"] = "close_sent" if self._order_entry_succeeded(close_result) else "close_failed"
+                    if self._order_entry_succeeded(close_result):
+                        record["trade_status"] = "partial_close_sent" if close_ratio < 0.999 else "close_sent"
+                    else:
+                        record["trade_status"] = "close_failed"
                     active_campaign = self._active_campaign(symbol)
                     if active_campaign and self._order_entry_succeeded(close_result):
-                        active_campaign["close_reason"] = "signal_exit"
-                        active_campaign["close_order_ids"] = self._extract_order_ids(close_result)
+                        if close_ratio >= 0.999:
+                            active_campaign["close_reason"] = "signal_exit"
+                            active_campaign["close_order_ids"] = self._extract_order_ids(close_result)
+                        else:
+                            active_campaign["last_partial_close_reason"] = "signal_exit"
+                            active_campaign["last_partial_close_order_ids"] = self._extract_order_ids(close_result)
                         self.kb.save_state()
-                    engine_logger.info("%s 主动平仓完成: %s", symbol, close_result)
+                    engine_logger.info("%s 主动平仓完成(close_ratio=%.2f): %s", symbol, close_ratio, close_result)
                     record["knife_attack_selected"] = False
                 else:
                     entry_price = tf_indicators["15M"]["close"]

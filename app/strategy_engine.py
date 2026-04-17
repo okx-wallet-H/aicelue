@@ -450,6 +450,17 @@ class StrategyEngine:
         side = None
         entry_bias = "无有效入场偏向"
         final_reason = "当前暂无可执行信号。"
+        adx = safe_float(h1.get("adx14") or h1.get("adx"), 0.0)
+        rsi = safe_float(m15.get("rsi14"), 50.0)
+        close_px = safe_float(m15.get("close"), 0.0)
+        boll_upper = safe_float(m15.get("bollinger_upper"), 0.0)
+        boll_lower = safe_float(m15.get("bollinger_lower"), 0.0)
+        is_range_market = adx < settings.adx_low
+        is_trend_market = adx > settings.adx_high
+        near_lower_band = close_px > 0 and boll_lower > 0 and close_px <= boll_lower * 1.008
+        near_upper_band = close_px > 0 and boll_upper > 0 and close_px >= boll_upper * 0.992
+        long_rsi_ready = rsi < 60
+        short_rsi_ready = rsi > 40
 
         if self.risk_manager.should_stop_new_trades():
             return action, side, position_ratio, entry_bias, "当前触发账户级风控熔断，仅允许观望。"
@@ -460,82 +471,76 @@ class StrategyEngine:
         if weighted_score < confidence_threshold:
             return action, side, position_ratio, entry_bias, f"当前加权分 {weighted_score:.4f} 低于自适应置信度门槛 {confidence_threshold:.4f}，暂不新开仓。"
 
+        if is_range_market:
+            mean_reversion_ratio = clamp(position_ratio * 0.55, 0.10, position_ratio)
+            if near_lower_band and rsi <= 42 and obi > -0.12:
+                return "OPEN_LONG", "buy", mean_reversion_ratio, "震荡下沿均值回归做多", f"ADX={adx:.1f}<20，判定为震荡市；15M 价格靠近布林下轨且 RSI={rsi:.1f}，只做低吸均值回归。"
+            if near_upper_band and rsi >= 58 and obi < 0.12:
+                return "OPEN_SHORT", "sell", mean_reversion_ratio, "震荡上沿均值回归做空", f"ADX={adx:.1f}<20，判定为震荡市；15M 价格靠近布林上轨且 RSI={rsi:.1f}，只做高抛均值回归。"
+            return action, side, position_ratio, entry_bias, f"ADX={adx:.1f}<20，当前为震荡市，且价格不在布林带极值区域，主动观望避免来回打止损。"
+
+        if not is_trend_market:
+            return action, side, position_ratio, entry_bias, f"ADX={adx:.1f} 位于20-25过渡区，趋势未确认，暂不追单。"
+
+        if rsi > 68 and state_name in {"强势上涨", "弱势上涨"}:
+            return action, side, position_ratio, entry_bias, f"15M RSI={rsi:.1f}>68，禁止追多，等待回调至60以下再考虑入场。"
+        if rsi < 32 and state_name in {"强势下跌", "弱势下跌"}:
+            return action, side, position_ratio, entry_bias, f"15M RSI={rsi:.1f}<32，禁止追空，等待反弹至40以上再考虑入场。"
+
         if state_name == "强势上涨":
-            if h1["ema20"] > h1["ema60"] and m15["ema20"] > m15["ema60"] and m15["rsi14"] <= 82:
+            if h1["ema20"] > h1["ema60"] and m15["ema20"] > m15["ema60"] and long_rsi_ready:
                 action, side = "OPEN_LONG", "buy"
-                entry_bias = "强势上涨趋势跟踪做多"
-                final_reason = "强势上涨，多周期多头共振，允许正常仓位追随趋势。"
-            elif h1["ema20"] > h1["ema60"] and m15["rsi14"] <= 74:
-                action, side = "OPEN_LONG", "buy"
-                position_ratio = clamp(position_ratio * 1.0, settings.min_position_ratio_initial, position_ratio)
-                entry_bias = "强势上涨先试探后加仓"
-                final_reason = "强势上涨但15M未完全共振，先以小仓位试探上车。"
+                entry_bias = "强趋势回调后顺势做多"
+                final_reason = f"ADX={adx:.1f}>25，趋势明确，且 RSI 回落至 {rsi:.1f}，允许顺势做多。"
             else:
-                final_reason = "强势上涨但短周期过热或结构不足，暂不追价。"
+                final_reason = f"强势上涨但 RSI={rsi:.1f} 尚未回落到60以下或短线结构不足，暂不追多。"
         elif state_name == "弱势上涨":
-            if h1["ema20"] > h1["ema60"] and m15["rsi14"] <= 72:
+            if h1["ema20"] > h1["ema60"] and 45 <= rsi < 60:
                 action, side = "OPEN_LONG", "buy"
-                position_ratio = clamp(position_ratio * 0.80, settings.min_position_ratio_initial, position_ratio)
-                entry_bias = "弱势上涨小仓位跟随做多"
-                final_reason = "弱势上涨阶段，采用小仓位跟随做多积累数据。"
+                position_ratio = clamp(position_ratio * 0.70, 0.10, position_ratio)
+                entry_bias = "弱趋势回调后轻仓做多"
+                final_reason = f"ADX={adx:.1f}>25 但上涨斜率一般，仅在 RSI={rsi:.1f} 回调后轻仓顺势。"
             else:
-                final_reason = "弱势上涨但追价性价比不足，等待更好节奏。"
+                final_reason = f"弱势上涨但当前 RSI={rsi:.1f} 不满足低风险追多窗口，继续等待。"
         elif state_name == "区间震荡":
-            if m15["rsi14"] <= 38 and obi > -0.12:
+            if h1["ema20"] > h1["ema60"] and m15["ema20"] >= m15["ema60"] and long_rsi_ready and obi >= 0.08:
                 action, side = "OPEN_LONG", "buy"
-                position_ratio = clamp(position_ratio * 0.90, settings.min_position_ratio_initial, position_ratio)
-                entry_bias = "震荡下沿均值回归做多"
-                final_reason = "区间震荡接近超卖，执行小仓位低吸。"
-            elif m15["rsi14"] >= 62 and obi < 0.12:
+                position_ratio = clamp(position_ratio * 0.50, 0.10, position_ratio)
+                entry_bias = "趋势确认前的小仓试多"
+                final_reason = f"ADX={adx:.1f}>25，但状态仍接近震荡，仅在盘口偏多且 RSI={rsi:.1f} 回落后小仓试多。"
+            elif h1["ema20"] < h1["ema60"] and m15["ema20"] <= m15["ema60"] and short_rsi_ready and obi <= -0.08:
                 action, side = "OPEN_SHORT", "sell"
-                position_ratio = clamp(position_ratio * 0.90, settings.min_position_ratio_initial, position_ratio)
-                entry_bias = "震荡上沿均值回归做空"
-                final_reason = "区间震荡接近超买，执行小仓位高抛。"
-            elif obi >= 0:
-                action, side = "OPEN_LONG", "buy"
-                position_ratio = clamp(position_ratio * 0.70, settings.min_position_ratio_initial, position_ratio)
-                entry_bias = "震荡中性偏多试探"
-                final_reason = "震荡中部也保持资金流动，以更小试探仓参与。"
+                position_ratio = clamp(position_ratio * 0.50, 0.10, position_ratio)
+                entry_bias = "趋势确认前的小仓试空"
+                final_reason = f"ADX={adx:.1f}>25，但状态仍接近震荡，仅在盘口偏空且 RSI={rsi:.1f} 回升后小仓试空。"
             else:
-                action, side = "OPEN_SHORT", "sell"
-                position_ratio = clamp(position_ratio * 0.70, settings.min_position_ratio_initial, position_ratio)
-                entry_bias = "震荡中性偏空试探"
-                final_reason = "震荡中部也保持资金流动，以更小试探仓参与。"
+                final_reason = "虽然 ADX 已抬升，但当前仍缺乏足够的趋势确认，继续观望。"
         elif state_name == "弱势下跌":
-            if h1["ema20"] < h1["ema60"] and m15["rsi14"] >= 28:
+            if h1["ema20"] < h1["ema60"] and 40 < rsi <= 55:
                 action, side = "OPEN_SHORT", "sell"
-                position_ratio = clamp(position_ratio * 0.80, settings.min_position_ratio_initial, position_ratio)
-                entry_bias = "弱势下跌小仓位跟随做空"
-                final_reason = "弱势下跌阶段，采用小仓位跟随做空积累数据。"
+                position_ratio = clamp(position_ratio * 0.70, 0.10, position_ratio)
+                entry_bias = "弱趋势反弹后轻仓做空"
+                final_reason = f"ADX={adx:.1f}>25 但下跌斜率一般，仅在 RSI 反弹到 {rsi:.1f} 后轻仓顺势做空。"
             else:
-                final_reason = "弱势下跌但短线过冷，暂缓继续追空。"
+                final_reason = f"弱势下跌但 RSI={rsi:.1f} 过低或结构不足，暂缓追空。"
         elif state_name == "强势下跌":
-            if h1["ema20"] < h1["ema60"] and m15["ema20"] < m15["ema60"] and m15["rsi14"] >= 18:
+            if h1["ema20"] < h1["ema60"] and m15["ema20"] < m15["ema60"] and short_rsi_ready:
                 action, side = "OPEN_SHORT", "sell"
-                entry_bias = "强势下跌趋势跟踪做空"
-                final_reason = "强势下跌，多周期空头共振，允许正常仓位追随趋势。"
-            elif h1["ema20"] < h1["ema60"] and m15["rsi14"] >= 26:
-                action, side = "OPEN_SHORT", "sell"
-                position_ratio = clamp(position_ratio * 1.0, settings.min_position_ratio_initial, position_ratio)
-                entry_bias = "强势下跌先试探后加仓"
-                final_reason = "强势下跌但15M未完全共振，先以小仓位试探做空。"
+                entry_bias = "强趋势反弹后顺势做空"
+                final_reason = f"ADX={adx:.1f}>25，趋势明确，且 RSI 回升至 {rsi:.1f}，允许顺势做空。"
             else:
-                final_reason = "强势下跌但短周期过冷，暂不在最低点追空。"
+                final_reason = f"强势下跌但 RSI={rsi:.1f} 尚未反弹到40以上或短线结构不足，暂不追空。"
         else:
             final_reason = "未知市场状态，维持观望。"
 
-        # 高频比赛模式兜底：只要加权分已通过门槛，就不再被状态分支二次拦截
-        if action == "HOLD" and weighted_score >= confidence_threshold:
-            fallback_ratio = clamp(position_ratio * 0.60, settings.min_position_ratio_initial, position_ratio)
+        if action == "HOLD" and is_trend_market and weighted_score >= confidence_threshold + 0.02:
+            fallback_ratio = clamp(position_ratio * 0.50, 0.10, position_ratio)
             llm_direction = str(llm_direction or "none").lower()
             llm_action = str(llm_action or "HOLD").upper()
-            if llm_direction == "buy" or llm_action == "OPEN_LONG":
-                return "OPEN_LONG", "buy", fallback_ratio, "高频比赛兜底做多", f"高频兜底：加权分{weighted_score:.4f}已通过门槛{confidence_threshold:.4f}，按LLM建议做多。"
-            if llm_direction == "sell" or llm_action == "OPEN_SHORT":
-                return "OPEN_SHORT", "sell", fallback_ratio, "高频比赛兜底做空", f"高频兜底：加权分{weighted_score:.4f}已通过门槛{confidence_threshold:.4f}，按LLM建议做空。"
-            if state_name in {"强势上涨", "弱势上涨"} or (state_name == "区间震荡" and obi >= 0):
-                return "OPEN_LONG", "buy", fallback_ratio, "高频比赛兜底做多", f"高频兜底：加权分{weighted_score:.4f}已通过门槛{confidence_threshold:.4f}，按技术偏向补充执行做多。"
-            return "OPEN_SHORT", "sell", fallback_ratio, "高频比赛兜底做空", f"高频兜底：加权分{weighted_score:.4f}已通过门槛{confidence_threshold:.4f}，按技术偏向补充执行做空。"
+            if (llm_direction == "buy" or llm_action == "OPEN_LONG") and long_rsi_ready:
+                return "OPEN_LONG", "buy", fallback_ratio, "趋势市兜底做多", f"趋势市中加权分{weighted_score:.4f}明显高于门槛{confidence_threshold:.4f}，且 RSI 回落后按 LLM 建议轻仓做多。"
+            if (llm_direction == "sell" or llm_action == "OPEN_SHORT") and short_rsi_ready:
+                return "OPEN_SHORT", "sell", fallback_ratio, "趋势市兜底做空", f"趋势市中加权分{weighted_score:.4f}明显高于门槛{confidence_threshold:.4f}，且 RSI 反弹后按 LLM 建议轻仓做空。"
 
         return action, side, position_ratio, entry_bias, final_reason
 
@@ -550,46 +555,51 @@ class StrategyEngine:
         position_snapshot: dict[str, Any],
         btc_weathervane: dict[str, Any] | None = None,
         btc_turn_alert: str | None = None,
-    ) -> tuple[str | None, str]:
+    ) -> tuple[str | None, str, float]:
         pos_side = position_snapshot["side"]
         if not pos_side:
             self.trailing_stop_state.pop(symbol, None)
-            return None, "当前无持仓，无需平仓。"
+            return None, "当前无持仓，无需平仓。", 0.0
 
         upl_ratio = position_snapshot["upl_ratio"]
+        rsi = safe_float(m15.get("rsi14"), 50.0)
         peak_upl_ratio, lock_pct = self._trailing_stop_lock(symbol=symbol, position_snapshot=position_snapshot)
         if lock_pct > 0 and upl_ratio <= lock_pct:
             close_action = "CLOSE_LONG" if pos_side == "buy" else "CLOSE_SHORT"
             return close_action, (
                 f"阶梯移动止盈：持仓峰值浮盈{peak_upl_ratio * 100:.1f}%，当前回撤至{upl_ratio * 100:.1f}%，"
                 f"触发{lock_pct * 100:.1f}%锁利线，执行保护性市价平仓。"
-            )
+            ), 1.0
+        if pos_side == "buy" and 66 <= rsi <= 70 and upl_ratio > 0:
+            return "CLOSE_LONG", f"15M RSI={rsi:.1f} 进入68附近过热区，已有多仓先市价减半，保留剩余仓位等待趋势延续。", 0.5
+        if pos_side == "sell" and 30 <= rsi <= 34 and upl_ratio > 0:
+            return "CLOSE_SHORT", f"15M RSI={rsi:.1f} 进入32附近过冷区，已有空仓先市价减半，保留剩余仓位等待趋势延续。", 0.5
 
         # 高频移动止盈：快进快出，赚2-5U就锁定
         if pos_side == "buy":
             if upl_ratio >= 0.025:
                 # 浮盈2.5%+：出现任何转弱就立刻止盈
                 if m15["rsi14"] >= 62 or m15["ema20"] < m15["ema60"] or h1["ema20"] < h1["ema60"]:
-                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达2.5%+，检测到转弱信号，快速锁定利润。"
+                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达2.5%+，检测到转弱信号，快速锁定利润。", 1.0
             elif upl_ratio >= 0.018:
                 # 浮盈1.8%+：RSI偏热或短线EMA死叉就止盈
                 if m15["rsi14"] >= 65 or m15["ema20"] < m15["ema60"]:
-                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达1.8%+，短线转弱，快速止盈。"
+                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达1.8%+，短线转弱，快速止盈。", 1.0
             elif upl_ratio >= 0.012:
                 # 浮盈1.2%+：明确反转信号就止盈
                 if m15["rsi14"] >= 68 and m15["ema20"] < m15["ema60"]:
-                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%，RSI过热且死叉，保护性止盈。"
+                    return "CLOSE_LONG", f"高频止盈：浮盈{upl_ratio * 100:.1f}%，RSI过热且死叉，保护性止盈。", 1.0
 
         if pos_side == "sell":
             if upl_ratio >= 0.025:
                 if m15["rsi14"] <= 38 or m15["ema20"] > m15["ema60"] or h1["ema20"] > h1["ema60"]:
-                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达2.5%+，检测到转强信号，快速锁定利润。"
+                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达2.5%+，检测到转强信号，快速锁定利润。", 1.0
             elif upl_ratio >= 0.018:
                 if m15["rsi14"] <= 35 or m15["ema20"] > m15["ema60"]:
-                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达1.8%+，短线转强，快速止盈。"
+                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%已达1.8%+，短线转强，快速止盈。", 1.0
             elif upl_ratio >= 0.012:
                 if m15["rsi14"] <= 32 and m15["ema20"] > m15["ema60"]:
-                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%，RSI过冷且金叉，保护性止盈。"
+                    return "CLOSE_SHORT", f"高频止盈：浮盈{upl_ratio * 100:.1f}%，RSI过冷且金叉，保护性止盈。", 1.0
         low_confidence = weighted_score < max(confidence_threshold * 0.92, confidence_threshold - 0.06)
         long_reversal = h1["ema20"] < h1["ema60"] or (m15["ema20"] < m15["ema60"] and m15["rsi14"] < 48)
         short_reversal = h1["ema20"] > h1["ema60"] or (m15["ema20"] > m15["ema60"] and m15["rsi14"] > 52)
@@ -603,46 +613,46 @@ class StrategyEngine:
         if pos_side == "buy":
             # 如果当前是多单，但市场状态是下跌且加权分较高（说明空头信号强）
             if state_name in {"强势下跌", "弱势下跌"} and weighted_score > 0.6:
-                return "CLOSE_LONG", f"检测到反向强信号(Score={weighted_score:.2f})，多单强制平仓。"
+                return "CLOSE_LONG", f"检测到反向强信号(Score={weighted_score:.2f})，多单强制平仓。", 1.0
 
             if btc_pressure_on_sol_long and upl_ratio >= 0.01:
-                return "CLOSE_LONG", f"{alert_prefix}BTC风向标偏空，SOL多单止盈收紧至1R，当前浮盈{upl_ratio * 100:.1f}%后执行保护性离场。"
+                return "CLOSE_LONG", f"{alert_prefix}BTC风向标偏空，SOL多单止盈收紧至1R，当前浮盈{upl_ratio * 100:.1f}%后执行保护性离场。", 1.0
             if btc_pressure_on_sol_long and (long_reversal or low_confidence):
-                return "CLOSE_LONG", f"{alert_prefix}BTC风向标偏空，且SOL多头结构转弱，多单风控升级后主动平仓。"
+                return "CLOSE_LONG", f"{alert_prefix}BTC风向标偏空，且SOL多头结构转弱，多单风控升级后主动平仓。", 1.0
             if state_name in {"强势下跌", "弱势下跌"}:
-                return "CLOSE_LONG", "市场状态已转入下跌区间，多单按策略退出。"
+                return "CLOSE_LONG", "市场状态已转入下跌区间，多单按策略退出。", 1.0
             if long_reversal and low_confidence:
-                return "CLOSE_LONG", "1H/15M 多头结构失效，且当前置信度不足，多单主动平仓。"
+                return "CLOSE_LONG", "1H/15M 多头结构失效，且当前置信度不足，多单主动平仓。", 1.0
             if upl_ratio >= 0.025 and m15["rsi14"] >= 68:
-                return "CLOSE_LONG", f"多单浮盈{upl_ratio * 100:.1f}%且15M RSI过热({m15['rsi14']:.0f})，执行移动止盈。"
+                return "CLOSE_LONG", f"多单浮盈{upl_ratio * 100:.1f}%且15M RSI过热({m15['rsi14']:.0f})，执行移动止盈。", 1.0
             if upl_ratio >= 0.015 and m15["ema20"] < m15["ema60"]:
-                return "CLOSE_LONG", f"多单浮盈{upl_ratio * 100:.1f}%且15M EMA死叉，执行保护性止盈。"
+                return "CLOSE_LONG", f"多单浮盈{upl_ratio * 100:.1f}%且15M EMA死叉，执行保护性止盈。", 1.0
             if upl_ratio <= -0.018:
-                return "CLOSE_LONG", f"多单浮亏{abs(upl_ratio) * 100:.1f}%超过软止损线，主动平仓止损。"
-            return None, "持有多单，当前结构未触发退出条件。"
+                return "CLOSE_LONG", f"多单浮亏{abs(upl_ratio) * 100:.1f}%超过软止损线，主动平仓止损。", 1.0
+            return None, "持有多单，当前结构未触发退出条件。", 0.0
 
         if pos_side == "sell":
             # 如果当前是空单，但市场状态是上涨且加权分较高（说明多头信号强）
             if state_name in {"强势上涨", "弱势上涨"} and weighted_score > 0.6:
-                return "CLOSE_SHORT", f"检测到反向强信号(Score={weighted_score:.2f})，空单强制平仓。"
+                return "CLOSE_SHORT", f"检测到反向强信号(Score={weighted_score:.2f})，空单强制平仓。", 1.0
 
             if btc_pressure_on_sol_short and upl_ratio >= 0.01:
-                return "CLOSE_SHORT", f"{alert_prefix}BTC风向标偏多，SOL空单止盈收紧至1R，当前浮盈{upl_ratio * 100:.1f}%后执行保护性离场。"
+                return "CLOSE_SHORT", f"{alert_prefix}BTC风向标偏多，SOL空单止盈收紧至1R，当前浮盈{upl_ratio * 100:.1f}%后执行保护性离场。", 1.0
             if btc_pressure_on_sol_short and (short_reversal or low_confidence):
-                return "CLOSE_SHORT", f"{alert_prefix}BTC风向标偏多，且SOL空头结构转弱，空单风控升级后主动平仓。"
+                return "CLOSE_SHORT", f"{alert_prefix}BTC风向标偏多，且SOL空头结构转弱，空单风控升级后主动平仓。", 1.0
             if state_name in {"强势上涨", "弱势上涨"}:
-                return "CLOSE_SHORT", "市场状态已转入上涨区间，空单按策略退出。"
+                return "CLOSE_SHORT", "市场状态已转入上涨区间，空单按策略退出。", 1.0
             if short_reversal and low_confidence:
-                return "CLOSE_SHORT", "1H/15M 空头结构失效，且当前置信度不足，空单主动平仓。"
+                return "CLOSE_SHORT", "1H/15M 空头结构失效，且当前置信度不足，空单主动平仓。", 1.0
             if upl_ratio >= 0.025 and m15["rsi14"] <= 35:
-                return "CLOSE_SHORT", f"空单浮盈{upl_ratio * 100:.1f}%且15M RSI过冷({m15['rsi14']:.0f})，执行移动止盈。"
+                return "CLOSE_SHORT", f"空单浮盈{upl_ratio * 100:.1f}%且15M RSI过冷({m15['rsi14']:.0f})，执行移动止盈。", 1.0
             if upl_ratio >= 0.015 and m15["ema20"] > m15["ema60"]:
-                return "CLOSE_SHORT", f"空单浮盈{upl_ratio * 100:.1f}%且15M EMA金叉，执行保护性止盈。"
+                return "CLOSE_SHORT", f"空单浮盈{upl_ratio * 100:.1f}%且15M EMA金叉，执行保护性止盈。", 1.0
             if upl_ratio <= -0.018:
-                return "CLOSE_SHORT", f"空单浮亏{abs(upl_ratio) * 100:.1f}%超过软止损线，主动平仓止损。"
-            return None, "持有空单，当前结构未触发退出条件。"
+                return "CLOSE_SHORT", f"空单浮亏{abs(upl_ratio) * 100:.1f}%超过软止损线，主动平仓止损。", 1.0
+            return None, "持有空单，当前结构未触发退出条件。", 0.0
 
-        return None, "当前无持仓，无需平仓。"
+        return None, "当前无持仓，无需平仓。", 0.0
 
     def decide(
         self,
@@ -772,7 +782,7 @@ class StrategyEngine:
             llm_action=llm_action,
         )
 
-        close_action, close_reason = self._close_signal(
+        close_action, close_reason, close_ratio = self._close_signal(
             symbol=symbol,
             state_name=state_name,
             h1=h1,
@@ -904,6 +914,7 @@ class StrategyEngine:
             "position_ratio": position_ratio,
             "leverage": leverage,
             "td_mode": "isolated",
+            "close_ratio": close_ratio if close_action else 0.0,
             "weighted_score": weighted_score,
             "confidence_threshold": confidence_threshold,
             "signal_grade": signal_grade,

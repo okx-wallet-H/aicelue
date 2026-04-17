@@ -63,12 +63,21 @@ class ExecutionEngine:
             return 0.0
         return safe_float(positions[0].get("pos"))
 
-    def close_with_reverse_market(self, symbol: str, tag: str = "agentTradeKit", td_mode: str = "isolated") -> list[dict[str, Any]]:
+    def close_with_reverse_market(
+        self,
+        symbol: str,
+        tag: str = "agentTradeKit",
+        td_mode: str = "isolated",
+        size: float | None = None,
+    ) -> list[dict[str, Any]]:
         net_pos = self.get_net_position(symbol)
         if net_pos == 0:
             return []
         side = "sell" if net_pos > 0 else "buy"
-        return self.client.place_order(symbol, side=side, size=abs(net_pos), ord_type="market", td_mode=td_mode, tag=tag, reduce_only=True)
+        close_size = abs(net_pos) if size is None else min(abs(net_pos), self._normalize_contracts(size))
+        if close_size <= 0:
+            return []
+        return self.client.place_order(symbol, side=side, size=close_size, ord_type="market", td_mode=td_mode, tag=tag, reduce_only=True)
 
     def close_position(
         self,
@@ -76,17 +85,24 @@ class ExecutionEngine:
         td_mode: str = "isolated",
         tag: str = "agentTradeKit",
         reason: str | None = None,
+        close_ratio: float = 1.0,
     ) -> dict[str, Any]:
         net_pos = self.get_net_position(symbol)
         if abs(net_pos) <= 1e-8:
             return {"entry": [], "algo": [], "closed_size": 0.0, "reason": reason or "flat_position"}
-        result = self.close_with_reverse_market(symbol=symbol, tag=tag, td_mode=td_mode)
+        normalized_ratio = min(max(safe_float(close_ratio, 1.0), 0.0), 1.0)
+        target_size = abs(net_pos)
+        if normalized_ratio < 0.999:
+            target_size = max(self._normalize_contracts(abs(net_pos) * normalized_ratio), 1.0)
+            target_size = min(target_size, abs(net_pos))
+        result = self.close_with_reverse_market(symbol=symbol, tag=tag, td_mode=td_mode, size=target_size)
         return {
             "entry": result,
             "algo": [],
-            "closed_size": abs(net_pos),
+            "closed_size": target_size,
             "reason": reason or "signal_exit",
             "td_mode": td_mode,
+            "close_ratio": normalized_ratio,
         }
 
     def _single_loss_size_cap(self, symbol: str, size: float, entry_price: float, stop_loss_pct: float) -> float:

@@ -35,7 +35,7 @@ class Settings:
     })
 
     candle_limit: int = 120
-    main_loop_interval_seconds: int = 300
+    main_loop_interval_seconds: int = 600
     evaluation_interval_hours: int = 4
     evaluation_trade_window: int = 40
     fills_scan_limit: int = 200
@@ -62,9 +62,9 @@ class Settings:
     min_order_margin_usdt: float = 100.0
     default_position_ratio: float = 0.35
 
-    # BTC 风向标资金分配：BTC 30%，SOL 70%，预留 2% 作为手续费与缓冲
-    btc_weathervane_capital_ratio: float = 0.30
-    sol_main_attack_capital_ratio: float = 0.70
+    # BTC 风向标资金分配：BTC 50%，SOL 50%，预留 2% 作为手续费与缓冲
+    btc_weathervane_capital_ratio: float = 0.50
+    sol_main_attack_capital_ratio: float = 0.50
     fee_buffer_capital_ratio: float = 0.02
     duplicate_entry_cooldown_seconds: int = 180
 
@@ -97,9 +97,9 @@ class Settings:
     min_strategy_weight: float = 0.10
     ewma_alpha: float = 0.35
 
-    confidence_threshold_default: float = 0.15
-    confidence_threshold_min: float = 0.08
-    confidence_threshold_max: float = 0.50
+    confidence_threshold_default: float = 0.28
+    confidence_threshold_min: float = 0.25
+    confidence_threshold_max: float = 0.30
     overall_position_scale_min: float = 0.60
     overall_position_scale_max: float = 1.40
     leverage_scale_min: float = 0.70
