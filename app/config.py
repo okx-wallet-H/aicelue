@@ -25,6 +25,10 @@ class Settings:
     okx_api_key: str = field(default_factory=lambda: os.getenv("OKX_API_KEY", ""))
     okx_secret_key: str = field(default_factory=lambda: os.getenv("OKX_SECRET_KEY", ""))
     okx_passphrase: str = field(default_factory=lambda: os.getenv("OKX_PASSPHRASE", ""))
+    # OKX CLI 可执行文件路径，默认 /usr/bin/okx，可通过 OKX_CLI_PATH 覆盖
+    okx_cli_path: str = field(default_factory=lambda: os.getenv("OKX_CLI_PATH", "/usr/bin/okx"))
+    # 交易总开关：必须设置为 true 才允许真实下单（TRADING_ENABLED=true）
+    trading_enabled: bool = field(default_factory=lambda: os.getenv("TRADING_ENABLED", "false").lower() == "true")
 
     symbols: tuple[str, ...] = ("BTC-USDT-SWAP", "ETH-USDT-SWAP", "SOL-USDT-SWAP")
     banned_symbols: tuple[str, ...] = tuple()
@@ -68,7 +72,12 @@ class Settings:
     fee_buffer_capital_ratio: float = 0.02
     duplicate_entry_cooldown_seconds: int = 180
 
-    single_loss_pct: float = 0.02
+    # 单笔最大风险比例（占账户权益），默认 1.5%；可通过子类或运行时覆盖
+    max_trade_risk_pct: float = field(default_factory=lambda: float(os.getenv("MAX_TRADE_RISK_PCT", "0.015")))
+    # 总保证金上限（占账户权益），比赛后期保守设置为 0.60
+    total_margin_cap_ratio: float = field(default_factory=lambda: float(os.getenv("TOTAL_MARGIN_CAP_RATIO", "0.60")))
+    # 杠杆上限，LLM 输出超过此值时强制截断
+    max_leverage_cap: int = field(default_factory=lambda: int(os.getenv("MAX_LEVERAGE_CAP", "15")))
     single_loss_pct_strong_trend: float = 0.015
     initial_capital: float = 1500.0
     max_single_loss_pct: float = 0.03

@@ -17,8 +17,7 @@ class OKXClient:
 
     def _base_command(self) -> list[str]:
         mode_flag = "--demo" if self.use_demo else "--live"
-        # 修正为服务器实际路径
-        okx_path = "/usr/bin/okx"
+        okx_path = settings.okx_cli_path
         return [okx_path, mode_flag, "--json"]
 
     def _parse_json_output(self, raw: str) -> Any:
