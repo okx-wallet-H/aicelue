@@ -57,17 +57,11 @@ class ProcessLock:
             self.handle = None
 
 
-def next_utc_4h_boundary(now_utc: datetime) -> datetime:
+def next_utc_1h_boundary(now_utc: datetime) -> datetime:
     aligned = now_utc.astimezone(timezone.utc).replace(minute=0, second=0, microsecond=0)
-    if aligned.hour % 4 == 0 and aligned == now_utc.astimezone(timezone.utc):
-        return aligned + timedelta(hours=4)
-
-    next_hour = aligned.hour + (4 - aligned.hour % 4)
-    if next_hour >= 24:
-        aligned = aligned.replace(hour=0) + timedelta(days=1)
-    else:
-        aligned = aligned.replace(hour=next_hour)
-    return aligned
+    if aligned == now_utc.astimezone(timezone.utc):
+        return aligned + timedelta(hours=1)
+    return aligned + timedelta(hours=1)
 
 
 def sleep_until_boundary(target_utc: datetime) -> None:
@@ -81,16 +75,16 @@ def sleep_until_boundary(target_utc: datetime) -> None:
 
 def run_aligned_loop(app: AgentTradeKitApp, execute_orders: bool) -> None:
     while True:
-        next_run_utc = next_utc_4h_boundary(datetime.now(timezone.utc))
+        next_run_utc = next_utc_1h_boundary(datetime.now(timezone.utc))
         engine_logger.info(
-            "调度器已对齐到下一个 4 小时整点，当前时间=%s，下次执行=%s，执行下单=%s",
+            "调度器已对齐到下一个 1 小时整点，当前时间=%s，下次执行=%s，执行下单=%s",
             datetime.now(timezone.utc).isoformat(),
             next_run_utc.isoformat(),
             execute_orders,
         )
         sleep_until_boundary(next_run_utc)
         try:
-            engine_logger.info("到达 4 小时整点，开始执行本轮策略。boundary_utc=%s", next_run_utc.isoformat())
+            engine_logger.info("到达 1 小时整点，开始执行本轮策略。boundary_utc=%s", next_run_utc.isoformat())
             app.run_once(execute_orders=execute_orders)
         except Exception as exc:  # noqa: BLE001
             engine_logger.exception("整点调度运行异常: %s", exc)
