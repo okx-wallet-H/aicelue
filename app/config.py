@@ -26,8 +26,8 @@ class Settings:
     okx_secret_key: str = field(default_factory=lambda: os.getenv("OKX_SECRET_KEY", ""))
     okx_passphrase: str = field(default_factory=lambda: os.getenv("OKX_PASSPHRASE", ""))
 
-    symbols: tuple[str, ...] = ("BTC-USDT-SWAP", "SOL-USDT-SWAP")
-    banned_symbols: tuple[str, ...] = ("ETH-USDT-SWAP",)
+    symbols: tuple[str, ...] = ("BTC-USDT-SWAP", "ETH-USDT-SWAP", "SOL-USDT-SWAP")
+    banned_symbols: tuple[str, ...] = tuple()
     timeframes: dict[str, str] = field(default_factory=lambda: {
         "4H": "4H",
         "1H": "1H",
@@ -76,13 +76,13 @@ class Settings:
     total_drawdown_fuse_pct: float = 0.25
     consecutive_loss_half: int = 4
     consecutive_loss_stop: int = 6
-    max_concurrent_positions: int = 2
+    max_concurrent_positions: int = 3
 
     btc_leverage_normal: int = 8
     btc_leverage_strong: int = 12
     sol_leverage_normal: int = 15
     sol_leverage_strong: int = 20
-    symbol_priority: tuple[str, ...] = ("BTC-USDT-SWAP", "SOL-USDT-SWAP")
+    symbol_priority: tuple[str, ...] = ("BTC-USDT-SWAP", "ETH-USDT-SWAP", "SOL-USDT-SWAP")
 
     knife_attack_enabled: bool = True
     knife_attack_margin_usdt: float = 60.0
@@ -129,7 +129,7 @@ class Settings:
     llm_conflict_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_CONFLICT_PENALTY", "0.05")))
     llm_hold_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_HOLD_PENALTY", "0.03")))
     llm_skip_conflict_threshold: float = field(default_factory=lambda: float(os.getenv("LLM_SKIP_CONFLICT_THRESHOLD", "0.95")))
-    llm_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_TEMPERATURE", "0.2")))
+    llm_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_TEMPERATURE", "0.35")))
     llm_review_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_REVIEW_TEMPERATURE", "0.10")))
     llm_review_bias_scale: float = field(default_factory=lambda: float(os.getenv("LLM_REVIEW_BIAS_SCALE", "0.50")))
 

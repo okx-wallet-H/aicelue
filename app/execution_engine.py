@@ -17,6 +17,8 @@ class ExecutionEngine:
     def _contract_size(symbol: str) -> float:
         if symbol == "BTC-USDT-SWAP":
             return 0.01
+        if symbol == "ETH-USDT-SWAP":
+            return 0.1
         if symbol == "SOL-USDT-SWAP":
             return 1.0
         return 1.0
