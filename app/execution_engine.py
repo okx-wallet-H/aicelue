@@ -160,7 +160,7 @@ class ExecutionEngine:
     def close_position(self, symbol: str, tag: str = "agentTradeKit") -> dict[str, Any]:
         net_pos = self.get_net_position(symbol)
         if abs(net_pos) <= 1e-8:
-            return {"status": "no_position"}
+            return {"status": "no_position", "attempts": 0, "net_pos_after": net_pos}
 
         side = "sell" if net_pos > 0 else "buy"
         result = self.client.place_order(
@@ -172,13 +172,56 @@ class ExecutionEngine:
             reduce_only=True,
         )
         if not self._has_success_row(result):
-            raise RuntimeError(f"{symbol} 平仓失败: {result}")
-        return {"status": "closed", "result": result, "size": abs(net_pos)}
+            engine_logger.error("%s 平仓下单失败: %s", symbol, result)
+            return {"status": "close_failed", "attempts": 1, "net_pos_after": net_pos, "result": result}
+
+        # Wait for exchange to reflect the fill before verifying
+        time.sleep(0.3)
+
+        net_pos_after = self.get_net_position(symbol)
+        if abs(net_pos_after) <= 1e-8:
+            return {"status": "closed", "attempts": 1, "net_pos_after": net_pos_after, "result": result, "size": abs(net_pos)}
+
+        # Verify failed – retry once with updated size/side
+        engine_logger.warning("%s 平仓后仍有仓位(net_pos=%.6f)，重试一次...", symbol, net_pos_after)
+        retry_side = "sell" if net_pos_after > 0 else "buy"
+        retry_result = self.client.place_order(
+            symbol,
+            side=retry_side,
+            size=abs(net_pos_after),
+            ord_type="market",
+            tag=tag,
+            reduce_only=True,
+        )
+        time.sleep(0.3)
+        net_pos_final = self.get_net_position(symbol)
+        if abs(net_pos_final) <= 1e-8:
+            return {
+                "status": "closed",
+                "attempts": 2,
+                "net_pos_after": net_pos_final,
+                "result": result,
+                "retry_result": retry_result,
+                "size": abs(net_pos),
+            }
+
+        engine_logger.error("%s 平仓重试后仍有残余仓位: net_pos=%.6f", symbol, net_pos_final)
+        return {
+            "status": "close_unverified",
+            "attempts": 2,
+            "net_pos_after": net_pos_final,
+            "result": result,
+            "retry_result": retry_result,
+            "size": abs(net_pos),
+        }
 
     def _force_flatten(self, symbol: str, reason: str, tag: str) -> dict[str, Any]:
         engine_logger.error("%s 触发强制平仓: %s", symbol, reason)
         try:
             close_result = self.close_position(symbol, tag=f"{tag}-forced-close")
+            if close_result.get("status") in {"close_failed", "close_unverified"}:
+                engine_logger.error("%s 强制平仓未能验证成功: %s", symbol, close_result)
+                return {"status": "forced_flatten_failed", "reason": reason, "close_result": close_result}
             return {"status": "forced_flattened", "reason": reason, "close_result": close_result}
         except Exception as exc:  # noqa: BLE001
             engine_logger.exception("%s 强制平仓失败: %s", symbol, exc)
