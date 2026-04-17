@@ -252,6 +252,21 @@ class AgentTradeKitApp:
         return False
 
     @staticmethod
+    def _open_action_target_direction(action: str) -> str:
+        if action == "OPEN_LONG":
+            return "LONG"
+        if action == "OPEN_SHORT":
+            return "SHORT"
+        return "FLAT"
+
+    def _needs_reverse_before_open(self, action: str, position: dict[str, Any] | None) -> bool:
+        if position is None:
+            return False
+        target_direction = self._open_action_target_direction(action)
+        current_direction = str(position.get("direction", "FLAT"))
+        return target_direction in {"LONG", "SHORT"} and current_direction in {"LONG", "SHORT"} and target_direction != current_direction
+
+    @staticmethod
     def _build_trailing_stop(decision: dict[str, Any]) -> dict[str, Any] | None:
         has_callback = decision.get("trailing_callback") is not None
         has_active = decision.get("active_px") is not None
@@ -404,8 +419,10 @@ class AgentTradeKitApp:
 
             action = self._normalize_action(decision.get("action"))
             symbol = str(decision.get("symbol", "NONE"))
-            if symbol in position_map:
-                engine_logger.info("%s 已有持仓，本轮跳过重复开仓。", symbol)
+            existing_position = position_map.get(symbol)
+            target_direction = self._open_action_target_direction(action)
+            if existing_position and not self._needs_reverse_before_open(action, existing_position):
+                engine_logger.info("%s 已有同向持仓或无需反手，本轮跳过重复开仓。", symbol)
                 continue
 
             if symbol in blocked_open_symbols:
@@ -429,6 +446,38 @@ class AgentTradeKitApp:
                 position_map = self._position_map(account_context.get("positions", []))
                 remaining_margin_budget = self._remaining_margin_budget(account_context)
                 campaigns = self.kb.state.get("open_campaigns", {}) or {}
+
+                existing_position = position_map.get(symbol)
+                if existing_position and self._needs_reverse_before_open(action, existing_position):
+                    try:
+                        engine_logger.info(
+                            "%s 检测到反手信号，先平掉现有 %s 仓位，再执行 %s。",
+                            symbol,
+                            existing_position.get("direction"),
+                            action,
+                        )
+                        reverse_close_result = self.execution_engine.close_position(symbol, tag="agentTradeKit-reverse-close")
+                        execution_results.append({
+                            "symbol": symbol,
+                            "action": f"REVERSE_CLOSE_FOR_{action}",
+                            "result": reverse_close_result,
+                        })
+                        self._clear_open_campaign(symbol)
+                        account_context = self._get_account_context()
+                        self._update_risk_state_from_equity(account_context)
+                        self._sync_open_campaigns(account_context.get("positions", []))
+                        position_map = self._position_map(account_context.get("positions", []))
+                        remaining_margin_budget = self._remaining_margin_budget(account_context)
+                        campaigns = self.kb.state.get("open_campaigns", {}) or {}
+                    except Exception as exc:  # noqa: BLE001
+                        engine_logger.error("%s 反手前平仓失败: %s", symbol, exc)
+                        execution_results.append({
+                            "symbol": symbol,
+                            "action": f"REVERSE_CLOSE_FOR_{action}",
+                            "status": "failed",
+                            "reason": str(exc),
+                        })
+                        continue
 
                 if symbol in position_map or symbol in campaigns:
                     engine_logger.info("%s 已存在实时持仓或持久化战役锁，跳过重复开仓。", symbol)
