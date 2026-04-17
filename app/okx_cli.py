@@ -17,7 +17,8 @@ class OKXClient:
 
     def _base_command(self) -> list[str]:
         mode_flag = "--demo" if self.use_demo else "--live"
-        return ["okx", mode_flag, "--json"]
+        okx_path = "/home/ubuntu/.local/share/pnpm/okx"
+        return [okx_path, mode_flag, "--json"]
 
     def _parse_json_output(self, raw: str) -> Any:
         raw = (raw or "").strip()
@@ -196,6 +197,8 @@ class OKXClient:
         tag: str = DEFAULT_ORDER_TAG,
         pos_side: str | None = None,
         reduce_only: bool = False,
+        callback_ratio: float | None = None,
+        active_px: float | None = None,
     ) -> list[dict[str, Any]]:
         args = [
             "swap", "algo", "place",
@@ -214,5 +217,9 @@ class OKXClient:
             args.extend(["--tpTriggerPx", str(tp_trigger_px), f"--tpOrdPx={tp_ord_px}"])
         if sl_trigger_px is not None:
             args.extend(["--slTriggerPx", str(sl_trigger_px), f"--slOrdPx={sl_ord_px}"])
+        if callback_ratio is not None:
+            args.extend(["--callbackRatio", str(callback_ratio)])
+        if active_px is not None:
+            args.extend(["--activePx", str(active_px)])
         data = self.run(args) or []
         return self._attach_requested_tag(data, tag)

@@ -1,22 +1,6 @@
 {
   "BTC-USDT-SWAP": [
     {
-      "timestamp": 1776186251238,
-      "open_interest": 3576970.8700000336
-    },
-    {
-      "timestamp": 1776186557339,
-      "open_interest": 3571681.120000033
-    },
-    {
-      "timestamp": 1776186863488,
-      "open_interest": 3571126.9800000326
-    },
-    {
-      "timestamp": 1776187169888,
-      "open_interest": 3568296.920000033
-    },
-    {
       "timestamp": 1776187475885,
       "open_interest": 3564761.750000033
     },
@@ -1999,25 +1983,25 @@
     {
       "timestamp": 1776337498135,
       "open_interest": 3509699.300000029
+    },
+    {
+      "timestamp": 1776413294207,
+      "open_interest": 3490521.10000003
+    },
+    {
+      "timestamp": 1776413343376,
+      "open_interest": 3492226.57000003
+    },
+    {
+      "timestamp": 1776413369063,
+      "open_interest": 3495111.31000003
+    },
+    {
+      "timestamp": 1776413401747,
+      "open_interest": 3496229.35000003
     }
   ],
   "SOL-USDT-SWAP": [
-    {
-      "timestamp": 1776186253335,
-      "open_interest": 2662222.9900000016
-    },
-    {
-      "timestamp": 1776186559437,
-      "open_interest": 2655482.670000002
-    },
-    {
-      "timestamp": 1776186865588,
-      "open_interest": 2652955.0900000017
-    },
-    {
-      "timestamp": 1776187171938,
-      "open_interest": 2648317.4400000013
-    },
     {
       "timestamp": 1776187477985,
       "open_interest": 2648061.910000001
@@ -4001,6 +3985,22 @@
     {
       "timestamp": 1776337500242,
       "open_interest": 2567129.4800000004
+    },
+    {
+      "timestamp": 1776413300807,
+      "open_interest": 2637609.0300000017
+    },
+    {
+      "timestamp": 1776413355018,
+      "open_interest": 2637805.8000000017
+    },
+    {
+      "timestamp": 1776413375861,
+      "open_interest": 2639570.2000000025
+    },
+    {
+      "timestamp": 1776413413669,
+      "open_interest": 2640093.4000000022
     }
   ]
 }

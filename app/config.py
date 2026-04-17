@@ -35,7 +35,7 @@ class Settings:
     })
 
     candle_limit: int = 120
-    main_loop_interval_seconds: int = 600
+    main_loop_interval_seconds: int = 14400  # 4小时主循环
     evaluation_interval_hours: int = 4
     evaluation_trade_window: int = 40
     fills_scan_limit: int = 200
@@ -119,7 +119,7 @@ class Settings:
 
     # LLM 分析配置
     llm_enabled: bool = field(default_factory=lambda: os.getenv("LLM_ENABLED", "true").lower() == "true")
-    llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "qwen-plus-latest"))
+    llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "gpt-4.1-mini"))
     llm_timeout_seconds: int = field(default_factory=lambda: int(os.getenv("LLM_TIMEOUT_SECONDS", "30")))
     llm_max_candles_per_tf: int = field(default_factory=lambda: int(os.getenv("LLM_MAX_CANDLES_PER_TF", "24")))
     llm_recent_record_window: int = field(default_factory=lambda: int(os.getenv("LLM_RECENT_RECORD_WINDOW", "12")))
@@ -129,7 +129,7 @@ class Settings:
     llm_conflict_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_CONFLICT_PENALTY", "0.05")))
     llm_hold_penalty: float = field(default_factory=lambda: float(os.getenv("LLM_HOLD_PENALTY", "0.03")))
     llm_skip_conflict_threshold: float = field(default_factory=lambda: float(os.getenv("LLM_SKIP_CONFLICT_THRESHOLD", "0.95")))
-    llm_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_TEMPERATURE", "0.15")))
+    llm_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_TEMPERATURE", "0.2")))
     llm_review_temperature: float = field(default_factory=lambda: float(os.getenv("LLM_REVIEW_TEMPERATURE", "0.10")))
     llm_review_bias_scale: float = field(default_factory=lambda: float(os.getenv("LLM_REVIEW_BIAS_SCALE", "0.50")))
 
@@ -144,6 +144,7 @@ class Settings:
     state_file: Path = field(init=False)
     strategy_weights_file: Path = field(init=False)
     oi_cache_file: Path = field(init=False)
+    ai_decision_log_file: Path = field(init=False)
 
     def __post_init__(self) -> None:
         self.data_dir = self.project_root / "data"
@@ -162,6 +163,7 @@ class Settings:
         self.state_file = self.data_dir / "state.json"
         self.strategy_weights_file = self.data_dir / "strategy_weights.json"
         self.oi_cache_file = self.data_dir / "oi_cache.json"
+        self.ai_decision_log_file = self.data_dir / "ai_decisions.jsonl"
 
         for path in (self.data_dir, self.logs_dir, self.review_dir, self.trade_snapshot_dir, self.iteration_dir):
             path.mkdir(parents=True, exist_ok=True)

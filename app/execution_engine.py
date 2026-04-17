@@ -24,38 +24,21 @@ class ExecutionEngine:
     def _normalize_contracts(self, contracts: float) -> float:
         if contracts <= 0:
             return 0.0
-        normalized = math.floor(contracts)
-        return float(max(normalized, 0))
+        return float(math.floor(contracts))
 
     def _contract_notional_usdt(self, symbol: str, price: float) -> float:
         if price <= 0:
             return 0.0
         return price * self._contract_size(symbol)
 
-    def _contracts_from_margin(self, symbol: str, margin_usdt: float, price: float, leverage: int, safety_haircut: float = 0.90) -> float:
-        if margin_usdt <= 0 or leverage <= 0:
+    def _contracts_from_margin(self, symbol: str, margin_usdt: float, price: float, leverage: int) -> float:
+        if margin_usdt <= 0 or leverage <= 0 or price <= 0:
             return 0.0
-        contract_notional_usdt = self._contract_notional_usdt(symbol, price)
-        if contract_notional_usdt <= 0:
+        contract_notional = self._contract_notional_usdt(symbol, price)
+        if contract_notional <= 0:
             return 0.0
-        notional_usdt = margin_usdt * leverage
-        raw_contracts = notional_usdt / contract_notional_usdt
-        safe_contracts = raw_contracts * safety_haircut
-        return self._normalize_contracts(safe_contracts)
-
-    def estimate_order_size(self, symbol: str, equity_usdt: float, price: float, leverage: int, position_ratio: float) -> float:
-        margin_usdt = equity_usdt * position_ratio
-        return self._contracts_from_margin(symbol=symbol, margin_usdt=margin_usdt, price=price, leverage=leverage)
-
-    def estimate_fixed_margin_order_size(self, symbol: str, margin_usdt: float, price: float, leverage: int) -> float:
-        return self._contracts_from_margin(symbol=symbol, margin_usdt=margin_usdt, price=price, leverage=leverage)
-
-    def cap_order_size_by_margin(self, symbol: str, requested_size: float, margin_usdt: float, price: float, leverage: int) -> float:
-        max_size = self.estimate_fixed_margin_order_size(symbol=symbol, margin_usdt=margin_usdt, price=price, leverage=leverage)
-        requested_size = self._normalize_contracts(requested_size)
-        if max_size <= 0:
-            return 0.0
-        return min(requested_size, max_size)
+        raw_contracts = (margin_usdt * leverage) / contract_notional
+        return self._normalize_contracts(raw_contracts * 0.95)  # 95% 冗余
 
     def get_net_position(self, symbol: str) -> float:
         positions = self.client.get_positions(symbol)
@@ -63,227 +46,98 @@ class ExecutionEngine:
             return 0.0
         return safe_float(positions[0].get("pos"))
 
-    def close_with_reverse_market(
-        self,
-        symbol: str,
-        tag: str = "agentTradeKit",
-        td_mode: str = "isolated",
-        size: float | None = None,
-    ) -> list[dict[str, Any]]:
-        net_pos = self.get_net_position(symbol)
-        if net_pos == 0:
-            return []
-        side = "sell" if net_pos > 0 else "buy"
-        close_size = abs(net_pos) if size is None else min(abs(net_pos), self._normalize_contracts(size))
-        if close_size <= 0:
-            return []
-        return self.client.place_order(symbol, side=side, size=close_size, ord_type="market", td_mode=td_mode, tag=tag, reduce_only=True)
-
-    def close_position(
-        self,
-        symbol: str,
-        td_mode: str = "isolated",
-        tag: str = "agentTradeKit",
-        reason: str | None = None,
-        close_ratio: float = 1.0,
-    ) -> dict[str, Any]:
+    def close_position(self, symbol: str, tag: str = "agentTradeKit") -> dict[str, Any]:
         net_pos = self.get_net_position(symbol)
         if abs(net_pos) <= 1e-8:
-            return {"entry": [], "algo": [], "closed_size": 0.0, "reason": reason or "flat_position"}
-        normalized_ratio = min(max(safe_float(close_ratio, 1.0), 0.0), 1.0)
-        target_size = abs(net_pos)
-        if normalized_ratio < 0.999:
-            target_size = max(self._normalize_contracts(abs(net_pos) * normalized_ratio), 1.0)
-            target_size = min(target_size, abs(net_pos))
-        result = self.close_with_reverse_market(symbol=symbol, tag=tag, td_mode=td_mode, size=target_size)
-        return {
-            "entry": result,
-            "algo": [],
-            "closed_size": target_size,
-            "reason": reason or "signal_exit",
-            "td_mode": td_mode,
-            "close_ratio": normalized_ratio,
-        }
+            return {"status": "no_position"}
+        
+        side = "sell" if net_pos > 0 else "buy"
+        result = self.client.place_order(
+            symbol, side=side, size=abs(net_pos), ord_type="market", tag=tag, reduce_only=True
+        )
+        return {"status": "closed", "result": result, "size": abs(net_pos)}
 
-    def _single_loss_size_cap(self, symbol: str, size: float, entry_price: float, stop_loss_pct: float) -> float:
-        requested_size = self._normalize_contracts(size)
-        if requested_size <= 0:
-            return 0.0
-        if entry_price <= 0 or stop_loss_pct <= 0:
-            return requested_size
-        contract_notional_usdt = self._contract_notional_usdt(symbol, entry_price)
-        if contract_notional_usdt <= 0:
-            return requested_size
-        max_loss_usdt = safe_float(settings.initial_capital) * safe_float(settings.max_single_loss_pct)
-        if max_loss_usdt <= 0:
-            return requested_size
-        max_notional_usdt = max_loss_usdt / stop_loss_pct
-        max_contracts = self._normalize_contracts(max_notional_usdt / contract_notional_usdt)
-        if max_contracts <= 0:
-            return 0.0
-        return min(requested_size, max_contracts)
-
-    def _okx_max_avail_size_cap(self, symbol: str, size: float, td_mode: str = "isolated", leverage: int | None = None) -> tuple[float, list[dict[str, Any]]]:
-        requested_size = self._normalize_contracts(size)
-        if requested_size <= 0:
-            return 0.0, []
-        try:
-            rows = self.client.get_max_avail_size(inst_id=symbol, td_mode=td_mode, lever=leverage)
-        except Exception as exc:
-            engine_logger.warning("%s 查询 OKX 最大可开张数失败，回退到代码侧张数控制: %s", symbol, exc)
-            return requested_size, []
-
-        max_size = 0.0
-        for row in rows if isinstance(rows, list) else []:
-            if not isinstance(row, dict):
-                continue
-            for value in (
-                row.get("maxBuy"),
-                row.get("maxSell"),
-                row.get("availBuy"),
-                row.get("availSell"),
-                row.get("maxAvailSz"),
-                row.get("maxSz"),
-                row.get("availSz"),
-            ):
-                max_size = max(max_size, safe_float(value))
-
-        if max_size <= 0:
-            return requested_size, rows if isinstance(rows, list) else []
-        okx_safe_size = self._normalize_contracts(max_size * 0.90)
-        if okx_safe_size <= 0:
-            return 0.0, rows if isinstance(rows, list) else []
-        return min(requested_size, okx_safe_size), rows if isinstance(rows, list) else []
-
-    def place_entry_with_tpsl(
+    def execute_ai_open(
         self,
         symbol: str,
-        side: str,
-        size: float,
-        entry_price: float,
-        stop_loss_pct: float,
-        take_profit_pct: float,
-        tag: str = "agentTradeKit",
-        td_mode: str = "isolated",
-        leverage: int | None = None,
-    ) -> dict[str, Any]:
-        leverage_result: list[dict[str, Any]] = []
-        if leverage is not None:
-            leverage_result = self.client.set_leverage(symbol, lever=leverage, mgn_mode=td_mode)
-
-        loss_capped_size = self._single_loss_size_cap(symbol=symbol, size=size, entry_price=entry_price, stop_loss_pct=stop_loss_pct)
-        if loss_capped_size < self._normalize_contracts(size):
-            engine_logger.info("%s 单笔亏损保护生效：请求sz=%.2f，按固定本金%.2fU × %.2f%% = 最大亏损%.2fU，并结合止损%.4f反算后缩减至 %.2f。", symbol, size, settings.initial_capital, settings.max_single_loss_pct * 100, safe_float(settings.initial_capital) * safe_float(settings.max_single_loss_pct), stop_loss_pct, loss_capped_size)
-        final_size, max_avail_rows = self._okx_max_avail_size_cap(symbol=symbol, size=loss_capped_size, td_mode=td_mode, leverage=leverage)
-        if final_size <= 0:
-            return {
-                "leverage": leverage_result,
-                "entry": [],
-                "algo": [],
-                "max_avail_size": max_avail_rows,
-                "requested_size": size,
-                "loss_capped_size": loss_capped_size,
-                "final_size": 0.0,
-                "stop_loss_pct": stop_loss_pct,
-                "take_profit_pct": take_profit_pct,
-                "td_mode": td_mode,
-            }
-        if final_size < self._normalize_contracts(size):
-            engine_logger.info("%s 下单前双保险生效：请求sz=%.2f，按 OKX 最大可开张数九折后缩减至 %.2f。", symbol, size, final_size)
-
-        order_result = self.client.place_order(
-            symbol,
-            side=side,
-            size=final_size,
-            ord_type="market",
-            td_mode=td_mode,
-            tag=tag,
-            reduce_only=False,
-        )
-        if not order_result:
-            return {"leverage": leverage_result, "entry": [], "algo": []}
-
-        entry_success = any(str(row.get("sCode", "")) == "0" for row in order_result if isinstance(row, dict))
-        if not entry_success:
-            return {
-                "leverage": leverage_result,
-                "entry": order_result,
-                "algo": [],
-                "max_avail_size": max_avail_rows,
-                "requested_size": size,
-                "loss_capped_size": loss_capped_size,
-                "final_size": final_size,
-                "stop_loss_pct": stop_loss_pct,
-                "take_profit_pct": take_profit_pct,
-                "td_mode": td_mode,
-            }
-
-        if side == "buy":
-            sl_trigger = round(entry_price * (1 - stop_loss_pct), 4)
-            tp_trigger = round(entry_price * (1 + take_profit_pct), 4)
-        else:
-            sl_trigger = round(entry_price * (1 + stop_loss_pct), 4)
-            tp_trigger = round(entry_price * (1 - take_profit_pct), 4)
-
-        exit_side = "sell" if side == "buy" else "buy"
-        algo_result = self.client.place_algo_order(
-            inst_id=symbol,
-            td_mode=td_mode,
-            algo_ord_type="oco",
-            side=exit_side,
-            sz=final_size,
-            tp_trigger_px=tp_trigger,
-            sl_trigger_px=sl_trigger,
-            tag=tag,
-            reduce_only=True,
-        )
-        return {
-            "leverage": leverage_result,
-            "entry": order_result,
-            "algo": algo_result,
-            "max_avail_size": max_avail_rows,
-            "requested_size": size,
-            "final_size": final_size,
-            "stop_loss_pct": stop_loss_pct,
-            "take_profit_pct": take_profit_pct,
-            "td_mode": td_mode,
-        }
-
-    def place_knife_attack(
-        self,
-        symbol: str,
-        side: str,
-        entry_price: float,
+        action: str,
         margin_usdt: float,
         leverage: int,
-        stop_loss_pct: float,
-        take_profit_pct: float,
-        tag: str = "agentTradeKit",
+        entry_price: float,
+        stop_loss_price: float,
+        trailing_stop: dict[str, Any] | None = None,
+        take_profit_price: float | None = None,
+        tag: str = "agentTradeKit"
     ) -> dict[str, Any]:
-        size = self.estimate_fixed_margin_order_size(symbol, margin_usdt=margin_usdt, price=entry_price, leverage=leverage)
+        """
+        执行 AI 的开仓决策，包括设置杠杆、下单、挂止损和移动止盈。
+        """
+        # 1. 设置杠杆
+        self.client.set_leverage(symbol, lever=leverage)
+        
+        # 2. 计算张数
+        size = self._contracts_from_margin(symbol, margin_usdt, entry_price, leverage)
         if size <= 0:
-            return {
-                "leverage": [],
-                "entry": [],
-                "algo": [],
-                "size": 0.0,
-                "margin_usdt": margin_usdt,
-                "leverage_requested": leverage,
-                "td_mode": "isolated",
-            }
-        result = self.place_entry_with_tpsl(
-            symbol=symbol,
-            side=side,
-            size=size,
-            entry_price=entry_price,
-            stop_loss_pct=stop_loss_pct,
-            take_profit_pct=take_profit_pct,
-            tag=tag,
-            td_mode="isolated",
-            leverage=leverage,
+            return {"status": "failed", "reason": "size_too_small"}
+
+        # 3. 下市价单开仓
+        side = "buy" if action == "OPEN_LONG" else "sell"
+        order_result = self.client.place_order(
+            symbol, side=side, size=size, ord_type="market", tag=tag
         )
-        result["size"] = size
-        result["margin_usdt"] = margin_usdt
-        result["leverage_requested"] = leverage
-        result["td_mode"] = "isolated"
-        return result
+        
+        # 检查开仓是否成功
+        success = any(str(row.get("sCode", "")) == "0" for row in (order_result or []))
+        if not success:
+            return {"status": "failed", "reason": "order_failed", "result": order_result}
+
+        # 4. 挂止损单 (OCO 或 独立止损)
+        exit_side = "sell" if side == "buy" else "buy"
+        sl_result = self.client.place_algo_order(
+            inst_id=symbol,
+            td_mode="isolated",
+            algo_ord_type="stop",
+            side=exit_side,
+            sz=size,
+            sl_trigger_px=stop_loss_price,
+            tag=tag,
+            reduce_only=True
+        )
+
+        # 5. 挂移动止盈单 (如果 AI 提供)
+        trailing_result = None
+        if trailing_stop and trailing_stop.get("active_px") and trailing_stop.get("callback_ratio"):
+            trailing_result = self.client.place_algo_order(
+                inst_id=symbol,
+                td_mode="isolated",
+                algo_ord_type="move_order_stop",
+                side=exit_side,
+                sz=size,
+                active_px=trailing_stop["active_px"],
+                callback_ratio=trailing_stop["callback_ratio"],
+                tag=tag,
+                reduce_only=True
+            )
+        
+        # 6. 挂固定止盈 (如果 AI 提供且没有移动止盈)
+        tp_result = None
+        if take_profit_price and not trailing_result:
+            tp_result = self.client.place_algo_order(
+                inst_id=symbol,
+                td_mode="isolated",
+                algo_ord_type="limit", # 或者在OKX中用止盈单
+                side=exit_side,
+                sz=size,
+                tp_trigger_px=take_profit_price,
+                tag=tag,
+                reduce_only=True
+            )
+
+        return {
+            "status": "success",
+            "entry": order_result,
+            "stop_loss": sl_result,
+            "trailing_stop": trailing_result,
+            "take_profit": tp_result,
+            "size": size
+        }
