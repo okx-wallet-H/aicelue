@@ -323,17 +323,36 @@ class AgentTradeKitApp:
             return
 
         position_map = self._position_map(account_context.get("positions", []))
+        open_symbols = set(position_map.keys())
+        blocked_open_symbols: set[str] = set()
 
         for decision in decisions:
             action = self._normalize_action(decision.get("action"))
             symbol = str(decision.get("symbol", "NONE"))
-            position = position_map.get(symbol)
-            if not self._should_close_decision(action, position):
+            if action not in {"CLOSE", "CLOSE_LONG", "CLOSE_SHORT"}:
+                continue
+            # open_symbols used only as a quick pre-filter; direction is authoritative from net position
+            if symbol not in open_symbols:
+                engine_logger.info("AI 建议平仓 %s 但当前无已知持仓，跳过。", symbol)
+                continue
+            net_pos = self.execution_engine.get_net_position(symbol)
+            if abs(net_pos) <= 1e-8:
+                engine_logger.info("AI 建议平仓 %s 但净仓位为零，跳过。", symbol)
+                continue
+            if action == "CLOSE_LONG" and net_pos < 0:
+                engine_logger.warning("%s CLOSE_LONG 但实际为空仓(net_pos=%.6f)，跳过。", symbol, net_pos)
+                continue
+            if action == "CLOSE_SHORT" and net_pos > 0:
+                engine_logger.warning("%s CLOSE_SHORT 但实际为多仓(net_pos=%.6f)，跳过。", symbol, net_pos)
                 continue
             try:
-                engine_logger.info("AI 建议平仓: action=%s symbol=%s", action, symbol)
+                engine_logger.info("AI 建议平仓: action=%s symbol=%s net_pos=%.6f", action, symbol, net_pos)
                 close_result = self.execution_engine.close_position(symbol)
                 execution_results.append({"symbol": symbol, "action": action, "result": close_result})
+                close_status = close_result.get("status", "")
+                if close_status in {"close_unverified", "close_failed"}:
+                    blocked_open_symbols.add(symbol)
+                    engine_logger.warning("%s 平仓未验证成功(status=%s)，本轮阻止该标的开仓。", symbol, close_status)
                 self._clear_open_campaign(symbol)
                 account_context = self._get_account_context()
                 self._update_risk_state_from_equity(account_context)
@@ -342,6 +361,7 @@ class AgentTradeKitApp:
             except Exception as exc:  # noqa: BLE001
                 engine_logger.error("执行平仓失败 %s: %s", symbol, exc)
                 execution_results.append({"symbol": symbol, "action": action, "status": "failed", "reason": str(exc)})
+                blocked_open_symbols.add(symbol)
 
         if self.risk_manager.should_stop_new_trades():
             engine_logger.warning("账户已触发熔断，停止新开仓。")
@@ -386,6 +406,11 @@ class AgentTradeKitApp:
             symbol = str(decision.get("symbol", "NONE"))
             if symbol in position_map:
                 engine_logger.info("%s 已有持仓，本轮跳过重复开仓。", symbol)
+                continue
+
+            if symbol in blocked_open_symbols:
+                engine_logger.info("%s 本轮因平仓未验证成功而阻止开仓。", symbol)
+                execution_results.append({"symbol": symbol, "action": action, "status": "skipped", "reason": "blocked_after_close"})
                 continue
 
             if remaining_margin_budget < settings.min_order_margin_usdt:
