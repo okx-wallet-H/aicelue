@@ -41,8 +41,8 @@ class Settings:
     })
 
     candle_limit: int = 120
-    main_loop_interval_seconds: int = 3600
-    evaluation_interval_hours: int = 1
+    main_loop_interval_seconds: int = 7200
+    evaluation_interval_hours: int = 2
     fills_scan_limit: int = 200
 
     max_total_margin_ratio: float = 0.60
