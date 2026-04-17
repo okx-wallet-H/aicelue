@@ -117,6 +117,9 @@ class Settings:
     # RootData API 配置
     rootdata_api_key: str = field(default_factory=lambda: os.getenv("ROOTDATA_API_KEY", ""))
 
+    # 交易安全开关：必须设置环境变量 TRADING_ENABLED=true 才允许真实下单
+    trading_enabled: bool = field(default_factory=lambda: os.getenv("TRADING_ENABLED", "false").lower() == "true")
+
     # LLM 分析配置
     llm_enabled: bool = field(default_factory=lambda: os.getenv("LLM_ENABLED", "true").lower() == "true")
     llm_model: str = field(default_factory=lambda: os.getenv("LLM_MODEL", "qwen-plus-latest"))

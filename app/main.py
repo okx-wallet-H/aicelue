@@ -145,18 +145,55 @@ class AgentTradeKitApp:
         used_margin = safe_float(account_context.get("used_margin"))
         total_margin_cap = equity * 0.60
         remaining_margin_budget = max(0.0, total_margin_cap - used_margin)
-        open_symbols = {str(p.get("symbol")) for p in account_context.get("positions", [])}
 
+        # 构建当前持仓映射：symbol -> side（"long"/"short"）
+        open_positions: dict[str, str] = {}
+        for p in account_context.get("positions", []):
+            sym = str(p.get("symbol"))
+            side = str(p.get("side", "")).lower()
+            open_positions[sym] = side
+
+        open_symbols = set(open_positions.keys())
+
+        # 本轮因平仓验证失败而被阻止再次开仓的标的
+        blocked_open_symbols: set[str] = set()
+
+        # ── 1. 先处理平仓信号 ─────────────────────────────────────────
         for decision in decisions:
             action = str(decision.get("action", "SKIP")).upper()
             symbol = str(decision.get("symbol", "NONE"))
-            if action == "CLOSE" and symbol in open_symbols:
-                try:
-                    engine_logger.info(f"AI 建议平仓: {symbol}")
-                    self.execution_engine.close_position(symbol)
-                except Exception as e:
-                    engine_logger.error(f"执行平仓失败 {symbol}: {e}")
 
+            # 标准化 CLOSE -> CLOSE_LONG / CLOSE_SHORT（根据当前持仓方向）
+            if action == "CLOSE":
+                pos_side = open_positions.get(symbol, "")
+                if pos_side in ("long", "net"):
+                    action = "CLOSE_LONG"
+                elif pos_side == "short":
+                    action = "CLOSE_SHORT"
+                else:
+                    engine_logger.info(
+                        "收到 CLOSE 信号但 %s 无持仓记录（当前持仓方向=%r），跳过平仓",
+                        symbol, pos_side,
+                    )
+                    continue
+
+            if action in ("CLOSE_LONG", "CLOSE_SHORT") and symbol in open_symbols:
+                try:
+                    engine_logger.info("AI 建议平仓: %s（action=%s）", symbol, action)
+                    self.execution_engine.close_position(symbol)
+                    # 平仓后验证仓位是否归零
+                    if not self.execution_engine.verify_position_closed(symbol):
+                        engine_logger.error(
+                            "平仓验证失败：%s 仓位未归零，本轮阻止该标的再次开仓", symbol
+                        )
+                        blocked_open_symbols.add(symbol)
+                    else:
+                        open_symbols.discard(symbol)
+                        open_positions.pop(symbol, None)
+                except Exception as e:
+                    engine_logger.error("执行平仓失败 %s: %s", symbol, e)
+
+        # ── 2. 收集开仓候选 ───────────────────────────────────────────
         open_candidates = []
         for decision in decisions:
             action = str(decision.get("action", "SKIP")).upper()
@@ -177,8 +214,13 @@ class AgentTradeKitApp:
         for decision in open_candidates:
             action = str(decision.get("action", "SKIP")).upper()
             symbol = str(decision.get("symbol", "NONE"))
+
+            if symbol in blocked_open_symbols:
+                engine_logger.warning("%s 因平仓验证失败被本轮阻止开仓，跳过。", symbol)
+                continue
+
             if symbol in open_symbols:
-                engine_logger.info(f"{symbol} 已有持仓，本轮跳过重复开仓。")
+                engine_logger.info("%s 已有持仓，本轮跳过重复开仓。", symbol)
                 continue
 
             if remaining_margin_budget < 10:
@@ -192,21 +234,24 @@ class AgentTradeKitApp:
             entry_px = safe_float(market_context.get(symbol, {}).get("indicators", {}).get("15M", {}).get("close"))
             sl_px = safe_float(decision.get("stop_loss"))
             if entry_px <= 0 or sl_px <= 0:
-                engine_logger.warning(f"{symbol} 缺少有效入场价或止损价，跳过。")
+                engine_logger.warning("%s 缺少有效入场价或止损价，跳过。", symbol)
                 continue
 
             risk_per_unit = abs(entry_px - sl_px) / entry_px
             if risk_per_unit <= 0:
-                engine_logger.warning(f"{symbol} 风险距离异常，跳过。")
+                engine_logger.warning("%s 风险距离异常，跳过。", symbol)
                 continue
 
-            max_risk_margin = (equity * 0.02) / risk_per_unit
+            max_risk_margin = (equity * 0.015) / risk_per_unit  # 单笔风险上限 1.5%
             if margin > max_risk_margin:
-                engine_logger.warning(f"{symbol} 触发 2% 风险保护，保证金从 {margin:.2f} 缩减至 {max_risk_margin:.2f}")
+                engine_logger.warning(
+                    "%s 触发 1.5%% 风险保护，保证金从 %.2f 缩减至 %.2f",
+                    symbol, margin, max_risk_margin,
+                )
                 margin = max_risk_margin
 
             if margin < 10:
-                engine_logger.warning(f"{symbol} 可用保证金不足 10U，跳过。")
+                engine_logger.warning("%s 可用保证金不足 10U，跳过。", symbol)
                 continue
 
             trailing = None
@@ -217,7 +262,10 @@ class AgentTradeKitApp:
                 }
 
             try:
-                engine_logger.info(f"执行 AI 开仓: {action} {symbol} 保证金:{margin:.2f} 剩余额度:{remaining_margin_budget:.2f}")
+                engine_logger.info(
+                    "执行 AI 开仓: %s %s 保证金:%.2f 剩余额度:%.2f",
+                    action, symbol, margin, remaining_margin_budget,
+                )
                 result = self.execution_engine.execute_ai_open(
                     symbol=symbol,
                     action=action,
@@ -228,11 +276,12 @@ class AgentTradeKitApp:
                     trailing_stop=trailing,
                     take_profit_price=decision.get("take_profit_price"),
                 )
-                engine_logger.info(f"{symbol} 开仓结果: {result['status']}")
-                remaining_margin_budget -= margin
-                open_symbols.add(symbol)
+                engine_logger.info("%s 开仓结果: %s", symbol, result["status"])
+                if result["status"] == "success":
+                    remaining_margin_budget -= margin
+                    open_symbols.add(symbol)
             except Exception as e:
-                engine_logger.error(f"执行开仓失败 {symbol}: {e}")
+                engine_logger.error("执行开仓失败 %s: %s", symbol, e)
 
 
 def clamp(val, min_val, max_val):
