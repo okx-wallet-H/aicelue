@@ -77,10 +77,7 @@ class RiskManager:
         ratio = base * kelly_fraction * funding_factor * atr_factor * drawdown_factor * orderbook_factor
         ratio *= overall_scale * symbol_scale * state_scale
         
-        # Hotfix 1: 增加最小开仓保底逻辑
-        equity = max(safe_float(self.state.get("current_equity")), 1.0)
-        if ratio * equity < 20:
-            ratio = 20 / equity
+
             
         return clamp(ratio, settings.min_position_ratio_initial, settings.max_position_ratio)
 

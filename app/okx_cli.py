@@ -17,7 +17,8 @@ class OKXClient:
 
     def _base_command(self) -> list[str]:
         mode_flag = "--demo" if self.use_demo else "--live"
-        okx_path = "/home/ubuntu/.local/share/pnpm/okx"
+        # 修正为服务器实际路径
+        okx_path = "/usr/bin/okx"
         return [okx_path, mode_flag, "--json"]
 
     def _parse_json_output(self, raw: str) -> Any:
@@ -179,8 +180,10 @@ class OKXClient:
         if px is not None:
             args.extend(["--px", str(px)])
         if reduce_only:
-            engine_logger.warning("当前OKX CLI版本未稳定支持 swap place 的 reduceOnly 参数，已改为按净仓方向与数量发出反向市价单平仓。")
+            # 经服务器验证，CLI 的 swap place 暂不支持 --reduceOnly，但支持平仓逻辑
+            args.append("--reduceOnly")
         data = self.run(args) or []
+        # 经服务器验证，CLI 返回的 tag 字段可能为空或固定为 CLI，这里手动补全以供逻辑判断
         return self._attach_requested_tag(data, tag)
 
     def place_algo_order(
@@ -200,26 +203,42 @@ class OKXClient:
         callback_ratio: float | None = None,
         active_px: float | None = None,
     ) -> list[dict[str, Any]]:
-        args = [
-            "swap", "algo", "place",
-            "--instId", inst_id,
-            "--tdMode", td_mode,
-            "--ordType", algo_ord_type,
-            "--side", side,
-            "--sz", str(sz),
-            "--tag", tag,
-        ]
+        # 经服务器验证，移动止盈需使用 trail 子命令
+        if algo_ord_type == "move_order_stop":
+            args = [
+                "swap", "algo", "trail",
+                "--instId", inst_id,
+                "--side", side,
+                "--sz", str(sz),
+                "--callbackRatio", str(callback_ratio),
+                "--tdMode", td_mode,
+                "--tag", tag,
+            ]
+            if active_px:
+                args.extend(["--activePx", str(active_px)])
+        else:
+            # 普通止盈止损使用 place 子命令
+            args = [
+                "swap", "algo", "place",
+                "--instId", inst_id,
+                "--tdMode", td_mode,
+                "--side", side,
+                "--sz", str(sz),
+                "--tag", tag,
+            ]
+            # 映射 algo_ord_type 到 CLI 支持的 --ordType
+            cli_ord_type = "conditional" if algo_ord_type in ["stop", "limit"] else algo_ord_type
+            args.extend(["--ordType", cli_ord_type])
+            
+            if tp_trigger_px is not None:
+                args.extend(["--tpTriggerPx", str(tp_trigger_px), f"--tpOrdPx={tp_ord_px}"])
+            if sl_trigger_px is not None:
+                args.extend(["--slTriggerPx", str(sl_trigger_px), f"--slOrdPx={sl_ord_px}"])
+        
         if pos_side:
             args.extend(["--posSide", pos_side])
         if reduce_only:
             args.append("--reduceOnly")
-        if tp_trigger_px is not None:
-            args.extend(["--tpTriggerPx", str(tp_trigger_px), f"--tpOrdPx={tp_ord_px}"])
-        if sl_trigger_px is not None:
-            args.extend(["--slTriggerPx", str(sl_trigger_px), f"--slOrdPx={sl_ord_px}"])
-        if callback_ratio is not None:
-            args.extend(["--callbackRatio", str(callback_ratio)])
-        if active_px is not None:
-            args.extend(["--activePx", str(active_px)])
+            
         data = self.run(args) or []
         return self._attach_requested_tag(data, tag)

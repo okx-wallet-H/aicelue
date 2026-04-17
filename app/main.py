@@ -71,7 +71,10 @@ class AgentTradeKitApp:
         
         entry = {
             "timestamp": datetime.now().isoformat(),
+            "action": action,
+            "symbol": decision.get("symbol", "NONE"),
             "confidence_score": round(safe_float(decision.get("confidence_score"), 0.0), 4),
+            "reasoning": str(decision.get("reasoning", "") or "")[:50],
             "position_amount_usdt": round(equity * pos_pct, 2),
             "leverage": leverage,
             "pnl": 0.0 if not is_open else None  # 开仓记录 pnl 为 None，跳过记录 pnl 为 0

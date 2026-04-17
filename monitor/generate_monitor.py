@@ -16,10 +16,14 @@ from okx import Account, PublicData, Trade
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE_PATH = Path(__file__).resolve().with_name("template.html")
 OUTPUT_PATH = Path("/var/www/okx_monitor/index.html")
+AI_DECISIONS_PATH = PROJECT_ROOT / "data" / "ai_decisions.jsonl"
+COMPLETED_TRADES_PATH = PROJECT_ROOT / "data" / "completed_trades.json"
+
 ACCOUNT_NAME = "温暖小号"
 PAGE_TITLE = "OKX交易赛监控面板"
 LOG_LINES = 50
 TRADE_LIMIT = 20
+AI_DECISION_LIMIT = 50
 
 
 def safe_float(value: Any, default: float = 0.0) -> float:
@@ -52,7 +56,7 @@ def fmt_money(value: Any) -> str:
 
 def fmt_percent(value: Any, digits: int = 2) -> str:
     number = safe_float(value, 0.0)
-    if abs(number) <= 1:
+    if abs(number) <= 1 and number != 0:
         number *= 100
     return f"{number:.{digits}f}%"
 
@@ -73,6 +77,43 @@ def badge_for_position(pos: Any) -> str:
     if position < 0:
         return '<span class="badge short">做空</span>'
     return '<span class="badge flat">空仓</span>'
+
+
+def translate_signal_text(value: Any) -> str:
+    raw = str(value or "").strip()
+    text = raw.upper()
+    mapping = {
+        "SKIP": "观望",
+        "OPEN_LONG": "做多",
+        "OPEN_SHORT": "做空",
+        "CLOSE": "平仓",
+        "CLOSE_LONG": "平多",
+        "CLOSE_SHORT": "平空",
+        "BUY": "买入",
+        "SELL": "卖出",
+        "LONG": "做多",
+        "SHORT": "做空",
+        "NET": "双向持仓",
+        "MARKET": "市价",
+        "LIMIT": "限价",
+    }
+    return mapping.get(text, raw or "-")
+
+
+def decision_badge_by_action(action: Any, position_amount_usdt: Any) -> str:
+    action_text = str(action or "").strip().upper()
+    if not action_text:
+        action_text = "SKIP" if safe_float(position_amount_usdt, 0.0) <= 0 else "OPEN_LONG"
+    label = translate_signal_text(action_text)
+    if action_text in {"OPEN_LONG", "LONG", "BUY"}:
+        css = "long"
+    elif action_text in {"OPEN_SHORT", "SHORT", "SELL"}:
+        css = "short"
+    elif action_text.startswith("CLOSE"):
+        css = "warning"
+    else:
+        css = "flat"
+    return f'<span class="badge {css}">{html.escape(label)}</span>'
 
 
 def load_credentials() -> tuple[str, str, str]:
@@ -197,7 +238,7 @@ def normalize_fill(item: dict[str, Any]) -> dict[str, str]:
     return {
         "time": format_fill_time(item.get("fillTime") or item.get("ts") or item.get("uTime")),
         "inst_id": html.escape(str(item.get("instId") or "-")),
-        "side": html.escape(str(side)),
+        "side": html.escape(translate_signal_text(side)),
         "price": fmt_price(item.get("fillPx") or item.get("px") or 0),
         "qty": fmt_qty(item.get("fillSz") or item.get("sz") or 0),
         "pnl": fmt_money(pnl_value),
@@ -258,6 +299,47 @@ def fetch_strategy_logs() -> list[str]:
         return [f"日志读取失败：{exc}"]
 
 
+def fetch_ai_decisions() -> dict[str, Any]:
+    decisions = []
+    if AI_DECISIONS_PATH.exists():
+        with open(AI_DECISIONS_PATH, "r", encoding="utf-8") as f:
+            for line in f:
+                try:
+                    decisions.append(json.loads(line))
+                except:
+                    continue
+    
+    # 倒序排列，最新的在上面
+    decisions.reverse()
+    
+    # 统计
+    total_count = len(decisions)
+    open_count = sum(1 for d in decisions if safe_float(d.get("position_amount_usdt")) > 0)
+    skip_count = total_count - open_count
+    
+    # 胜率计算：需要结合已完成交易
+    win_count = 0
+    if COMPLETED_TRADES_PATH.exists():
+        try:
+            with open(COMPLETED_TRADES_PATH, "r", encoding="utf-8") as f:
+                completed = json.load(f)
+                win_count = sum(1 for t in completed if safe_float(t.get("realized_pnl")) > 0)
+        except:
+            pass
+            
+    win_rate = (win_count / open_count) if open_count > 0 else 0.0
+    
+    return {
+        "decisions": decisions[:AI_DECISION_LIMIT],
+        "stats": {
+            "total_count": total_count,
+            "open_count": open_count,
+            "skip_count": skip_count,
+            "win_rate": win_rate
+        }
+    }
+
+
 def render_positions_table(positions: list[dict[str, Any]]) -> str:
     if not positions:
         return '<table><thead><tr><th>状态</th></tr></thead><tbody><tr><td>当前无持仓</td></tr></tbody></table>'
@@ -315,6 +397,52 @@ def render_trades_table(fills: list[dict[str, str]]) -> str:
     )
 
 
+def render_ai_decisions_table(decisions: list[dict[str, Any]]) -> str:
+    if not decisions:
+        return '<table class="ai-table"><thead><tr><th>状态</th></tr></thead><tbody><tr><td>暂无 AI 决策记录</td></tr></tbody></table>'
+
+    rows = []
+    for item in decisions:
+        ts = item.get("timestamp", "-")
+        if "T" in ts:
+            ts = ts.replace("T", " ").split(".")[0]
+            
+        conf = safe_float(item.get("confidence_score"))
+        amount = safe_float(item.get("position_amount_usdt"))
+        leverage = item.get("leverage", 0)
+        pnl = item.get("pnl")
+        reasoning = str(item.get("reasoning") or "-").strip() or "-"
+        
+        pnl_str = "-"
+        pnl_class = "muted"
+        if pnl is not None:
+            pnl_val = safe_float(pnl)
+            pnl_str = fmt_money(pnl_val)
+            pnl_class = css_class_for_number(pnl_val)
+            
+        action_badge = decision_badge_by_action(item.get("action"), amount)
+
+        rows.append(
+            "<tr>"
+            f"<td>{html.escape(ts)}</td>"
+            f"<td>{action_badge}</td>"
+            f"<td>{fmt_percent(conf)}</td>"
+            f"<td>{fmt_money(amount)}</td>"
+            f"<td>{leverage}x</td>"
+            f"<td class=\"{pnl_class}\">{pnl_str}</td>"
+            f"<td class=\"reasoning-cell\">{html.escape(reasoning)}</td>"
+            "</tr>"
+        )
+
+    return (
+        "<table class=\"ai-table\"><thead><tr>"
+        "<th>分析时间</th><th>动作</th><th>置信分数</th><th>建仓金额（USDT）</th><th>杠杆</th><th>最终利润</th><th>分析理由</th>"
+        "</tr></thead><tbody>"
+        + "".join(rows)
+        + "</tbody></table>"
+    )
+
+
 def render_log_items(lines: list[str]) -> str:
     return "".join(f'<div class="log-item">{html.escape(line)}</div>' for line in lines)
 
@@ -322,16 +450,17 @@ def render_log_items(lines: list[str]) -> str:
 def render_html(context: dict[str, str]) -> str:
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     for key, value in context.items():
-        template = template.replace(f"{{{{{key}}}}}", value)
+        template = template.replace(f"{{{{{key}}}}}", str(value))
     return template
 
 
-def collect_dashboard_data() -> dict[str, str]:
+def collect_dashboard_data() -> dict[str, Any]:
     account_api, trade_api, public_api = get_okx_clients()
     balance_summary = fetch_balance_summary(account_api)
     positions, long_margin, short_margin = fetch_positions(account_api)
     fills = fetch_recent_fills(trade_api)
     logs = fetch_strategy_logs()
+    ai_data = fetch_ai_decisions()
 
     context = {
         "PAGE_TITLE": PAGE_TITLE,
@@ -346,16 +475,27 @@ def collect_dashboard_data() -> dict[str, str]:
         "POSITIONS_TABLE": render_positions_table(positions),
         "TRADES_TABLE": render_trades_table(fills),
         "LOG_ITEMS": render_log_items(logs),
+        
+        # AI 决策模块数据
+        "AI_TOTAL_COUNT": ai_data["stats"]["total_count"],
+        "AI_OPEN_COUNT": ai_data["stats"]["open_count"],
+        "AI_SKIP_COUNT": ai_data["stats"]["skip_count"],
+        "AI_WIN_RATE": fmt_percent(ai_data["stats"]["win_rate"]),
+        "AI_WIN_RATE_CLASS": css_class_for_number(ai_data["stats"]["win_rate"]),
+        "AI_DECISIONS_TABLE": render_ai_decisions_table(ai_data["decisions"]),
     }
     return context
 
 
 def main() -> None:
-    context = collect_dashboard_data()
-    html_text = render_html(context)
-    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT_PATH.write_text(html_text, encoding="utf-8")
-    print(json.dumps({"status": "ok", "output": str(OUTPUT_PATH), "account": ACCOUNT_NAME}, ensure_ascii=False))
+    try:
+        context = collect_dashboard_data()
+        html_text = render_html(context)
+        OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
+        OUTPUT_PATH.write_text(html_text, encoding="utf-8")
+        print(json.dumps({"status": "ok", "output": str(OUTPUT_PATH), "account": ACCOUNT_NAME}, ensure_ascii=False))
+    except Exception as e:
+        print(json.dumps({"status": "error", "message": str(e)}, ensure_ascii=False))
 
 
 if __name__ == "__main__":
