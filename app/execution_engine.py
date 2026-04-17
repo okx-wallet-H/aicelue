@@ -146,6 +146,7 @@ class ExecutionEngine:
             sz=size,
             sl_trigger_px=stop_loss_price,
             tag=tag,
+            reduce_only=True,
         )
 
         if not validate_okx_rows(sl_result, label=f"stop_loss:{symbol}"):
@@ -174,6 +175,7 @@ class ExecutionEngine:
                 active_px=trailing_stop["active_px"],
                 callback_ratio=trailing_stop["callback_ratio"],
                 tag=tag,
+                reduce_only=True,
             )
             if not validate_okx_rows(trailing_result, label=f"trailing:{symbol}"):
                 engine_logger.warning("[execute_ai_open] %s 移动止盈挂单失败（非致命），继续持仓。trailing_result=%s", symbol, trailing_result)
@@ -190,6 +192,7 @@ class ExecutionEngine:
                 sz=size,
                 tp_trigger_px=take_profit_price,
                 tag=tag,
+                reduce_only=True,
             )
             if not validate_okx_rows(tp_result, label=f"take_profit:{symbol}"):
                 engine_logger.warning("[execute_ai_open] %s 止盈挂单失败（非致命），继续持仓。tp_result=%s", symbol, tp_result)

@@ -146,7 +146,7 @@ class AgentTradeKitApp:
                 try:
                     indicators[tf] = self.indicator_engine.calculate(k)
                 except Exception as e:
-                    engine_logger.warning(f"{symbol} 周期 {tf} 指标计算失败: {e}，使用空指标")
+                    engine_logger.warning("%s 周期 %s 指标计算失败: %s，使用空指标", symbol, tf, e)
                     indicators[tf] = {}
             market_context[symbol] = {
                 "funding_rate": safe_float(data.get("funding_rate")),
